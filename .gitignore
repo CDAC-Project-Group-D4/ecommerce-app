@@ -1,0 +1,78 @@
+# =========================================================================
+# 1. ROOT & GENERAL EXCLUSIONS
+# =========================================================================
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.log
+logs/
+temp/
+tmp/
+
+# =========================================================================
+# 2. FRONTEND EXCLUSIONS (React / Node / Vite)
+# =========================================================================
+# Dependencies
+frontend/node_modules/
+frontend/.pnpm-store/
+
+# Production build output
+frontend/dist/
+frontend/build/
+
+# Local environment variables (Contains local API keys/secrets)
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# Log files
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+
+# =========================================================================
+# 3. BACKEND EXCLUSIONS (Java / Maven / Spring Boot)
+# =========================================================================
+# Compiled build output
+backend/target/
+backend/*.jar
+backend/*.war
+backend/*.zip
+backend/*.tar.gz
+
+# Keep Maven wrapper binary safe but ignore local configurations
+!backend/.mvn/wrapper/maven-wrapper.jar
+
+# CRITICAL SECURITY: Ignore production database & cloud access profiles
+backend/src/main/resources/application-prod.properties
+backend/src/main/resources/application-production.properties
+backend/.env
+
+# =========================================================================
+# 4. IDE, EDITORS & TOOLING CONFIGURATIONS
+# =========================================================================
+# IntelliJ IDEA (Global or Subfolders)
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# VS Code
+.vscode/
+.history/
+
+# Eclipse
+.metadata
+.classpath
+.project
+.settings/
+*.launch
+*.factorypath
