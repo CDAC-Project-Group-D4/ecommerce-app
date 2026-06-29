@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 
 public record UserResponseDTO(
 
-        BigInteger userId,
+        Long userId,
         String fullName,
         String email,
         String phone,

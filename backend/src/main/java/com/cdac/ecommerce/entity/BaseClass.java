@@ -16,7 +16,7 @@ public abstract class BaseClass {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private BigInteger id;
+    private Long id;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
