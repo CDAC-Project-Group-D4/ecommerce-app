@@ -5,6 +5,7 @@ import com.cdac.ecommerce.dto.response.UserResponseDTO;
 import com.cdac.ecommerce.entity.User;
 import com.cdac.ecommerce.service.UserService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,5 +39,11 @@ public class UserController {
     public ResponseEntity<Void> deleteUserById(@PathVariable BigInteger id){
         userService.deleteUserById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping
+    public ResponseEntity<UserResponseDTO> addUser(@RequestBody @Valid UserRequestDTO user){
+        UserResponseDTO newUser = userService.addUser(user);
+        return new ResponseEntity<>(newUser, HttpStatus.CREATED);
     }
 }

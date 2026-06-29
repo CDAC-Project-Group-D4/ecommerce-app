@@ -15,4 +15,6 @@ public interface UserRepo extends JpaRepository<User, BigInteger> {
     @Query("Update User u set u.active = false where u.id = :id")
     @Modifying
     void softDeleteUser(@Param("id") BigInteger id);
+
+    boolean existsByEmail(String email);
 }
