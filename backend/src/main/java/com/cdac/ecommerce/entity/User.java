@@ -1,0 +1,39 @@
+package com.cdac.ecommerce.entity;
+
+import com.cdac.ecommerce.entity.enums.Roles;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@Table(name = "users")
+public class User extends BaseClass{
+
+    @Column(name = "full_name", nullable = false)
+    private String fullName;
+
+    @Column(name = "email", unique = true, length = 100)
+    private String email;
+
+    @Column(length = 20)
+    private String phone;
+
+    @Column(nullable = false)
+    private String password;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "roles", nullable = false)
+    private Roles role;
+
+    @Column(name = "is_active", nullable = false)
+    private boolean active = true;
+
+    @Column(name = "is_blocked", nullable = false)
+    private boolean blocked = false;
+}
