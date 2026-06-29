@@ -56,7 +56,8 @@ public class UserServiceImpl implements UserService {
         boolean existingUser = userRepo.existsByEmail(user.email());
 
         if(!existingUser){
-            User newUser = userRepo.save(userMapper.toEntity(user));
+            userRepo.save(userMapper.toEntity(user));
+            User newUser = userRepo.findByEmail(user.email());
             return userMapper.toResponseDTO(newUser);
         }
         else{
