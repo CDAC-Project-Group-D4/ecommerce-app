@@ -8,6 +8,7 @@ public record UserResponseDTO(
         Long userId,
         String fullName,
         String email,
+        String imageUrl,
         String phone,
         String role,
         boolean active,

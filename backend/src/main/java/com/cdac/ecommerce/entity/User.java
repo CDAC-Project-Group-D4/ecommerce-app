@@ -13,6 +13,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "users")
+@AttributeOverride(name = "userId", column = @Column(name = "id"))
 public class User extends BaseClass{
 
     @Column(name = "full_name", nullable = false)
@@ -23,6 +24,9 @@ public class User extends BaseClass{
 
     @Column(length = 20)
     private String phone;
+
+    @Column(name = "image_url", length = 500)
+    private String imageUrl;
 
     @Column(nullable = false)
     private String password;
