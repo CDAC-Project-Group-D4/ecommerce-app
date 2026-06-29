@@ -1,11 +1,14 @@
 package com.cdac.ecommerce.service.impl;
 
+import com.cdac.ecommerce.dto.request.UserRequestDTO;
 import com.cdac.ecommerce.dto.response.UserResponseDTO;
 import com.cdac.ecommerce.entity.User;
+import com.cdac.ecommerce.exception.UserAlreadyExistsException;
 import com.cdac.ecommerce.exception.UserNotFoundException;
 import com.cdac.ecommerce.mapper.UserMapper;
 import com.cdac.ecommerce.repository.UserRepo;
 import com.cdac.ecommerce.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,5 +49,18 @@ public class UserServiceImpl implements UserService {
 
         userRepo.softDeleteUser(id);
 
+    }
+
+    @Override
+    public UserResponseDTO addUser(@Valid UserRequestDTO user) {
+        boolean existingUser = userRepo.existsByEmail(user.email());
+
+        if(!existingUser){
+            User newUser = userRepo.save(userMapper.toEntity(user));
+            return userMapper.toResponseDTO(newUser);
+        }
+        else{
+            throw new UserAlreadyExistsException("User with this email already exists!");
+        }
     }
 }
