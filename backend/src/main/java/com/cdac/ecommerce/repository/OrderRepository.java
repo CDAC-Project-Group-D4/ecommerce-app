@@ -1,4 +1,4 @@
-package com.cdac.ecommerce.service.impl;
+package com.cdac.ecommerce.repository;
 
 import com.cdac.ecommerce.entity.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
