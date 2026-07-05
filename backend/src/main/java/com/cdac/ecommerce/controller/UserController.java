@@ -29,14 +29,14 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> getUserById(@PathVariable BigInteger id){
+    public ResponseEntity<UserResponseDTO> getUserById(@PathVariable Long id){
         UserResponseDTO dto = userService.getUserById(id);
         return ResponseEntity.ok(dto);
     }
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUserById(@PathVariable BigInteger id){
+    public ResponseEntity<Void> deleteUserById(@PathVariable Long id){
         userService.deleteUserById(id);
         return ResponseEntity.noContent().build();
     }
