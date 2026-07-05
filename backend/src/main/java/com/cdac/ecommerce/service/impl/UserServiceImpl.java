@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigInteger;
 import java.util.List;
 
 @Service
@@ -25,14 +24,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserResponseDTO> getAllUsers() {
-        return userRepo.findAll()
+        return userRepo.findByActiveTrue()
                 .stream()
                 .map(userMapper::toResponseDTO)
                 .toList();
     }
 
     @Override
-    public UserResponseDTO getUserById(BigInteger id) {
+    public UserResponseDTO getUserById(Long id) {
 
         User user = userRepo.findById(id).orElseThrow(() -> new UserNotFoundException("User not found!"));
 
@@ -42,7 +41,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void deleteUserById(BigInteger id) {
+    public void deleteUserById(Long id) {
 
         User user = userRepo.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User doesn't exists"));

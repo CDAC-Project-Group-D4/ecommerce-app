@@ -4,7 +4,6 @@ import com.cdac.ecommerce.dto.request.UserRequestDTO;
 import com.cdac.ecommerce.dto.response.UserResponseDTO;
 import jakarta.validation.Valid;
 
-import java.math.BigInteger;
 import java.util.List;
 
 public interface UserService {
@@ -12,9 +11,9 @@ public interface UserService {
 
     List<UserResponseDTO> getAllUsers();
 
-    UserResponseDTO getUserById(BigInteger id);
+    UserResponseDTO getUserById(Long id);
 
-    void deleteUserById(BigInteger id);
+    void deleteUserById(Long id);
 
     UserResponseDTO addUser(@Valid UserRequestDTO user);
 }
