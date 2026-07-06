@@ -14,6 +14,7 @@ import com.cdac.ecommerce.repository.UserRepo;
 import com.cdac.ecommerce.service.CustomerComplaintService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -27,11 +28,13 @@ public class CustomerComplaintServiceImpl implements CustomerComplaintService {
     private final OrderRepository orderRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public List<CustomerComplaintResponseDTO> getCustomerComplaintById(Long customerId) {
         return repo.findByCustomer_Id(customerId).stream().map(mapper::toDto).toList();
     }
 
     @Override
+    @Transactional
     public CustomerComplaintResponseDTO createComplaint(CustomerComplaintRequestDTO complaintRequestDTO) {
 
         CustomerComplaint complaint = mapper.toEntity(complaintRequestDTO);
@@ -40,7 +43,7 @@ public class CustomerComplaintServiceImpl implements CustomerComplaintService {
                 .findById(complaintRequestDTO.customerId())
                 .orElseThrow(() ->
                         new UserNotFoundException(
-                                "User with user id: " + complaintRequestDTO.customerId() + "does not exist!"));
+                                "User with user id: " + complaintRequestDTO.customerId() + " does not exist!"));
 
         complaint.setCustomer(customer);
 
