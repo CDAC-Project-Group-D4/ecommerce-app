@@ -13,6 +13,7 @@ public interface UserMapper {
     @Mapping(source = "id", target = "userId")
     UserResponseDTO toResponseDTO(User user);
 
+
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "active", constant = "true")
     @Mapping(target = "blocked", constant = "false")
