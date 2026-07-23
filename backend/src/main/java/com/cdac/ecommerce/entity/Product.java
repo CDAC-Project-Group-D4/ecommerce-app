@@ -1,6 +1,8 @@
 package com.cdac.ecommerce.entity;
 
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,7 +20,7 @@ public class Product extends BaseClass{
     private String name;
 
     @Column(name="price" ,nullable=false)
-    private double price;
+    private BigDecimal  price;
 
     @Column(name="stock" ,nullable=false)
     private int stock;
