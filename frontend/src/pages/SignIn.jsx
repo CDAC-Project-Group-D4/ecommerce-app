@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 function SignIn() {
 
-    const navigate= useNavigate()
+    const navigate = useNavigate()
 
     const [formData, setFormData] = useState({
         email: "",
@@ -33,12 +33,18 @@ function SignIn() {
             const data = await signinUser(formData);
             setSuccess("Login Successful");
 
-            if(data.role === "SELLER"){
-                navigate("/seller/dashboard")
+            if (data.jwtToken) {
+                localStorage.setItem("jwtToken", data.jwtToken);
+                localStorage.setItem("user", JSON.stringify(data));
             }
-            else{
-                navigate("/")
-            }
+
+            setTimeout(() => {
+                if (data.role === "SELLER") {
+                    navigate("/seller/dashboard");
+                } else {
+                    navigate("/");
+                }
+            }, 1000);
 
         } catch (err) {
             setError(err.message);
@@ -61,7 +67,7 @@ function SignIn() {
                     <form onSubmit={handleSubmit}>
 
                         <div className="mb-3">
-                            <input name="email" placeholder="Email" value={formData.email} onChange={handleChange} className="form-control custom-input"/>
+                            <input name="email" placeholder="Email" value={formData.email} onChange={handleChange} className="form-control custom-input" required />
                         </div>
 
                         <div className="mb-3">
@@ -70,6 +76,7 @@ function SignIn() {
                                 value={formData.password}
                                 onChange={handleChange}
                                 className="form-control custom-input"
+                                required
                             />
                         </div>
 

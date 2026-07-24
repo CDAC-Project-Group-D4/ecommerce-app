@@ -37,15 +37,16 @@ public class AuthServiceImpl implements AuthService {
         }
 
         User user = modelMapper.map(signUpRequestDTO, User.class);
-        // MODIFIED: Encode raw password using PasswordEncoder before saving
         user.setPassword(passwordEncoder.encode(signUpRequestDTO.getPassword()));
         User newUser = authRepository.save(user);
-        return modelMapper.map(newUser, SignUpResponseDTO.class);
+
+        SignUpResponseDTO responseDTO = modelMapper.map(newUser, SignUpResponseDTO.class);
+        responseDTO.setUserId(newUser.getId());
+        return responseDTO;
     }
 
     @Override
     public SignInResponseDTO signIn(SignInRequestDTO signInRequestDTO) {
-        // MODIFIED: Perform authentication via Spring Security AuthenticationManager
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(signInRequestDTO.getEmail(), signInRequestDTO.getPassword())
         );
@@ -53,10 +54,10 @@ public class AuthServiceImpl implements AuthService {
         User user = authRepository.findByEmail(signInRequestDTO.getEmail())
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        // MODIFIED: Generate JWT token upon successful authentication
         String jwtToken = jwtUtils.generateTokenFromUsername(user.getEmail());
 
         SignInResponseDTO responseDTO = modelMapper.map(user, SignInResponseDTO.class);
+        responseDTO.setUserId(user.getId());
         responseDTO.setMessage("Login successful");
         responseDTO.setJwtToken(jwtToken);
 
