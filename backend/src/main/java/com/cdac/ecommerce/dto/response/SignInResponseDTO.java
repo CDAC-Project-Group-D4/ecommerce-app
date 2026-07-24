@@ -15,4 +15,8 @@ public class SignInResponseDTO {
     private boolean active;
     private LocalDateTime createdAt;
     private String message;
+
+    // MODIFIED: Added JWT token fields for authentication response
+    private String jwtToken;
+    private String tokenType = "Bearer";
 }
