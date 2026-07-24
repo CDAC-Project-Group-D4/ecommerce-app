@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { signupUser } from "../api/authApi";
 import '../css/SignUp.css'
+import { useNavigate, Link } from "react-router-dom";
 
 function SignUp() {
+
+    const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
         fullName: "",
@@ -40,6 +43,10 @@ function SignUp() {
                 password: "",
                 role: "CUSTOMER"
             })
+
+            setTimeout(()=>{
+                navigate("/signin")
+            }, 1000)
 
         }
         catch (err) {
@@ -138,9 +145,9 @@ function SignUp() {
                     
                     <p className="text-center mt-12">
                         Already have an account?{" "}
-                        <a href="/" className="font-semibold hover:underline">
+                        <Link to="/signin" className="font-semibold hover:underline">
                             Sign In
-                        </a>
+                        </Link>
                     </p>
 
                     {error && <div className="alert alert-danger mt-3">{error}</div>}

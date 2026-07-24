@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { signinUser } from "../api/authApi";
-import "../css/SignUp.css"; 
+import "../css/SignUp.css";
+import { useNavigate } from "react-router-dom";
 
 function SignIn() {
+
+    const navigate= useNavigate()
 
     const [formData, setFormData] = useState({
         email: "",
@@ -30,10 +33,12 @@ function SignIn() {
             const data = await signinUser(formData);
             setSuccess("Login Successful");
 
-            setFormData({
-                email: "",
-                password: ""
-            });
+            if(data.role === "SELLER"){
+                navigate("/seller/dashboard")
+            }
+            else{
+                navigate("/")
+            }
 
         } catch (err) {
             setError(err.message);
