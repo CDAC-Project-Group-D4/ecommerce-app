@@ -4,16 +4,15 @@ import SignUp from './pages/SignUp'
 import Cart from "./pages/Cart.jsx";
 
 function App(){
-  return (
-    <div>
-      <Routes>
-
-        <Route path='/' element= {<SignIn/>}/>
-        <Route path='/signup' element= {<SignUp/>}/>
-          <Route path="/cart" element={<Cart />} />
-      </Routes>
-    </div>
-  )
+    return (
+        <div>
+            <Routes>
+                <Route path='/' element={<SignIn />} />
+                <Route path='/signup' element={<SignUp />} />
+                <Route path="/cart" element={<Cart />} />
+            </Routes>
+        </div>
+    )
 }
 
 export default App

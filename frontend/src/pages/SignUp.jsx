@@ -2,8 +2,12 @@ import { useState } from "react";
 import { signupUser } from "../api/authApi";
 import '../css/SignUp.css'
 
+
+import { useNavigate, Link } from "react-router-dom";
+
 function SignUp() {
 
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         fullName: "",
         email: "",
@@ -40,6 +44,11 @@ function SignUp() {
                 password: "",
                 role: "CUSTOMER"
             })
+
+
+            setTimeout(()=>{
+                navigate("/signin")
+            }, 1000)
 
         }
         catch (err) {
@@ -114,19 +123,58 @@ function SignUp() {
                     <h2 className="text-center mb-4 signup-title">Sign Up</h2>
                     <form onSubmit={handleSubmit}>
                         <div className="mb-3">
-                            <input name="fullName" placeholder="Full Name" onChange={handleChange} value={formData.fullName} className="form-control custom-input" />
+                            <input
+                                name="fullName"
+                                placeholder="Full Name"
+                                onChange={handleChange}
+                                value={formData.fullName}
+                                className="form-control custom-input"
+                                required
+                            />
                         </div>
+
                         <div className="mb-3">
-                            <input name="email" placeholder="Email" onChange={handleChange} value={formData.email} className="form-control custom-input" />
+                            <input
+                                name="email"
+                                placeholder="Email"
+                                onChange={handleChange}
+                                value={formData.email}
+                                className="form-control custom-input"
+                                required
+                            />
                         </div>
+
                         <div className="mb-3">
-                            <input name="phone" placeholder="Phone" onChange={handleChange} value={formData.phone} className="form-control custom-input" />
+                            <input
+                                name="phone"
+                                placeholder="Phone"
+                                onChange={handleChange}
+                                value={formData.phone}
+                                className="form-control custom-input"
+                                required
+                            />
                         </div>
+
                         <div className="mb-3">
-                            <input name="password" type="password" placeholder="Password" onChange={handleChange} value={formData.password} className="form-control custom-input" />
+                            <input
+                                name="password"
+                                type="password"
+                                placeholder="Password"
+                                onChange={handleChange}
+                                value={formData.password}
+                                className="form-control custom-input"
+                                required
+                            />
                         </div>
+
                         <div className="mb-3">
-                            <select name="role" onChange={handleChange} value={formData.role} className="form-select custom-select">
+                            <select
+                                name="role"
+                                onChange={handleChange}
+                                value={formData.role}
+                                className="form-select custom-select"
+                                required
+                            >
                                 <option value="CUSTOMER">Customer</option>
                                 <option value="SELLER">Seller</option>
                             </select>
@@ -138,9 +186,9 @@ function SignUp() {
                     
                     <p className="text-center mt-12">
                         Already have an account?{" "}
-                        <a href="/" className="font-semibold hover:underline">
+                        <Link to="/signin" className="font-semibold hover:underline">
                             Sign In
-                        </a>
+                        </Link>
                     </p>
 
                     {error && <div className="alert alert-danger mt-3">{error}</div>}
