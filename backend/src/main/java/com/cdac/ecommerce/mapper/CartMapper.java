@@ -36,8 +36,8 @@ public class CartMapper {
                 .build();
     }
 
-   
+
     private String resolvePrimaryImageUrl(Cart cart) {
-        return null;
+        return cart.getProduct().getImageUrl();
     }
 }

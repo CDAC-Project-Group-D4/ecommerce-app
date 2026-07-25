@@ -2,6 +2,7 @@ import {Route, Routes} from 'react-router-dom'
 import SignIn from './pages/SignIn'
 import SignUp from './pages/SignUp'
 import Cart from "./pages/Cart.jsx";
+import Wishlist from "./pages/Wishlist.jsx";
 
 function App(){
     return (
@@ -10,6 +11,7 @@ function App(){
                 <Route path='/' element={<SignIn />} />
                 <Route path='/signup' element={<SignUp />} />
                 <Route path="/cart" element={<Cart />} />
+                <Route path='/wishlist' element={<Wishlist/>}/>
             </Routes>
         </div>
     )
