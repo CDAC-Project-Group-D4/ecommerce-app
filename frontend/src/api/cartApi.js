@@ -1,28 +1,27 @@
 import axios from "axios";
 
 const api = axios.create({
-    baseURL: "http://localhost:8080/api/users"
+    baseURL: "http://localhost:8080/api/cart"
 });
 
 // Add JWT token to every cart request
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem("jwtToken");
-
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
-
     return config;
 });
 
-export const getCart = async (userId) => {
-    const response = await api.get(`/${userId}/cart`);
+// GET /api/cart — userId no longer needed, backend reads it from the JWT
+export const getCart = async () => {
+    const response = await api.get("/");
     return response.data;
 };
 
-// Add product to cart
-export const addToCart = async (userId, productId, quantity = 1) => {
-    const response = await api.post(`/${userId}/cart`, {
+// POST /api/cart — add product to cart
+export const addToCart = async (productId, quantity = 1) => {
+    const response = await api.post("/", {
         productId,
         quantity
     });
@@ -30,14 +29,10 @@ export const addToCart = async (userId, productId, quantity = 1) => {
     return response.data;
 };
 
-// Update cart quantity
-export const updateQuantity = async (
-    userId,
-    cartItemId,
-    quantity
-) => {
+// PATCH /api/cart/{cartItemId} — update quantity
+export const updateQuantity = async (cartItemId, quantity) => {
     const response = await api.patch(
-        `/${userId}/cart/${cartItemId}`,
+        `/${cartItemId}`,
         null,
         {
             params: { quantity }
@@ -47,12 +42,12 @@ export const updateQuantity = async (
     return response.data;
 };
 
-// Remove one cart item
-export const removeCartItem = async (userId, cartItemId) => {
-    await api.delete(`/${userId}/cart/${cartItemId}`);
+// DELETE /api/cart/{cartItemId} — remove one item
+export const removeCartItem = async (cartItemId) => {
+    await api.delete(`/${cartItemId}`);
 };
 
-// Clear the complete cart
-export const clearCart = async (userId) => {
-    await api.delete(`/${userId}/cart`);
+// DELETE /api/cart — clear entire cart
+export const clearCart = async () => {
+    await api.delete("/");
 };
