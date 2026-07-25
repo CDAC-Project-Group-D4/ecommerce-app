@@ -2,6 +2,7 @@ import { useState } from "react";
 import { signinUser } from "../api/authApi";
 import "../css/SignUp.css";
 import { useNavigate } from "react-router-dom";
+import { getMyStore } from "../api/storeApi";
 
 function SignIn() {
     const navigate = useNavigate()
@@ -42,9 +43,15 @@ function SignIn() {
                 password: ""
             });
 
-            setTimeout(() => {
+            setTimeout(async() => {
                 if (data.role === "SELLER") {
-                    navigate("/seller/dashboard");
+                    try{
+                        await getMyStore();
+                        navigate("/seller/dashboard");
+                    }
+                    catch(err){
+                        navigate("/create-store");
+                    }
                 } else {
                     navigate("/");
                 }

@@ -3,6 +3,8 @@ import SignIn from './pages/SignIn'
 import SignUp from './pages/SignUp'
 import Cart from "./pages/Cart.jsx";
 import Wishlist from "./pages/Wishlist.jsx";
+import SellerDashboard from './pages/SellerDashboard.jsx';
+import CreateStore from './pages/CreateStore.jsx';
 
 function App(){
     return (
@@ -12,6 +14,8 @@ function App(){
                 <Route path='/signup' element={<SignUp />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path='/wishlist' element={<Wishlist/>}/>
+                <Route path='/seller/dashboard' element={<SellerDashboard/>}/>
+                <Route path='/create-store' element={<CreateStore/>}/>
             </Routes>
         </div>
     )
