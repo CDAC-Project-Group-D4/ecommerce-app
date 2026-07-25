@@ -6,10 +6,7 @@ import com.cdac.ecommerce.dto.response.StoreResponseDTO;
 import com.cdac.ecommerce.service.StoreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,6 +21,9 @@ public class StoreController {
         return ResponseEntity.ok(storeResponseDTO);
     }
 
-//    @GetMapping("/get-store")
-//    public ResponseEntity<StoreResponseDTO> getStore()()
+    @GetMapping("/get-store")
+    public ResponseEntity<StoreResponseDTO> getStore(){
+        StoreResponseDTO storeResponseDTO = storeService.getStore();
+        return ResponseEntity.ok(storeResponseDTO);
+    }
 }
