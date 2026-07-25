@@ -32,23 +32,28 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public SignUpResponseDTO signUp(SignUpRequestDTO signUpRequestDTO) {
 
-        if(authRepository.findByEmail(signUpRequestDTO.getEmail()).isPresent()){
+        if (authRepository.findByEmail(signUpRequestDTO.getEmail()).isPresent()) {
             throw new UserAlreadyExistsException("Email already exists");
         }
 
         User user = modelMapper.map(signUpRequestDTO, User.class);
         user.setPassword(passwordEncoder.encode(signUpRequestDTO.getPassword()));
+
         User newUser = authRepository.save(user);
 
         SignUpResponseDTO responseDTO = modelMapper.map(newUser, SignUpResponseDTO.class);
         responseDTO.setUserId(newUser.getId());
+
         return responseDTO;
     }
 
     @Override
     public SignInResponseDTO signIn(SignInRequestDTO signInRequestDTO) {
+
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(signInRequestDTO.getEmail(), signInRequestDTO.getPassword())
+                new UsernamePasswordAuthenticationToken(
+                        signInRequestDTO.getEmail(),
+                        signInRequestDTO.getPassword())
         );
 
         User user = authRepository.findByEmail(signInRequestDTO.getEmail())
