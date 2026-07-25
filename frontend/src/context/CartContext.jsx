@@ -60,11 +60,13 @@ export const CartProvider = ({children}) => {
         try {
             await removeCartItemApi(cartItemId);
             await refreshCart();
+            return true;
         } catch (err) {
             console.error("Remove Error:", err);
             console.log(err.response?.data);
             console.log(err.response?.status);
             setError("Failed to remove item");
+            return false;
         }
     };
 

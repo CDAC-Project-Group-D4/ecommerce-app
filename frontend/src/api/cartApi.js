@@ -15,13 +15,13 @@ api.interceptors.request.use((config) => {
 
 // GET /api/cart — userId no longer needed, backend reads it from the JWT
 export const getCart = async () => {
-    const response = await api.get("/");
+    const response = await api.get("");
     return response.data;
 };
 
 // POST /api/cart — add product to cart
 export const addToCart = async (productId, quantity = 1) => {
-    const response = await api.post("/", {
+    const response = await api.post("", {
         productId,
         quantity
     });
@@ -49,5 +49,5 @@ export const removeCartItem = async (cartItemId) => {
 
 // DELETE /api/cart — clear entire cart
 export const clearCart = async () => {
-    await api.delete("/");
+    await api.delete("");
 };

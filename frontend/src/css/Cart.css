@@ -187,6 +187,99 @@
     outline-offset: 2px;
 }
 
+.cart-dialog-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1050;
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+    background: rgba(30, 20, 15, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+.cart-remove-dialog {
+    width: min(100%, 450px);
+    padding: 1.75rem;
+    border: 1px solid rgba(255, 122, 41, 0.18);
+    border-radius: 20px;
+    background: #fff;
+    text-align: center;
+    box-shadow: 0 24px 60px rgba(45, 25, 15, 0.24);
+    animation: cart-dialog-in 0.2s ease-out;
+}
+
+.cart-dialog-icon {
+    display: grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 1rem;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #fff4eb, #ffd9bd);
+    color: var(--cart-accent-dark);
+    font-size: 2.4rem;
+    line-height: 1;
+}
+
+.cart-remove-dialog h4 {
+    margin-bottom: 0.65rem;
+    color: #241b17;
+    font-weight: 750;
+}
+
+.cart-remove-dialog p {
+    margin-bottom: 1.4rem;
+    color: #74675f;
+    line-height: 1.55;
+}
+
+.cart-dialog-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.7rem;
+}
+
+.cart-dialog-actions .btn {
+    border-radius: 10px;
+    font-weight: 700;
+}
+
+.cart-dialog-wishlist {
+    border: 0 !important;
+    background: var(--cart-gradient) !important;
+    color: #fff !important;
+    box-shadow: 0 6px 14px rgba(255, 92, 0, 0.22);
+}
+
+.cart-dialog-remove {
+    border: 1px solid #ef9d91 !important;
+    background: #fff5f2 !important;
+    color: #c83d29 !important;
+}
+
+.cart-dialog-cancel {
+    grid-column: 1 / -1;
+    border: 0 !important;
+    background: transparent !important;
+    color: #756a64 !important;
+}
+
+.cart-dialog-actions .btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+}
+
+@keyframes cart-dialog-in {
+    from {
+        transform: translateY(10px) scale(0.98);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
 @media (max-width: 767.98px) {
     .cart-header {
         padding: 2rem 1rem 2.5rem;
@@ -211,5 +304,13 @@
 
     .cart-item-card .btn-outline-danger {
         margin-left: auto;
+    }
+
+    .cart-dialog-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .cart-dialog-cancel {
+        grid-column: auto;
     }
 }

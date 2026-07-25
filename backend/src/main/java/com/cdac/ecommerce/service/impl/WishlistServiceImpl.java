@@ -70,7 +70,9 @@ public class WishlistServiceImpl implements WishlistService {
 
         return wishlistMapper.toResponseDTO(savedWishlist);
     }
+
     @Override
+    @Transactional(readOnly = true)
     public List<WishlistResponseDTO> getWishlistForUser(Long userId) {
 
         return wishlistRepository.findByUser_Id(userId)

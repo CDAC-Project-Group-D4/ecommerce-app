@@ -16,7 +16,7 @@ public class WishlistMapper {
                 .id(wishlist.getId())
                 .productId(wishlist.getProduct().getId())
                 .productName(wishlist.getProduct().getName())
-                .productImageUrl(null) // same placeholder as CartMapper — wire up once ProductImage relation is available
+                .productImageUrl(wishlist.getProduct().getImageUrl())
                 .price(wishlist.getProduct().getPrice())
                 .inStock(wishlist.getProduct().getStock() > 0)
                 .addedAt(wishlist.getCreatedAt())

@@ -1,7 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useCart } from "../context/CartContext";
+import { useWishlist } from "../context/WishlistContext";
 import "../css/Cart.css";
 function Cart() {
+    const [itemToRemove, setItemToRemove] = useState(null);
+    const [removing, setRemoving] = useState(false);
+
     const {
         cartItems,
         loading,
@@ -11,6 +15,7 @@ function Cart() {
         handleRemoveItem,
         handleClearCart,
     } = useCart();
+    const { handleAddToWishlist } = useWishlist();
 
     useEffect(() => {
         refreshCart();
@@ -18,6 +23,27 @@ function Cart() {
 
     const grandTotal = cartItems.reduce((total, item) => total + item.lineTotal, 0);
     const itemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+
+    const removeSelectedItem = async (moveToWishlist) => {
+        if (!itemToRemove || removing) return;
+
+        setRemoving(true);
+
+        if (moveToWishlist) {
+            const added = await handleAddToWishlist(itemToRemove.productId);
+            if (!added) {
+                setRemoving(false);
+                return;
+            }
+        }
+
+        const removed = await handleRemoveItem(itemToRemove.id);
+        setRemoving(false);
+
+        if (removed) {
+            setItemToRemove(null);
+        }
+    };
 
     return (
         <div style={{ backgroundColor: "#FAFAFA", minHeight: "100vh" }}>
@@ -93,7 +119,7 @@ function Cart() {
                                                 className="qty-btn"
                                                 onClick={() => {
                                                     if (item.quantity === 1) {
-                                                        handleRemoveItem(item.id);
+                                                        setItemToRemove(item);
                                                     } else {
                                                         handleUpdateQuantity(item.id, item.quantity - 1);
                                                     }
@@ -118,7 +144,7 @@ function Cart() {
 
                                         <button
                                             className="btn btn-sm btn-outline-danger rounded-3"
-                                            onClick={() => handleRemoveItem(item.id)}
+                                            onClick={() => setItemToRemove(item)}
                                         >
                                             Remove
                                         </button>
@@ -157,6 +183,48 @@ function Cart() {
                     </div>
                 )}
             </div>
+
+            {itemToRemove && (
+                <div className="cart-dialog-backdrop" role="presentation">
+                    <div
+                        className="cart-remove-dialog"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="remove-dialog-title"
+                    >
+                        <div className="cart-dialog-icon">♡</div>
+                        <h4 id="remove-dialog-title">Remove from cart?</h4>
+                        <p>
+                            Would you like to save <strong>{itemToRemove.productName}</strong> to
+                            your wishlist before removing it?
+                        </p>
+
+                        <div className="cart-dialog-actions">
+                            <button
+                                className="btn cart-dialog-wishlist"
+                                disabled={removing}
+                                onClick={() => removeSelectedItem(true)}
+                            >
+                                {removing ? "Please wait..." : "Move to Wishlist"}
+                            </button>
+                            <button
+                                className="btn cart-dialog-remove"
+                                disabled={removing}
+                                onClick={() => removeSelectedItem(false)}
+                            >
+                                Remove Only
+                            </button>
+                            <button
+                                className="btn cart-dialog-cancel"
+                                disabled={removing}
+                                onClick={() => setItemToRemove(null)}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
