@@ -76,3 +76,6 @@ out/
 .settings/
 *.launch
 *.factorypath
+
+#documentation
+DOCUMENTATION.md
