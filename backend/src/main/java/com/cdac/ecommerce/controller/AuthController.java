@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(origins= "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
@@ -20,14 +20,18 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/signup")
-    public ResponseEntity<SignUpResponseDTO> signUp(@Valid @RequestBody SignUpRequestDTO signUpRequestDTO){
-        SignUpResponseDTO signUpResponseDTO= authService.signUp(signUpRequestDTO);
+    public ResponseEntity<SignUpResponseDTO> signUp(
+            @Valid @RequestBody SignUpRequestDTO signUpRequestDTO) {
+
+        SignUpResponseDTO signUpResponseDTO = authService.signUp(signUpRequestDTO);
         return ResponseEntity.ok(signUpResponseDTO);
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<SignInResponseDTO> signIn(@Valid @RequestBody SignInRequestDTO signInRequestDTO){
-        SignInResponseDTO signInResponseDTO= authService.signIn(signInRequestDTO);
+    public ResponseEntity<SignInResponseDTO> signIn(
+            @Valid @RequestBody SignInRequestDTO signInRequestDTO) {
+
+        SignInResponseDTO signInResponseDTO = authService.signIn(signInRequestDTO);
         return ResponseEntity.ok(signInResponseDTO);
     }
 }

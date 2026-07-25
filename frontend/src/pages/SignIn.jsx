@@ -4,9 +4,7 @@ import "../css/SignUp.css";
 import { useNavigate } from "react-router-dom";
 
 function SignIn() {
-
     const navigate = useNavigate()
-
     const [formData, setFormData] = useState({
         email: "",
         password: ""
@@ -35,8 +33,14 @@ function SignIn() {
 
             if (data.jwtToken) {
                 localStorage.setItem("jwtToken", data.jwtToken);
-                localStorage.setItem("user", JSON.stringify(data));
             }
+
+            localStorage.setItem("user", JSON.stringify(data));
+
+            setFormData({
+                email: "",
+                password: ""
+            });
 
             setTimeout(() => {
                 if (data.role === "SELLER") {
@@ -67,11 +71,15 @@ function SignIn() {
                     <form onSubmit={handleSubmit}>
 
                         <div className="mb-3">
+
                             <input name="email" placeholder="Email" value={formData.email} onChange={handleChange} className="form-control custom-input" required />
+
                         </div>
 
                         <div className="mb-3">
-                            <input name="password" type="password"
+                            <input
+                                name="password"
+                                type="password"
                                 placeholder="Password"
                                 value={formData.password}
                                 onChange={handleChange}
