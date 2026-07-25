@@ -41,6 +41,6 @@ public class User extends BaseClass{
     @Column(name = "is_blocked", nullable = false)
     private boolean blocked = false;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Store store;
 }
