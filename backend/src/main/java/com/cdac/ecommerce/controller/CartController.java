@@ -52,6 +52,9 @@ public class CartController {
 	            @PathVariable Long cartItemId,
 	            @RequestParam Integer quantity) {
 	        CartResponseDTO response = cartService.updateQuantity(userId, cartItemId, quantity);
+			if (response == null) {
+				return ResponseEntity.noContent().build(); // HTTP 204
+			}
 	        return ResponseEntity.ok(response);
 	    }
 	    

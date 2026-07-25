@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useCart } from "../context/CartContext";
-
+import "../css/Cart.css";
 function Cart() {
     const {
         cartItems,
@@ -21,70 +21,6 @@ function Cart() {
 
     return (
         <div style={{ backgroundColor: "#FAFAFA", minHeight: "100vh" }}>
-            <style>{`
-        :root {
-          --cart-accent: #FF7A29;
-          --cart-accent-dark: #E85D00;
-        }
-        .cart-header {
-          background: linear-gradient(135deg, #FF9142 0%, #FF5C00 100%);
-          border-radius: 0 0 24px 24px;
-          color: white;
-          padding: 2.5rem 0 3rem;
-        }
-        .cart-item-card {
-          border: none;
-          border-radius: 16px;
-          box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-          transition: box-shadow 0.2s ease;
-        }
-        .cart-item-card:hover {
-          box-shadow: 0 4px 20px rgba(0,0,0,0.10);
-        }
-        .qty-btn {
-          border: 1.5px solid var(--cart-accent);
-          color: var(--cart-accent-dark);
-          background: white;
-          width: 32px;
-          height: 32px;
-          border-radius: 8px;
-          font-weight: 600;
-          line-height: 1;
-        }
-        .qty-btn:hover:not(:disabled) {
-          background: var(--cart-accent);
-          color: white;
-        }
-        .qty-btn:disabled {
-          opacity: 0.4;
-        }
-        .btn-accent {
-          background: var(--cart-accent);
-          border: none;
-          color: white;
-          font-weight: 600;
-        }
-        .btn-accent:hover {
-          background: var(--cart-accent-dark);
-          color: white;
-        }
-        .summary-card {
-          border: none;
-          border-radius: 16px;
-          box-shadow: 0 2px 16px rgba(0,0,0,0.08);
-          position: sticky;
-          top: 1.5rem;
-        }
-        .product-thumb {
-          width: 72px;
-          height: 72px;
-          object-fit: cover;
-          border-radius: 12px;
-          background: #f2f2f2;
-        }
-      `}</style>
-
-            {/* Header banner matching Sign In page gradient */}
             <div className="cart-header text-center mb-4">
                 <h2 className="fw-bold mb-1">🛒 Your Cart</h2>
                 <p className="mb-0" style={{ opacity: 0.9 }}>
@@ -155,8 +91,13 @@ function Cart() {
                                         <div className="d-flex align-items-center gap-2">
                                             <button
                                                 className="qty-btn"
-                                                disabled={item.quantity === 1}
-                                                onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
+                                                onClick={() => {
+                                                    if (item.quantity === 1) {
+                                                        handleRemoveItem(item.id);
+                                                    } else {
+                                                        handleUpdateQuantity(item.id, item.quantity - 1);
+                                                    }
+                                                }}
                                             >
                                                 −
                                             </button>
