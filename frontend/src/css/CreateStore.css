@@ -1,0 +1,204 @@
+/* ===== CreateStore.css ===== */
+/* Restyled to match the app's SignUp.css theme (Poppins, orange gradient, #f4f5f7 inputs) */
+
+.cs-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    font-family: 'Poppins', sans-serif;
+    background-color: #f3f4f6;
+}
+
+.cs-window {
+    width: 100%;
+    max-width: 420px;
+    background-color: #ffffff;
+    border-radius: 24px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.cs-titlebar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.cs-dots {
+    display: flex;
+    gap: 7px;
+}
+
+.cs-dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+}
+
+.cs-dot-red { background: #ff5f57; }
+.cs-dot-yellow { background: #febc2e; }
+.cs-dot-green { background: #28c840; }
+
+.cs-expand {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+}
+
+.cs-form {
+    padding: 45px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.cs-heading {
+    font-weight: 700;
+    font-size: 26px;
+    color: #1a1a1a;
+    margin: 0 0 -4px;
+}
+
+.cs-error {
+    border-radius: 10px;
+    font-size: 14px;
+    background-color: #fdeceb;
+    color: #c0392b;
+    padding: 10px 12px;
+}
+
+.cs-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.cs-field label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+.cs-field input,
+.cs-field textarea {
+    background-color: #f4f5f7;
+    border: 1px solid #f4f5f7;
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 14px;
+    font-family: inherit;
+    color: #333;
+    outline: none;
+    resize: none;
+    width: 100%;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.cs-field input::placeholder,
+.cs-field textarea::placeholder {
+    color: #9ca3af;
+}
+
+.cs-field input:focus,
+.cs-field textarea:focus {
+    background-color: #ffffff;
+    border-color: #f5821f;
+    box-shadow: 0 0 0 3px rgba(245, 130, 31, 0.15);
+}
+
+.cs-url-group {
+    display: flex;
+    align-items: center;
+    background-color: #f4f5f7;
+    border: 1px solid #f4f5f7;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.cs-url-group:focus-within {
+    background-color: #ffffff;
+    border-color: #f5821f;
+    box-shadow: 0 0 0 3px rgba(245, 130, 31, 0.15);
+}
+
+.cs-url-prefix {
+    padding: 12px 8px 12px 16px;
+    font-size: 14px;
+    color: #9ca3af;
+    border-right: 1px solid #e5e7eb;
+    white-space: nowrap;
+}
+
+.cs-url-group input {
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.cs-url-group input:focus {
+    background-color: transparent;
+    box-shadow: none;
+}
+
+.cs-copy-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background-color: #ececea;
+    border: none;
+    border-left: 1px solid #e5e7eb;
+    padding: 11px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.2s ease;
+}
+
+.cs-copy-btn:hover {
+    opacity: 0.85;
+}
+
+.cs-submit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 6px;
+    background: linear-gradient(90deg, #ff8c42, #f5691f);
+    border: none;
+    border-radius: 10px;
+    color: #ffffff;
+    padding: 12px;
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: opacity 0.2s ease, transform 0.1s ease;
+}
+
+.cs-submit:hover:not(:disabled) {
+    opacity: 0.92;
+}
+
+.cs-submit:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+.cs-submit:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}

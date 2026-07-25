@@ -1,0 +1,146 @@
+/* ===== Sidebar.css ===== */
+/* Palette/radius/focus states aligned with SignUp.css (Poppins, #f4f5f7 fields, orange accent) */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+.sd-sidebar {
+    width: 270px;
+    flex-shrink: 0;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    background-color: #f4f5f7;
+    padding: 22px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    font-family: 'Poppins', sans-serif;
+    box-sizing: border-box;
+}
+
+.sd-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 18px;
+    color: #1a1a1a;
+    padding: 0 6px;
+}
+
+.sd-shop-switcher {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #ffffff;
+    border: 1px solid #ffffff;
+    border-radius: 10px;
+    padding: 10px 12px;
+    cursor: pointer;
+    text-align: left;
+    color: #1a1a1a;
+    width: 100%;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sd-shop-switcher:hover {
+    border-color: #f5821f;
+    box-shadow: 0 0 0 3px rgba(245, 130, 31, 0.12);
+}
+
+.sd-shop-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(160deg, #ff9a4d, #f5691f);
+    flex-shrink: 0;
+}
+
+.sd-shop-avatar.small {
+    width: 20px;
+    height: 20px;
+}
+
+.sd-shop-text {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    line-height: 1.25;
+}
+
+.sd-shop-label {
+    font-size: 11px;
+    color: #9ca3af;
+}
+
+.sd-shop-name {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.sd-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+/* .sd-nav-item is a NavLink (renders as <a>) so reset link defaults */
+.sd-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: none;
+    border: none;
+    text-align: left;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 14px;
+    color: #4b4b4b;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    width: 100%;
+    font-family: inherit;
+}
+
+.sd-nav-item:hover {
+    background-color: #ececea;
+    color: #1a1a1a;
+}
+
+.sd-nav-item.active {
+    background-color: #ffffff;
+    color: #1a1a1a;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.sd-nav-item.active svg {
+    color: #f5691f;
+}
+
+/* Footer area (pinned to bottom) — holds Logout */
+.sd-footer {
+    margin-top: auto;
+    padding-top: 14px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.sd-logout {
+    color: #d64545;
+}
+
+.sd-logout:hover {
+    background-color: #fdeceb;
+    color: #c0392b;
+}
+
+@media (max-width: 860px) {
+    .sd-sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        border-bottom: 1px solid #e5e7eb;
+    }
+}
