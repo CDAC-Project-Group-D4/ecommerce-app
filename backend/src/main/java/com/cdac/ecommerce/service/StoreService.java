@@ -6,4 +6,6 @@ import com.cdac.ecommerce.dto.response.StoreResponseDTO;
 public interface StoreService {
 
     StoreResponseDTO createStore(StoreRequestDTO storeRequestDTO);
+
+    StoreResponseDTO getStore();
 }
