@@ -1,6 +1,9 @@
 package com.cdac.ecommerce.service.impl;
 
 import com.cdac.ecommerce.dto.response.SellerResponseDTO;
+import com.cdac.ecommerce.entity.User;
+import com.cdac.ecommerce.mapper.SellerMapper;
+import com.cdac.ecommerce.mapper.UserMapper;
 import com.cdac.ecommerce.repository.UserRepo;
 import com.cdac.ecommerce.service.AdminSellerService;
 import lombok.RequiredArgsConstructor;
@@ -13,9 +16,16 @@ import java.util.List;
 public class AdminSellerServiceImpl implements AdminSellerService {
 
     private final UserRepo userRepo;
+    private final SellerMapper sellerMapper;
 
     @Override
     public List<SellerResponseDTO> getAllSellers() {
-        return List.of();
+
+        List<User> sellers = userRepo.findAllSellers();
+
+        List<SellerResponseDTO> responseDTOS = sellers.stream().map((seller) -> sellerMapper.toDTO(seller)).toList();
+
+        return responseDTOS;
+
     }
 }
