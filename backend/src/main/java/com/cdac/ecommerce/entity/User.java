@@ -51,4 +51,7 @@ public class User extends BaseClass{
     public void addRole(Roles role){
         this.roles.add((role));
     }
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Store store;
 }

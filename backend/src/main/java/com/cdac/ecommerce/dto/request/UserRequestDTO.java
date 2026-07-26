@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.util.Set;
+
 public record UserRequestDTO(
 
         @NotBlank(message = "Full name is required")
@@ -24,6 +26,6 @@ public record UserRequestDTO(
         String phone,
 
         @NotNull(message = "Role is required")
-        Roles role
+        Set<Roles> roles
 ) {
 }
