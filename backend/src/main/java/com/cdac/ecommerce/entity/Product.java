@@ -1,6 +1,5 @@
 package com.cdac.ecommerce.entity;
 
-
 import java.math.BigDecimal;
 
 import jakarta.persistence.*;
