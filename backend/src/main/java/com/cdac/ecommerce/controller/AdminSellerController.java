@@ -27,7 +27,4 @@ public class AdminSellerController {
         return new ResponseEntity<>(sellerDTOS, HttpStatus.OK);
     }
 
-
-
-
 }
