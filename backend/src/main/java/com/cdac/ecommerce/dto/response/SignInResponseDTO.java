@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class SignInResponseDTO {
+
     private Long userId;
     private String fullName;
     private String email;
@@ -15,4 +16,7 @@ public class SignInResponseDTO {
     private boolean active;
     private LocalDateTime createdAt;
     private String message;
+
+    private String jwtToken;
+    private String tokenType = "Bearer";
 }

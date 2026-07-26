@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
@@ -21,4 +22,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByStore_Id(Long storeId);
 
     List<Product> findByCategory_Id(Long categoryId);
+
+    @Query("Select p FROM Product p WHERE p.is_active = true")
+    List<Product> findByIs_activeTrue();
+
+    @Override
+    Optional<Product> findById(Long id);
 }

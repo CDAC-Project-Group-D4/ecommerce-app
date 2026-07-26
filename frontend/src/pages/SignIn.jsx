@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { signinUser } from "../api/authApi";
-import "../css/SignUp.css"; 
+import "../css/SignUp.css";
+import { useNavigate } from "react-router-dom";
+import { getMyStore } from "../api/storeApi";
 
 function SignIn() {
-
+    const navigate = useNavigate()
     const [formData, setFormData] = useState({
         email: "",
         password: ""
@@ -30,10 +32,30 @@ function SignIn() {
             const data = await signinUser(formData);
             setSuccess("Login Successful");
 
+            if (data.jwtToken) {
+                localStorage.setItem("jwtToken", data.jwtToken);
+            }
+
+            localStorage.setItem("user", JSON.stringify(data));
+
             setFormData({
                 email: "",
                 password: ""
             });
+
+            setTimeout(async() => {
+                if (data.role === "SELLER") {
+                    try{
+                        await getMyStore();
+                        navigate("/seller/dashboard");
+                    }
+                    catch(err){
+                        navigate("/create-store");
+                    }
+                } else {
+                    navigate("/");
+                }
+            }, 1000);
 
         } catch (err) {
             setError(err.message);
@@ -56,15 +78,20 @@ function SignIn() {
                     <form onSubmit={handleSubmit}>
 
                         <div className="mb-3">
-                            <input name="email" placeholder="Email" value={formData.email} onChange={handleChange} className="form-control custom-input"/>
+
+                            <input name="email" placeholder="Email" value={formData.email} onChange={handleChange} className="form-control custom-input" required />
+
                         </div>
 
                         <div className="mb-3">
-                            <input name="password" type="password"
+                            <input
+                                name="password"
+                                type="password"
                                 placeholder="Password"
                                 value={formData.password}
                                 onChange={handleChange}
                                 className="form-control custom-input"
+                                required
                             />
                         </div>
 

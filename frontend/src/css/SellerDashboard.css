@@ -1,0 +1,362 @@
+/* ===== SellerDashboard.css ===== */
+/* Palette/radius/focus states aligned with SignUp.css (Poppins, #f4f5f7 fields, orange accent) */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+.sd-shell {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+    background-color: #eceef1;
+    font-family: 'Poppins', sans-serif;
+    color: #1a1a1a;
+}
+
+/* ---------- Main ---------- */
+.sd-main {
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+    padding: 28px 36px 60px;
+}
+
+.sd-topbar {
+    margin-bottom: 24px;
+}
+
+.sd-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #ffffff;
+    border: 1px solid #ffffff;
+    border-radius: 10px;
+    padding: 12px 16px;
+    max-width: 420px;
+    color: #9ca3af;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sd-search:focus-within {
+    border-color: #f5821f;
+    box-shadow: 0 0 0 3px rgba(245, 130, 31, 0.15);
+}
+
+.sd-search input {
+    border: none;
+    outline: none;
+    background: none;
+    font-size: 14px;
+    width: 100%;
+    color: #1a1a1a;
+    font-family: inherit;
+}
+
+.sd-search input::placeholder {
+    color: #9ca3af;
+}
+
+.sd-section {
+    margin-bottom: 28px;
+}
+
+.sd-section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 14px;
+}
+
+.sd-section-title svg {
+    color: #f5691f;
+}
+
+.sd-card-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.sd-stat-card,
+.sd-listing-card {
+    background-color: #ffffff;
+    border: 1px solid #ffffff;
+    border-radius: 14px;
+    padding: 18px 22px;
+    flex: 1;
+    min-width: 170px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+}
+
+.sd-stat-label {
+    font-size: 12.5px;
+    color: #9ca3af;
+}
+
+.sd-stat-value {
+    font-size: 26px;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+.sd-listing-card {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #333;
+}
+
+.sd-listing-count {
+    font-size: 17px;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+/* ---------- Pie Chart Section ---------- */
+.sd-pie-card {
+    background-color: #ffffff;
+    border: 1px solid #ffffff;
+    border-radius: 14px;
+    padding: 24px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+}
+
+.sd-pie-content {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    flex-wrap: wrap;
+}
+
+.sd-pie-visual {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    flex-shrink: 0;
+}
+
+.sd-pie-svg {
+    width: 100%;
+    height: 100%;
+}
+
+.sd-pie-slice {
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    cursor: pointer;
+}
+
+.sd-pie-slice:hover {
+    opacity: 0.85;
+}
+
+.sd-pie-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    pointer-events: none;
+}
+
+.sd-pie-count {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a1a1a;
+    line-height: 1.1;
+}
+
+.sd-pie-subtext {
+    font-size: 11px;
+    color: #9ca3af;
+    margin-top: 2px;
+}
+
+.sd-pie-legends {
+    display: flex;
+    gap: 16px;
+    flex: 1;
+    min-width: 260px;
+    flex-wrap: wrap;
+}
+
+.sd-legend-box {
+    flex: 1;
+    min-width: 140px;
+    padding: 16px 20px;
+    border-radius: 12px;
+    background-color: #f8fafc;
+    border: 1px solid #f1f5f9;
+}
+
+.sd-legend-box.successful {
+    background-color: #f0fdf4;
+    border-color: #dcfce7;
+}
+
+.sd-legend-box.pending {
+    background-color: #fefce8;
+    border-color: #fef08a;
+}
+
+.sd-legend-box.rejected {
+    background-color: #fef2f2;
+    border-color: #fee2e2;
+}
+
+.sd-legend-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.sd-legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.sd-legend-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.sd-legend-val-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+}
+
+.sd-legend-val {
+    font-size: 22px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.sd-legend-pct {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #6b7280;
+}
+
+/* ---------- Order Listing Table ---------- */
+.sd-table-card {
+    background-color: #ffffff;
+    border: 1px solid #ffffff;
+    border-radius: 14px;
+    overflow-x: auto;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+}
+
+.sd-orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 13.5px;
+}
+
+.sd-orders-table th {
+    background-color: #f9fafb;
+    color: #6b7280;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 14px 18px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.sd-orders-table td {
+    padding: 14px 18px;
+    border-bottom: 1px solid #f3f4f6;
+    color: #374151;
+    vertical-align: middle;
+}
+
+.sd-orders-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.sd-orders-table tbody tr:hover {
+    background-color: #f9fafb;
+}
+
+.sd-cell-code {
+    font-weight: 600;
+    color: #111827;
+    font-family: monospace;
+    font-size: 13px;
+}
+
+.sd-cell-subcode {
+    color: #6b7280;
+    font-family: monospace;
+    font-size: 12.5px;
+}
+
+.sd-cell-name {
+    font-weight: 500;
+    color: #1f2937;
+}
+
+.sd-cell-qty {
+    font-weight: 600;
+    text-align: center;
+}
+
+.sd-orders-table th:nth-child(5) {
+    text-align: center;
+}
+
+.sd-status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
+    border: 1px solid transparent;
+}
+
+.badge-successful {
+    background-color: #dcfce7;
+    color: #166534;
+    border-color: #bbf7d0;
+}
+
+.badge-rejected {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border-color: #fecaca;
+}
+
+.badge-pending {
+    background-color: #fef9c3;
+    color: #854d0e;
+    border-color: #fef08a;
+}
+
+.sd-no-results {
+    text-align: center;
+    padding: 30px;
+    color: #9ca3af;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 860px) {
+    .sd-shell {
+        flex-direction: column;
+    }
+}

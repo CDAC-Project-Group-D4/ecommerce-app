@@ -87,9 +87,13 @@ public class CartServiceImpl implements CartService {
 		.orElseThrow(()->new ResourceNotFoundException("cart item not found with id: "+cartItemId));
 		
 		//check the ownership of cart
-		if(!carts.getUser().getId().equals(cartItemId)) {
+		if(!carts.getUser().getId().equals(userId)) {
 			throw new ResourceNotFoundException("cart item not found with id: "+cartItemId);
 		}
+        if (quantity <= 0) {
+            cartRepository.delete(carts);
+            return null;
+        }
 		
 		carts.setQuantity(quantity);
 		Cart updatedCart = cartRepository.save(carts);
@@ -104,7 +108,7 @@ public class CartServiceImpl implements CartService {
 		Cart carts=cartRepository.findById(cartItemId)
 				.orElseThrow(()->new ResourceNotFoundException("cart item not found with id: " +cartItemId));
 		//check the ownership of cart
-		if(!carts.getUser().getId().equals(cartItemId)) {
+		if(!carts.getUser().getId().equals(userId)) {
 			throw new ResourceNotFoundException("cart item not found with id: "+cartItemId);
 		}
 		cartRepository.deleteById(cartItemId);
@@ -116,8 +120,6 @@ public class CartServiceImpl implements CartService {
 	public void clearCart(Long userId) {
 		List<Cart> items=cartRepository.findByUser_Id(userId);
 		cartRepository.deleteAll(items);
-		
-		
 	}
 	
 	
