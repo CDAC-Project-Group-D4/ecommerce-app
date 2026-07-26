@@ -22,10 +22,10 @@ public class Store extends BaseClass{
     private String description;
 
     @Column(name="banner_url")
-    private String bannerUrl;
+    private String bannerUrl = null;
 
     @Column(name="profile_photo_url")
-    private String profilePhotoUrl;
+    private String profilePhotoUrl = null;
 
     @Column(name="on_holiday", nullable = false)
     private boolean onHoliday= false;

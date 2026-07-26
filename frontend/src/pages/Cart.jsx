@@ -1,7 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useCart } from "../context/CartContext";
-
+import { useWishlist } from "../context/WishlistContext";
+import "../css/Cart.css";
 function Cart() {
+    const [itemToRemove, setItemToRemove] = useState(null);
+    const [removing, setRemoving] = useState(false);
+
     const {
         cartItems,
         loading,
@@ -11,6 +15,7 @@ function Cart() {
         handleRemoveItem,
         handleClearCart,
     } = useCart();
+    const { handleAddToWishlist } = useWishlist();
 
     useEffect(() => {
         refreshCart();
@@ -19,72 +24,29 @@ function Cart() {
     const grandTotal = cartItems.reduce((total, item) => total + item.lineTotal, 0);
     const itemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
+    const removeSelectedItem = async (moveToWishlist) => {
+        if (!itemToRemove || removing) return;
+
+        setRemoving(true);
+
+        if (moveToWishlist) {
+            const added = await handleAddToWishlist(itemToRemove.productId);
+            if (!added) {
+                setRemoving(false);
+                return;
+            }
+        }
+
+        const removed = await handleRemoveItem(itemToRemove.id);
+        setRemoving(false);
+
+        if (removed) {
+            setItemToRemove(null);
+        }
+    };
+
     return (
         <div style={{ backgroundColor: "#FAFAFA", minHeight: "100vh" }}>
-            <style>{`
-        :root {
-          --cart-accent: #FF7A29;
-          --cart-accent-dark: #E85D00;
-        }
-        .cart-header {
-          background: linear-gradient(135deg, #FF9142 0%, #FF5C00 100%);
-          border-radius: 0 0 24px 24px;
-          color: white;
-          padding: 2.5rem 0 3rem;
-        }
-        .cart-item-card {
-          border: none;
-          border-radius: 16px;
-          box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-          transition: box-shadow 0.2s ease;
-        }
-        .cart-item-card:hover {
-          box-shadow: 0 4px 20px rgba(0,0,0,0.10);
-        }
-        .qty-btn {
-          border: 1.5px solid var(--cart-accent);
-          color: var(--cart-accent-dark);
-          background: white;
-          width: 32px;
-          height: 32px;
-          border-radius: 8px;
-          font-weight: 600;
-          line-height: 1;
-        }
-        .qty-btn:hover:not(:disabled) {
-          background: var(--cart-accent);
-          color: white;
-        }
-        .qty-btn:disabled {
-          opacity: 0.4;
-        }
-        .btn-accent {
-          background: var(--cart-accent);
-          border: none;
-          color: white;
-          font-weight: 600;
-        }
-        .btn-accent:hover {
-          background: var(--cart-accent-dark);
-          color: white;
-        }
-        .summary-card {
-          border: none;
-          border-radius: 16px;
-          box-shadow: 0 2px 16px rgba(0,0,0,0.08);
-          position: sticky;
-          top: 1.5rem;
-        }
-        .product-thumb {
-          width: 72px;
-          height: 72px;
-          object-fit: cover;
-          border-radius: 12px;
-          background: #f2f2f2;
-        }
-      `}</style>
-
-            {/* Header banner matching Sign In page gradient */}
             <div className="cart-header text-center mb-4">
                 <h2 className="fw-bold mb-1">🛒 Your Cart</h2>
                 <p className="mb-0" style={{ opacity: 0.9 }}>
@@ -155,8 +117,13 @@ function Cart() {
                                         <div className="d-flex align-items-center gap-2">
                                             <button
                                                 className="qty-btn"
-                                                disabled={item.quantity === 1}
-                                                onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
+                                                onClick={() => {
+                                                    if (item.quantity === 1) {
+                                                        setItemToRemove(item);
+                                                    } else {
+                                                        handleUpdateQuantity(item.id, item.quantity - 1);
+                                                    }
+                                                }}
                                             >
                                                 −
                                             </button>
@@ -177,7 +144,7 @@ function Cart() {
 
                                         <button
                                             className="btn btn-sm btn-outline-danger rounded-3"
-                                            onClick={() => handleRemoveItem(item.id)}
+                                            onClick={() => setItemToRemove(item)}
                                         >
                                             Remove
                                         </button>
@@ -216,6 +183,48 @@ function Cart() {
                     </div>
                 )}
             </div>
+
+            {itemToRemove && (
+                <div className="cart-dialog-backdrop" role="presentation">
+                    <div
+                        className="cart-remove-dialog"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="remove-dialog-title"
+                    >
+                        <div className="cart-dialog-icon">♡</div>
+                        <h4 id="remove-dialog-title">Remove from cart?</h4>
+                        <p>
+                            Would you like to save <strong>{itemToRemove.productName}</strong> to
+                            your wishlist before removing it?
+                        </p>
+
+                        <div className="cart-dialog-actions">
+                            <button
+                                className="btn cart-dialog-wishlist"
+                                disabled={removing}
+                                onClick={() => removeSelectedItem(true)}
+                            >
+                                {removing ? "Please wait..." : "Move to Wishlist"}
+                            </button>
+                            <button
+                                className="btn cart-dialog-remove"
+                                disabled={removing}
+                                onClick={() => removeSelectedItem(false)}
+                            >
+                                Remove Only
+                            </button>
+                            <button
+                                className="btn cart-dialog-cancel"
+                                disabled={removing}
+                                onClick={() => setItemToRemove(null)}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
