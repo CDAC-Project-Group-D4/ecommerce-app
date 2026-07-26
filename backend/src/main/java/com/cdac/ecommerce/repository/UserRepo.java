@@ -16,6 +16,15 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepo extends JpaRepository<User, Long> {
+    @Transactional
+    @Modifying
+    @Query("update User u set u.blocked = true where u.id = ?1")
+    int blockSeller(Long id);
+
+    @Transactional
+    @Modifying
+    @Query("update User u set u.blocked = false where u.id = ?1")
+    int unblockSeller(Long id);
 
     @Query("Update User u set u.active = false where u.id = :id")
     @Modifying
