@@ -46,7 +46,7 @@ public class StoreServiceImpl implements StoreService {
         String email = userDetails.getUsername();
         User user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        if (user.getRole() != Roles.SELLER) {
+        if (user.getRoles().contains(Roles.SELLER)) {
             throw new SellerCreateStoreException("only sellers can create a store");
         }
 

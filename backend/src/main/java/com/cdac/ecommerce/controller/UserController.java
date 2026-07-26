@@ -2,7 +2,6 @@ package com.cdac.ecommerce.controller;
 
 import com.cdac.ecommerce.dto.request.UserRequestDTO;
 import com.cdac.ecommerce.dto.response.UserResponseDTO;
-import com.cdac.ecommerce.entity.User;
 import com.cdac.ecommerce.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
