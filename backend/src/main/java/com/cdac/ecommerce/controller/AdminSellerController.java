@@ -6,10 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -28,9 +25,9 @@ public class AdminSellerController {
         return new ResponseEntity<>(sellerDTOS, HttpStatus.OK);
     }
 
-    @PatchMapping
+    @PatchMapping("/{sellerId}/block")
     @Operation(summary = "Block seller")
-    public ResponseEntity<Boolean> blockSeller(Long sellerId){
+    public ResponseEntity<Boolean> blockSeller(@PathVariable Long sellerId){
 
 
         boolean deleted = adminSellerService.blockSeller(sellerId);
@@ -43,9 +40,9 @@ public class AdminSellerController {
         }
     }
 
-    @PatchMapping
-    @Operation(summary = "Block seller")
-    public ResponseEntity<Boolean> unblockSeller(Long sellerId){
+    @PatchMapping("/{sellerId}/unblock")
+    @Operation(summary = "unblock seller")
+    public ResponseEntity<Boolean> unblockSeller(@PathVariable Long sellerId){
 
 
         boolean deleted = adminSellerService.unblockSeller(sellerId);
@@ -57,6 +54,23 @@ public class AdminSellerController {
             return ResponseEntity.noContent().build();
         }
     }
+
+    @DeleteMapping("/{sellerId}")
+    @Operation(summary = "Soft delete seller")
+    public ResponseEntity<Void> deleteSeller(@PathVariable Long sellerId){
+
+        boolean deleted = adminSellerService.deleteSeller(sellerId);
+
+        if(deleted){
+            return ResponseEntity.noContent().build();
+        }
+        else{
+            return ResponseEntity.notFound().build();
+        }
+
+    }
+
+
 
 
 }

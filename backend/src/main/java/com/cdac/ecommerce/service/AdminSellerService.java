@@ -10,4 +10,6 @@ public interface AdminSellerService {
     boolean blockSeller(Long sellerId);
 
     boolean unblockSeller(Long sellerId);
+
+    boolean deleteSeller(Long sellerId);
 }
