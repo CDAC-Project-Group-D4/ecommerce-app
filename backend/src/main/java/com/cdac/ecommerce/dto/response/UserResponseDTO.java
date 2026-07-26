@@ -2,6 +2,7 @@ package com.cdac.ecommerce.dto.response;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 public record UserResponseDTO(
 
@@ -10,7 +11,7 @@ public record UserResponseDTO(
         String email,
         String imageUrl,
         String phone,
-        String role,
+        Set<String> roles,
         boolean active,
         LocalDateTime createdAt
 

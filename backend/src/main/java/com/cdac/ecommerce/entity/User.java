@@ -7,6 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -31,13 +34,21 @@ public class User extends BaseClass{
     @Column(nullable = false)
     private String password;
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
-    @Column(name = "roles", nullable = false)
-    private Roles role;
+    @Column(name = "role", nullable = false)
+    private Set<Roles> roles = new HashSet<>();
 
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
 
     @Column(name = "is_blocked", nullable = false)
     private boolean blocked = false;
+
+    public void addRole(Roles role){
+        this.roles.add((role));
+    }
 }
