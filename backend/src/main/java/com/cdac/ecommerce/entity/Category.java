@@ -18,4 +18,9 @@ public class Category extends BaseClass{
 
     @OneToMany(mappedBy = "category",cascade = CascadeType.ALL)
     List<Product> products=new ArrayList<>();
+
+    private String name;
+
+    private boolean isActive = true;
+
 }
