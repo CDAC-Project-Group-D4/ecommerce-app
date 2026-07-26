@@ -27,7 +27,7 @@ public interface UserRepo extends JpaRepository<User, Long> {
 
     List<User> findByActiveTrue();
 
-    @Query("SELECT u FROM User u WHERE u.role = :role")
+    @Query("SELECT DISTINCT u FROM User u JOIN u.roles r WHERE r = :role")
     List<User> findByRole(@Param("role") Roles role);
 
     default List<User> findAllCustomers(){
