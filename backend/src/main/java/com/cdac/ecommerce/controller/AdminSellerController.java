@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,5 +27,36 @@ public class AdminSellerController {
         List<SellerResponseDTO> sellerDTOS = adminSellerService.getAllSellers();
         return new ResponseEntity<>(sellerDTOS, HttpStatus.OK);
     }
+
+    @PatchMapping
+    @Operation(summary = "Block seller")
+    public ResponseEntity<Boolean> blockSeller(Long sellerId){
+
+
+        boolean deleted = adminSellerService.blockSeller(sellerId);
+
+        if(deleted){
+            return ResponseEntity.ok().build();
+        }
+        else{
+            return ResponseEntity.noContent().build();
+        }
+    }
+
+    @PatchMapping
+    @Operation(summary = "Block seller")
+    public ResponseEntity<Boolean> unblockSeller(Long sellerId){
+
+
+        boolean deleted = adminSellerService.unblockSeller(sellerId);
+
+        if(deleted){
+            return ResponseEntity.ok().build();
+        }
+        else{
+            return ResponseEntity.noContent().build();
+        }
+    }
+
 
 }

@@ -6,4 +6,8 @@ import java.util.List;
 
 public interface AdminSellerService {
     List<SellerResponseDTO> getAllSellers();
+
+    boolean blockSeller(Long sellerId);
+
+    boolean unblockSeller(Long sellerId);
 }
