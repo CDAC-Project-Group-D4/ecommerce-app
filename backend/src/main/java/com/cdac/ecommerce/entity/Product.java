@@ -31,7 +31,7 @@ public class Product extends BaseClass{
     private boolean is_active=true;
 
     @Column(name = "image_url", length = 1000)
-    private String imageUrl;
+    private String imageUrl = null;
 
     @ManyToOne
     @JoinColumn(name="store_id" ,nullable = false)
