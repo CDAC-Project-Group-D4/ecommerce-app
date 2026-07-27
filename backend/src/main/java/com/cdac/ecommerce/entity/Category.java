@@ -11,24 +11,20 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
+//@ToString
 @Table(name = "categories")
 @AttributeOverride(name="category_id",column = @Column(name="id"))
 public class Category extends BaseClass{
 
-    @Column(name="category_name", nullable = false, unique = true)
-    private String name;
-
-    @Column(name="is_active", nullable = false)
-    private boolean isActive = true;
-
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
     private Category parent;
 
-    //self - referencing
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
-    private List<Category> subCategories = new ArrayList<>();
+    @OneToMany(mappedBy = "category",cascade = CascadeType.ALL)
+    List<Product> products=new ArrayList<>();
 
-    @OneToMany(mappedBy = "category")
-    private List<Product> products = new ArrayList<>();
+    private String name;
+
+    private boolean isActive = true;
 
 }
