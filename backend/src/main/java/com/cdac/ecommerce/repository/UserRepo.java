@@ -34,8 +34,7 @@ public interface UserRepo extends JpaRepository<User, Long> {
 
     List<User> findByActiveTrue();
 
-    @Query("SELECT DISTINCT u FROM User u JOIN u.roles r WHERE r = :role")
-    List<User> findByRole(@Param("role") Roles role);
+    List<User> findByRole(Roles role);
 
     default List<User> findAllCustomers(){
         return findByRole(Roles.CUSTOMER);
@@ -46,6 +45,6 @@ public interface UserRepo extends JpaRepository<User, Long> {
     @Modifying
     int blockCustomer(Long customerId);
 
-    @Query("SELECT u FROM User u JOIN u.store s WHERE com.cdac.ecommerce.entity.enums.Roles.SELLER MEMBER OF u.roles AND s.active = true")
+    @Query("SELECT u FROM User u JOIN u.store s WHERE u.role = com.cdac.ecommerce.entity.enums.Roles.SELLER AND s.active = true")
     List<User> findAllSellers();
 }
