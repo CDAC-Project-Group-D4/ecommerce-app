@@ -1,7 +1,7 @@
 import axios from "axios";
 const BASE_URL = "http://localhost:8080/api/store";
 
-// ✅ Helper to get token
+// get token
 const getAuthHeader = () => {
     const token = localStorage.getItem("jwtToken");
     return {
@@ -19,12 +19,8 @@ export const createStore = async (storeData) => {
 
 // get store api
 export const getMyStore = async () => {
-    try {
         const response = await axios.get(`${BASE_URL}/get-store`, getAuthHeader());
         return response.data;
-    } catch (error) {
-        throw error.response?.data || { message: "Store not found" };
-    }
 };
 
 // update store api
@@ -50,5 +46,11 @@ export const uploadStoreMedia = async (formData) => {
             }
         }
     );
+    return response.data;
+};
+
+// get store orders api
+export const getStoreOrders = async () => {
+    const response = await axios.get(`${BASE_URL}/orders`, getAuthHeader());
     return response.data;
 };

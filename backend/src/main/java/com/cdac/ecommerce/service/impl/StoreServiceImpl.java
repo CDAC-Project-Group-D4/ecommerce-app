@@ -8,6 +8,10 @@ import com.cdac.ecommerce.entity.enums.Roles;
 import com.cdac.ecommerce.exception.SellerCreateStoreException;
 import com.cdac.ecommerce.exception.StoreAlreadyExistsException;
 import com.cdac.ecommerce.exception.UserNotFoundException;
+import com.cdac.ecommerce.dto.response.OrderResponseDTO;
+import com.cdac.ecommerce.entity.Order;
+import com.cdac.ecommerce.mapper.OrderMapper;
+import com.cdac.ecommerce.repository.OrderRepository;
 import com.cdac.ecommerce.repository.StoreRepository;
 import com.cdac.ecommerce.repository.UserRepo;
 import com.cdac.ecommerce.security.UserDetailsImpl;
@@ -28,8 +32,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +43,8 @@ public class StoreServiceImpl implements StoreService {
 
     private final StoreRepository storeRepository;
     private final UserRepo userRepository;
+    private final OrderRepository orderRepository;
+    private final OrderMapper orderMapper;
     private final ModelMapper modelMapper;
 
     @Override
@@ -167,5 +175,23 @@ public class StoreServiceImpl implements StoreService {
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
         return "/uploads/" + fileName;
+    }
+
+    @Override
+    public List<OrderResponseDTO> getStoreOrders() {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        String email = userDetails.getUsername();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        Store store = user.getStore();
+        if (store == null) {
+            throw new RuntimeException("Store not found for this user");
+        }
+
+        List<Order> orders = orderRepository.findOrdersByStoreId(store.getId());
+        return orders.stream().map(order -> modelMapper.map(order, OrderResponseDTO.class)).collect(Collectors.toList());
     }
 }

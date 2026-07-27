@@ -1,0 +1,420 @@
+/* ===== Product.css ===== */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+.prd-header-action-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.prd-add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #f5821f;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 12px rgba(245, 130, 31, 0.25);
+}
+
+.prd-add-btn:hover {
+    background-color: #e07010;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(245, 130, 31, 0.35);
+}
+
+.prd-add-btn:active {
+    transform: translateY(0);
+}
+
+/* Non-scrollable Full-Width Table Styling */
+.prd-table-container {
+    background-color: #ffffff;
+    border-radius: 14px;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+    box-sizing: border-box;
+}
+
+.prd-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 13px;
+    table-layout: auto;
+}
+
+.prd-table th {
+    background-color: #f9fafb;
+    color: #4b5563;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 12px 10px;
+    border-bottom: 2px solid #e5e7eb;
+    white-space: nowrap;
+}
+
+.prd-table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #f3f4f6;
+    color: #374151;
+    vertical-align: middle;
+    transition: background-color 0.2s ease;
+}
+
+/* Red marking for deleted products */
+.prd-row-deleted {
+    background-color: #fef2f2 !important;
+    border-left: 4px solid #ef4444;
+}
+
+.prd-row-deleted td {
+    color: #991b1b !important;
+    background-color: #fef2f2 !important;
+}
+
+.prd-row-deleted .prd-product-name {
+    text-decoration: line-through;
+    color: #b91c1c !important;
+}
+
+.prd-product-name {
+    font-weight: 600;
+    color: #1f2937;
+    white-space: normal;
+    word-break: break-word;
+}
+
+/* Cover Photo Column */
+.prd-cover-thumb {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    object-fit: cover;
+    background-color: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.prd-no-img {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background-color: #f3f4f6;
+    border: 1px dashed #d1d5db;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+}
+
+/* Reduced size specifically for Update Product and Delete Product buttons */
+.prd-btn-update {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background-color: #eff6ff;
+    color: #2563eb;
+    border: 1px solid #bfdbfe;
+    padding: 4px 9px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.prd-btn-update:hover {
+    background-color: #2563eb;
+    color: #ffffff;
+    border-color: #2563eb;
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.2);
+}
+
+.prd-btn-delete {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background-color: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+    padding: 4px 9px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.prd-btn-delete:hover:not(:disabled) {
+    background-color: #dc2626;
+    color: #ffffff;
+    border-color: #dc2626;
+    box-shadow: 0 2px 6px rgba(220, 38, 38, 0.2);
+}
+
+.prd-btn-delete:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Status badges */
+.prd-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11.5px;
+    font-weight: 600;
+}
+
+.prd-badge-active {
+    background-color: #dcfce7;
+    color: #15803d;
+}
+
+.prd-badge-deleted {
+    background-color: #fee2e2;
+    color: #b91c1c;
+}
+
+/* Modals & File Upload Box */
+.prd-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(3px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.prd-modal-card {
+    background-color: #ffffff;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 28px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    animation: prdModalFade 0.2s ease-out;
+}
+
+@keyframes prdModalFade {
+    from {
+        opacity: 0;
+        transform: translateY(-15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.prd-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #f3f4f6;
+    padding-bottom: 12px;
+}
+
+.prd-modal-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+}
+
+.prd-modal-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #9ca3af;
+    cursor: pointer;
+    padding: 4px;
+}
+
+.prd-modal-close:hover {
+    color: #111827;
+}
+
+.prd-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.prd-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.prd-form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.prd-form-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.prd-form-group input,
+.prd-form-group select {
+    padding: 10px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.prd-form-group input:focus,
+.prd-form-group select:focus {
+    border-color: #f5821f;
+    box-shadow: 0 0 0 3px rgba(245, 130, 31, 0.15);
+}
+
+/* File Upload Box */
+.prd-file-upload-box {
+    border: 2px dashed #d1d5db;
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+    background-color: #f9fafb;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.prd-file-upload-box:hover {
+    border-color: #f5821f;
+    background-color: #fff7ed;
+}
+
+.prd-file-upload-box input[type="file"] {
+    display: none;
+}
+
+.prd-upload-icon {
+    color: #f5821f;
+    margin-bottom: 6px;
+}
+
+.prd-upload-text {
+    font-size: 13px;
+    color: #4b5563;
+    font-weight: 500;
+}
+
+.prd-upload-subtext {
+    font-size: 11.5px;
+    color: #9ca3af;
+    margin-top: 2px;
+}
+
+.prd-preview-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.prd-cover-preview-img {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 2px solid #f5821f;
+}
+
+.prd-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.prd-btn-cancel {
+    background-color: #f3f4f6;
+    color: #4b5563;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13.5px;
+    cursor: pointer;
+}
+
+.prd-btn-cancel:hover {
+    background-color: #e5e7eb;
+}
+
+.prd-btn-submit {
+    background-color: #f5821f;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13.5px;
+    cursor: pointer;
+}
+
+.prd-btn-submit:hover {
+    background-color: #e07010;
+}
+
+.prd-btn-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Alert messages */
+.prd-alert-error {
+    background-color: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    font-size: 13.5px;
+}
+
+.prd-alert-success {
+    background-color: #f0fdf4;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    font-size: 13.5px;
+}
