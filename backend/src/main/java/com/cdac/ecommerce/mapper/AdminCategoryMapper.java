@@ -8,12 +8,16 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface AdminCategoryMapper {
+
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "products", ignore = true)
-    @Mapping(target = "name", ignore = true)
+    @Mapping(target = "parent", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "active", constant = "true")
     Category toEntity(AdminCategoryRequestDTO dto);
 
-    @Mapping(target = "parentId", source = "name")
+    @Mapping(target = "parentId", source = "parent.id")
+    @Mapping(target = "active", source = "active")
     AdminCategoryResponseDTO toResponse(Category category);
 }
