@@ -16,7 +16,7 @@ import java.util.List;
 public class Category extends BaseClass{
 
     @Column(name="category_name", nullable = false, unique = true)
-    private String CategoryName;
+    private String name;
 
     @Column(name="is_active", nullable = false)
     private boolean isActive = true;
