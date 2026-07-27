@@ -5,6 +5,7 @@ import Cart from "./pages/Cart.jsx";
 import Wishlist from "./pages/Wishlist.jsx";
 import SellerDashboard from './pages/SellerDashboard.jsx';
 import CreateStore from './pages/CreateStore.jsx';
+import Store from './pages/Store.jsx';
 
 function App(){
     return (
@@ -16,6 +17,7 @@ function App(){
                 <Route path='/wishlist' element={<Wishlist/>}/>
                 <Route path='/seller/dashboard' element={<SellerDashboard/>}/>
                 <Route path='/create-store' element={<CreateStore/>}/>
+                <Route path='/seller/store-info' element={<Store/>}/>
             </Routes>
         </div>
     )
