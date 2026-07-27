@@ -28,30 +28,4 @@ public interface UserMapper {
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     User toEntity(UserRequestDTO dto);
-
-
-    // =========================================================================
-    // MAPSTRUCT AUTOMATICALLY MATCHES THESE METHODS BY TYPE SIGNATURE (NO @Named NEEDED)
-    // =========================================================================
-
-    /** Converts Set<Roles> to Set<String> for UserResponseDTO */
-    default Set<String> mapRolesToStrings(Set<Roles> roles) {
-        if (roles == null || roles.isEmpty()) {
-            return Collections.emptySet();
-        }
-        return roles.stream()
-                .map(Roles::name)
-                .collect(Collectors.toSet());
-    }
-
-    /** Converts Set<String> to Set<Roles> for User Entity */
-    default Set<Roles> mapStringsToRoles(Set<String> roleStrings) {
-        if (roleStrings == null || roleStrings.isEmpty()) {
-            return Collections.emptySet();
-        }
-        return roleStrings.stream()
-                .map(String::toUpperCase)
-                .map(Roles::valueOf)
-                .collect(Collectors.toSet());
-    }
 }

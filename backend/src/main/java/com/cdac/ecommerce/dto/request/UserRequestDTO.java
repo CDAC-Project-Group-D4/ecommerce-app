@@ -26,6 +26,6 @@ public record UserRequestDTO(
         String phone,
 
         @NotNull(message = "Role is required")
-        Set<Roles> roles
+        Roles role
 ) {
 }

@@ -4,6 +4,7 @@ package com.cdac.ecommerce.controller;
 import com.cdac.ecommerce.dto.request.StoreRequestDTO;
 import com.cdac.ecommerce.dto.response.StoreResponseDTO;
 import com.cdac.ecommerce.service.StoreService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,7 @@ public class StoreController {
     private final StoreService storeService;
 
     @PostMapping("/create-store")
-    public ResponseEntity<StoreResponseDTO> createStore(@RequestBody StoreRequestDTO storeRequestDTO){
+    public ResponseEntity<StoreResponseDTO> createStore(@Valid @RequestBody StoreRequestDTO storeRequestDTO){
         StoreResponseDTO storeResponseDTO= storeService.createStore(storeRequestDTO);
         return ResponseEntity.ok(storeResponseDTO);
     }
@@ -31,7 +32,7 @@ public class StoreController {
     }
 
     @PutMapping("/update-store")
-    public ResponseEntity<StoreResponseDTO> updateStore(@RequestBody StoreRequestDTO storeRequestDTO){
+    public ResponseEntity<StoreResponseDTO> updateStore(@Valid @RequestBody StoreRequestDTO storeRequestDTO){
         StoreResponseDTO storeResponseDTO= storeService.updateStore(storeRequestDTO);
         return ResponseEntity.ok(storeResponseDTO);
     }

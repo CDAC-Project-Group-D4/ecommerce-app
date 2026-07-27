@@ -1,5 +1,6 @@
 package com.cdac.ecommerce.dto.response;
 
+import com.cdac.ecommerce.entity.enums.Roles;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -10,9 +11,8 @@ public record UserResponseDTO(
         String email,
         String imageUrl,
         String phone,
-        Set<String> roles,
+        Roles role,
         boolean active,
         LocalDateTime createdAt
-
 ) {
 }

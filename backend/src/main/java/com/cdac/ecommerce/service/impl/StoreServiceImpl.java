@@ -21,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.management.relation.Role;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -46,7 +47,7 @@ public class StoreServiceImpl implements StoreService {
         String email = userDetails.getUsername();
         User user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        if (user.getRoles().contains(Roles.SELLER)) {
+        if (user.getRole()!= Roles.SELLER) {
             throw new SellerCreateStoreException("only sellers can create a store");
         }
 
