@@ -1,0 +1,512 @@
+/* ===== Store.css ===== */
+
+/* ---------- Page header ---------- */
+.si-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.si-page-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+.si-topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.si-account-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #1a1a1a;
+    cursor: pointer;
+}
+
+.si-account-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: #e5e7eb;
+    color: #6b6f76;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ---------- Error ---------- */
+.si-error {
+    background-color: #fdeceb;
+    color: #c0392b;
+    font-size: 13px;
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-bottom: 12px;
+}
+
+/* ---------- Card ---------- */
+.si-card {
+    background-color: #ffffff;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+    width: 100%;
+    max-width: 100%;
+    flex: 1;
+    min-height: calc(100vh - 90px);
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 24px;
+    box-sizing: border-box;
+}
+
+/* ---------- Banner ---------- */
+.si-banner {
+    position: relative;
+    z-index: 1;
+    height: 160px;
+    border-radius: 14px 14px 0 0;
+    overflow: hidden;
+    background-color: #2f3b33;
+    background-image: linear-gradient(160deg, #3c4a3f, #232b26);
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.si-banner-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+}
+
+.si-update-banner-btn {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background-color: rgba(20, 20, 20, 0.72);
+    color: #ffffff;
+    border: none;
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+.si-banner:hover .si-update-banner-btn {
+    opacity: 1;
+}
+
+.si-update-banner-btn:disabled {
+    opacity: 1;
+    cursor: not-allowed;
+}
+
+/* ---------- Avatar + name row ---------- */
+.si-header-row {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    padding: 0 clamp(16px, 3vw, 28px);
+    margin-top: -72px;
+}
+
+.si-avatar-wrap {
+    position: relative;
+    z-index: 10;
+    flex-shrink: 0;
+}
+
+.si-avatar {
+    position: relative;
+    z-index: 10;
+    width: 144px;
+    height: 144px;
+    border-radius: 50%;
+    border: 4px solid #ffffff;
+    background-color: #f4f5f7;
+    background-image: linear-gradient(160deg, #ff9a4d, #f5691f);
+    background-size: cover;
+    background-position: center;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.14);
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.si-avatar-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+}
+
+.si-avatar-cam-btn {
+    position: absolute;
+    z-index: 20;
+    bottom: 6px;
+    right: 6px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background-color: #1a1a1a;
+    color: #ffffff;
+    border: 2px solid #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+.si-avatar-cam-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.si-avatar-tooltip {
+    position: absolute;
+    bottom: -28px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(20, 20, 20, 0.85);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+    padding: 4px 8px;
+    border-radius: 6px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+}
+
+.si-avatar-wrap:hover .si-avatar-tooltip {
+    opacity: 1;
+}
+
+.si-title-block {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 92px;
+    padding-bottom: 2px;
+}
+
+.si-heading-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.si-store-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+.si-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 999px;
+}
+
+.si-badge-holiday {
+    background-color: #fff4e5;
+    color: #b4690e;
+}
+
+.si-store-id {
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+/* ---------- Details list ---------- */
+.si-details-list {
+    margin: 24px clamp(16px, 3vw, 28px) 0;
+    padding: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
+.si-detail-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid #f1f1ef;
+}
+
+.si-detail-row:last-child {
+    border-bottom: none;
+}
+
+.si-detail-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13.5px;
+    color: #6b6f76;
+    flex-shrink: 0;
+    min-width: 140px;
+}
+
+.si-detail-label svg {
+    color: #f5691f;
+}
+
+.si-detail-value {
+    font-size: 14px;
+    color: #1a1a1a;
+    text-align: right;
+    line-height: 1.4;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+/* ---------- Actions ---------- */
+.si-actions {
+    display: flex;
+    gap: 12px;
+    margin: 20px clamp(16px, 3vw, 28px) 0;
+    margin-top: auto;
+}
+
+.si-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border-radius: 8px;
+    padding: 9px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.si-btn:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+.si-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.si-btn-outline-primary {
+    background-color: #ffffff;
+    border: 1px solid #f5b98a;
+    color: #f5691f;
+}
+
+.si-btn-outline-primary:hover:not(:disabled) {
+    background-color: #fff5ee;
+}
+
+.si-btn-outline-danger {
+    background-color: #ffffff;
+    border: 1px solid #f2b8b8;
+    color: #d64545;
+}
+
+.si-btn-outline-danger:hover:not(:disabled) {
+    background-color: #fdeceb;
+}
+
+.si-btn-secondary {
+    background-color: #f4f5f7;
+    border: 1px solid #f4f5f7;
+    color: #1a1a1a;
+}
+
+.si-btn-secondary:hover:not(:disabled) {
+    background-color: #ececea;
+}
+
+/* ---------- Edit form ---------- */
+.si-edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin: 24px clamp(16px, 3vw, 28px) 0;
+    flex: 1;
+    justify-content: space-between;
+}
+
+.si-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.si-field label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+}
+
+.si-field input,
+.si-field textarea {
+    background-color: #f4f5f7;
+    border: 1px solid #f4f5f7;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 13.5px;
+    font-family: inherit;
+    color: #333;
+    outline: none;
+    resize: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.si-field input:focus,
+.si-field textarea:focus {
+    background-color: #ffffff;
+    border-color: #f5821f;
+    box-shadow: 0 0 0 3px rgba(245, 130, 31, 0.15);
+}
+
+/* ---------- No Store Fallback ---------- */
+.si-no-store {
+    padding: 60px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin: 20px 0;
+    min-height: 300px;
+}
+
+.si-no-store p {
+    font-size: 18px;
+    font-weight: 600;
+    color: #4b5563;
+    margin: 0 0 20px 0;
+}
+
+.si-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: linear-gradient(90deg, #ff8c42, #f5691f);
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 28px;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(245, 105, 31, 0.3);
+    transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+}
+
+
+
+.si-btn-primary:active {
+    transform: translateY(0) scale(0.98);
+}
+
+/* ---------- Responsive Adjustments ---------- */
+@media (max-width: 768px) {
+    .si-header-row {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        margin-top: -34px;
+        gap: 10px;
+    }
+
+    .si-title-block {
+        align-items: center;
+        text-align: center;
+        padding-bottom: 0;
+    }
+
+    .si-heading-row {
+        justify-content: center;
+    }
+
+    .si-detail-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+        padding: 8px 0;
+    }
+
+    .si-detail-label {
+        min-width: unset;
+        width: 100%;
+    }
+
+    .si-detail-value {
+        text-align: left;
+        width: 100%;
+    }
+
+    .si-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .si-btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .si-banner {
+        height: 75px;
+    }
+
+    .si-avatar {
+        width: 64px;
+        height: 64px;
+    }
+
+    .si-header-row {
+        margin-top: -30px;
+    }
+
+    .si-page-title {
+        font-size: 18px;
+    }
+}
