@@ -1,16 +1,16 @@
 package com.cdac.ecommerce.dto.response;
 
 import java.time.LocalDateTime;
-import java.util.Set;
 
-public record UserResponseDTO(
+public record SellerResponseDTO(
 
-        Long userId,
-        String fullName,
+        long sellerId,
+        long storeId,
+        String storeName,
         String email,
-        String imageUrl,
         String phone,
-        Set<String> roles,
+        String imageUrl,
+        boolean blocked,
         boolean active,
         LocalDateTime createdAt
 
