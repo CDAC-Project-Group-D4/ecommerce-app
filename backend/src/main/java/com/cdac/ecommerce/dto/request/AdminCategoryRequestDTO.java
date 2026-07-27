@@ -7,7 +7,7 @@ package com.cdac.ecommerce.dto.request;
 //@Setter
 public record AdminCategoryRequestDTO(
          Long parent_id,
-        String name
+         String name
 ) {
 
 
