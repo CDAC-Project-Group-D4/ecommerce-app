@@ -57,3 +57,34 @@ INSERT IGNORE INTO user_roles (user_id, role) VALUES
 -- Admin Role
 INSERT IGNORE INTO user_roles (user_id, role) VALUES
 (15, 'ADMIN');
+
+
+INSERT INTO categories
+(id, parent_id, name, is_active, created_at, updated_at)
+VALUES
+(1, NULL, 'Electronics', 1, NOW(), NOW()),
+(2, NULL, 'Fashion', 1, NOW(), NOW()),
+(3, NULL, 'Home & Kitchen', 1, NOW(), NOW()),
+(4, NULL, 'Books', 1, NOW(), NOW()),
+(5, NULL, 'Sports', 1, NOW(), NOW()),
+
+-- Electronics Children
+(6, 1, 'Mobiles', 1, NOW(), NOW()),
+(7, 1, 'Laptops', 1, NOW(), NOW()),
+(8, 1, 'Televisions', 1, NOW(), NOW()),
+
+-- Fashion Children
+(9, 2, 'Men Clothing', 1, NOW(), NOW()),
+(10, 2, 'Women Clothing', 1, NOW(), NOW()),
+
+-- Home Children
+(11, 3, 'Kitchen Appliances', 1, NOW(), NOW()),
+(12, 3, 'Furniture', 1, NOW(), NOW()),
+
+-- Books Children
+(13, 4, 'Programming', 1, NOW(), NOW()),
+(14, 4, 'Novels', 1, NOW(), NOW()),
+
+-- Sports Children
+(15, 5, 'Cricket', 1, NOW(), NOW()),
+(16, 5, 'Football', 1, NOW(), NOW());
