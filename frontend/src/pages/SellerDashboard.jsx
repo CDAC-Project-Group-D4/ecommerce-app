@@ -1,21 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Sidebar from "../components/sellerComponents/Sidebar";
 import Icon from "../components/sellerComponents/Icon";
+import { getMyStore, getStoreOrders } from "../api/storeApi.js";
 import "../css/SellerDashboard.css";
-
-// Sample Order Data
-const INITIAL_ORDERS = [
-    { id: "ORD-7821", productId: "PRD-101", productName: "Self Love Club Retro Print", customerName: "Emily Carter", quantity: 2, status: "Successful" },
-    { id: "ORD-7822", productId: "PRD-204", productName: "Retro Quote Wall Print", customerName: "Charlotte Smith", quantity: 1, status: "Pending" },
-    { id: "ORD-7823", productId: "PRD-305", productName: "Minimalist Abstract Frame", customerName: "Henry Reed", quantity: 3, status: "Rejected" },
-    { id: "ORD-7824", productId: "PRD-102", productName: "Vintage Aesthetic Poster", customerName: "Sophia Martinez", quantity: 1, status: "Successful" },
-    { id: "ORD-7825", productId: "PRD-408", productName: "Boho Sun & Moon Canvas", customerName: "Liam Johnson", quantity: 2, status: "Pending" },
-    { id: "ORD-7826", productId: "PRD-201", productName: "Mid-Century Modern Art", customerName: "Olivia Davis", quantity: 1, status: "Successful" },
-    { id: "ORD-7827", productId: "PRD-512", productName: "Botanical Leaf Line Art", customerName: "Ethan Brown", quantity: 4, status: "Rejected" },
-    { id: "ORD-7828", productId: "PRD-105", productName: "Japanese Wave Painting", customerName: "Ava Wilson", quantity: 2, status: "Successful" },
-    { id: "ORD-7829", productId: "PRD-309", productName: "Geometric Terracotta Print", customerName: "Lucas Miller", quantity: 1, status: "Pending" },
-    { id: "ORD-7830", productId: "PRD-412", productName: "Typography Coffee Poster", customerName: "Mia Taylor", quantity: 3, status: "Successful" },
-];
 
 function OrderPieChart({ successful, rejected, pending }) {
     const chartData = [
@@ -127,23 +114,93 @@ function OrderPieChart({ successful, rejected, pending }) {
     );
 }
 
+function getStatusCategory(status) {
+    if (!status) return "Pending";
+    const s = String(status).toUpperCase();
+    if (["CONFIRMED", "SHIPPED", "OUT_FOR_DELIVERY", "DELIVERED", "COMPLETED", "SUCCESSFUL"].includes(s)) {
+        return "Successful";
+    }
+    if (["CANCELLED", "RETURNED", "REJECTED"].includes(s)) {
+        return "Rejected";
+    }
+    return "Pending";
+}
+
 function SellerDashboard() {
-    const storeName = "Your Store";
-    const [orders] = useState(INITIAL_ORDERS);
+    const [store, setStore] = useState(null);
+    const [rawOrders, setRawOrders] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
 
-    // Calculate pie chart statistics from orders
-    const successfulCount = orders.filter((o) => o.status === "Successful").length;
-    const pendingCount = orders.filter((o) => o.status === "Pending").length;
-    const rejectedCount = orders.filter((o) => o.status === "Rejected").length;
+    useEffect(() => {
+        setLoading(true);
+        Promise.all([getMyStore().catch(() => null), getStoreOrders().catch(() => [])])
+            .then(([storeData, ordersData]) => {
+                if (storeData) setStore(storeData);
+                setRawOrders(ordersData || []);
+                setError(null);
+            })
+            .catch((err) => {
+                setError(err.message || "Failed to load dashboard data");
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+    }, []);
 
-    // Filter orders by search term
-    const filteredOrders = orders.filter(
-        (o) =>
-            o.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            o.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            o.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            o.productId.toLowerCase().includes(searchTerm.toLowerCase())
+    const storeName = store?.storeName || "Your Store";
+
+    // Flatten orders & orderItems for table rendering & statistics
+    const itemList = [];
+    let totalRevenue = 0;
+    const uniqueCustomers = new Set();
+    const uniqueProducts = new Set();
+
+    let successfulCount = 0;
+    let pendingCount = 0;
+    let rejectedCount = 0;
+
+    rawOrders.forEach((order) => {
+        const category = getStatusCategory(order.orderStatus);
+        if (category === "Successful") successfulCount++;
+        else if (category === "Pending") pendingCount++;
+        else rejectedCount++;
+
+        const customerName = order.address?.fullName || "Customer";
+        if (customerName) uniqueCustomers.add(customerName);
+
+        if (order.totalAmt) {
+            totalRevenue += Number(order.totalAmt);
+        }
+
+        if (order.orderItems && order.orderItems.length > 0) {
+            order.orderItems.forEach((item) => {
+                if (item.productId) uniqueProducts.add(item.productId);
+                itemList.push({
+                    id: `ORD-${order.orderId}`,
+                    orderItemId: item.orderItemId,
+                    productId: `PRD-${item.productId}`,
+                    productName: item.productName || "Product",
+                    customerName: customerName,
+                    quantity: item.quantity,
+                    totalAmt: item.lineTotal || (item.price * item.quantity) || 0,
+                    statusCategory: category,
+                    rawStatus: order.orderStatus || "PENDING"
+                });
+            });
+        }
+    });
+
+    const totalOrders = rawOrders.length;
+
+    // Filter order items by search term
+    const filteredItems = itemList.filter(
+        (item) =>
+            item.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            item.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            item.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            item.productId.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
@@ -163,6 +220,8 @@ function SellerDashboard() {
                     </div>
                 </div>
 
+                {error && <div style={{ color: "red", marginBottom: "16px" }}>{error}</div>}
+
                 {/* Section 1: Stats Overview */}
                 <section className="sd-section">
                     <h2 className="sd-section-title">
@@ -171,24 +230,26 @@ function SellerDashboard() {
                     <div className="sd-card-row">
                         <div className="sd-stat-card">
                             <span className="sd-stat-label">Total Orders</span>
-                            <span className="sd-stat-value">24,432</span>
+                            <span className="sd-stat-value">{loading ? "..." : totalOrders.toLocaleString()}</span>
                         </div>
                         <div className="sd-stat-card">
-                            <span className="sd-stat-label">Sales per annum</span>
-                            <span className="sd-stat-value">1,423</span>
+                            <span className="sd-stat-label">Total Revenue</span>
+                            <span className="sd-stat-value">
+                                {loading ? "..." : `₹${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                            </span>
                         </div>
                         <div className="sd-stat-card">
-                            <span className="sd-stat-label">Total Products</span>
-                            <span className="sd-stat-value">578</span>
+                            <span className="sd-stat-label">Total Products Sold</span>
+                            <span className="sd-stat-value">{loading ? "..." : uniqueProducts.size.toLocaleString()}</span>
                         </div>
                         <div className="sd-stat-card">
                             <span className="sd-stat-label">Total Customers</span>
-                            <span className="sd-stat-value">578</span>
+                            <span className="sd-stat-value">{loading ? "..." : uniqueCustomers.size.toLocaleString()}</span>
                         </div>
                     </div>
                 </section>
 
-                {/* Section 2: Order Breakdown Pie Chart (Between Stats Overview and Order Listing) */}
+                {/* Section 2: Order Breakdown Pie Chart */}
                 <section className="sd-section">
                     <h2 className="sd-section-title">
                         <Icon name="pie-chart" size={18} /> Order Status Breakdown
@@ -214,29 +275,37 @@ function SellerDashboard() {
                                     <th>Product Name</th>
                                     <th>Customer Name</th>
                                     <th>Quantity</th>
+                                    <th>Amount</th>
                                     <th>Order Status</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {filteredOrders.length > 0 ? (
-                                    filteredOrders.map((order) => (
-                                        <tr key={order.id}>
-                                            <td className="sd-cell-code">{order.id}</td>
-                                            <td className="sd-cell-subcode">{order.productId}</td>
-                                            <td className="sd-cell-name">{order.productName}</td>
-                                            <td>{order.customerName}</td>
-                                            <td className="sd-cell-qty">{order.quantity}</td>
+                                {loading ? (
+                                    <tr>
+                                        <td colSpan="7" className="sd-no-results">
+                                            Loading store orders...
+                                        </td>
+                                    </tr>
+                                ) : filteredItems.length > 0 ? (
+                                    filteredItems.map((item, idx) => (
+                                        <tr key={item.orderItemId || idx}>
+                                            <td className="sd-cell-code">{item.id}</td>
+                                            <td className="sd-cell-subcode">{item.productId}</td>
+                                            <td className="sd-cell-name">{item.productName}</td>
+                                            <td>{item.customerName}</td>
+                                            <td className="sd-cell-qty">{item.quantity}</td>
+                                            <td>₹{Number(item.totalAmt).toFixed(2)}</td>
                                             <td>
-                                                <span className={`sd-status-badge badge-${order.status.toLowerCase()}`}>
-                                                    {order.status}
+                                                <span className={`sd-status-badge badge-${item.statusCategory.toLowerCase()}`}>
+                                                    {item.statusCategory}
                                                 </span>
                                             </td>
                                         </tr>
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="6" className="sd-no-results">
-                                            No orders found matching "{searchTerm}"
+                                        <td colSpan="7" className="sd-no-results">
+                                            {searchTerm ? `No orders found matching "${searchTerm}"` : "No orders placed yet"}
                                         </td>
                                     </tr>
                                 )}

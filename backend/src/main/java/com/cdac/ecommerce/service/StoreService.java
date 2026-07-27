@@ -4,6 +4,8 @@ import com.cdac.ecommerce.dto.request.StoreRequestDTO;
 import com.cdac.ecommerce.dto.response.StoreResponseDTO;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.cdac.ecommerce.dto.response.OrderResponseDTO;
+import java.util.List;
 import java.util.Map;
 
 public interface StoreService {
@@ -17,4 +19,6 @@ public interface StoreService {
     StoreResponseDTO deleteStore();
 
     Map<String, String> uploadMedia(MultipartFile banner, MultipartFile profilePhoto);
+
+    List<OrderResponseDTO> getStoreOrders();
 }

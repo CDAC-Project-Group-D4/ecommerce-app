@@ -73,6 +73,8 @@ function Icon({ name, size = 18 }) {
             return (<svg {...props}><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>);
         case "user":
             return (<svg {...props}><circle cx="12" cy="8" r="4" /><path d="M4 20a8 8 0 0 1 16 0" /></svg>);
+        case "plus":
+            return (<svg {...props}><path d="M12 5v14M5 12h14" /></svg>);
         default:
             return null;
     }

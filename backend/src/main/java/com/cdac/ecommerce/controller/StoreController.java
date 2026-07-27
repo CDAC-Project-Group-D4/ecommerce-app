@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.cdac.ecommerce.dto.response.OrderResponseDTO;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -29,6 +31,12 @@ public class StoreController {
     public ResponseEntity<StoreResponseDTO> getStore(){
         StoreResponseDTO storeResponseDTO = storeService.getStore();
         return ResponseEntity.ok(storeResponseDTO);
+    }
+
+    @GetMapping("/orders")
+    public ResponseEntity<List<OrderResponseDTO>> getStoreOrders(){
+        List<OrderResponseDTO> orderResponseDTO= storeService.getStoreOrders();
+        return ResponseEntity.ok(orderResponseDTO);
     }
 
     @PutMapping("/update-store")
