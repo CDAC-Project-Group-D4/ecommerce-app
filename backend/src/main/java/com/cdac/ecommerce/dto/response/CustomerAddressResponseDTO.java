@@ -1,5 +1,6 @@
 package com.cdac.ecommerce.dto.response;
 
+import com.cdac.ecommerce.entity.enums.AddressLabel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -32,4 +33,5 @@ public class CustomerAddressResponseDTO {
     private String pincode;
 
     private boolean defaultAddress;
+    private AddressLabel label;
 }

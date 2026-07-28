@@ -36,9 +36,9 @@ public class CheckoutServiceImpl implements CheckoutService {
     public CheckoutResponseDTO getCheckout(Long userId) {
         //et all cart items
         List<Cart> cartItems = cartRepository.findByUser_Id(userId);
-        if (cartItems.isEmpty()) {
-            throw new IllegalStateException("Cart is empty");
-        }
+//        if (cartItems.isEmpty()) {
+//            throw new IllegalStateException("Cart is empty");
+//        }
         List<CustomerAddress> customerAddressList = addressRepository.findByUser_IdAndActiveTrue(userId);
 
         BigDecimal subtotal = BigDecimal.ZERO;

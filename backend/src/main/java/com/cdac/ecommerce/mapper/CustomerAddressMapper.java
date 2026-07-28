@@ -12,6 +12,7 @@ public class CustomerAddressMapper {
         CustomerAddressResponseDTO dto = new CustomerAddressResponseDTO();
 
         dto.setId(address.getId());
+        dto.setLabel(address.getLabel());
         dto.setFullName(address.getFullName());
         dto.setMobileNumber(address.getMobileNumber());
         dto.setAddressLine1(address.getAddressLine1());
@@ -20,6 +21,7 @@ public class CustomerAddressMapper {
         dto.setState(address.getState());
         dto.setCountry(address.getCountry());
         dto.setPincode(address.getPincode());
+
         return dto;
     }
 }
