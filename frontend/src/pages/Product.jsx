@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import Sidebar from "../components/sellerComponents/Sidebar";
+import SellerNavbar from "../components/sellerComponents/SellerNavbar";
 import Icon from "../components/sellerComponents/Icon";
 import { getMyStore, uploadStoreMedia } from "../api/storeApi";
 import { getStoreProducts, createProduct, updateProduct, deleteProduct } from "../api/productApi";
+import { useSeller } from "../context/SellerContext.jsx";
 import "../css/SellerDashboard.css";
 import "../css/Product.css";
 
@@ -18,12 +20,17 @@ const getImageUrl = (url) => {
 };
 
 function Product() {
-    const [store, setStore] = useState(null);
+    const { store: contextStore, storeName } = useSeller();
+    const [store, setStore] = useState(contextStore);
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
+
+    useEffect(() => {
+        if (contextStore) setStore(contextStore);
+    }, [contextStore]);
 
     // Modal state for Add Product
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -65,15 +72,11 @@ function Product() {
         }
     }, [success]);
 
-    // Fetch Store & Products on Mount
+    // Fetch Products on Mount
     useEffect(() => {
         setLoading(true);
-        Promise.all([
-            getMyStore().catch(() => null),
-            getStoreProducts().catch(() => [])
-        ])
-            .then(([storeData, productsData]) => {
-                if (storeData) setStore(storeData);
+        getStoreProducts()
+            .then((productsData) => {
                 setProducts(productsData || []);
                 setError(null);
             })
@@ -84,8 +87,6 @@ function Product() {
                 setLoading(false);
             });
     }, []);
-
-    const storeName = store?.storeName || "Your Store";
 
     // Handle Cover Photo Selection
     const handleCoverFileChange = (e) => {
@@ -276,18 +277,7 @@ function Product() {
 
             {/* Main content area */}
             <main className="sd-main">
-                {/* Search & Top Action Bar */}
-                <div className="sd-topbar">
-                    <div className="sd-search">
-                        <Icon name="search" size={16} />
-                        <input
-                            type="text"
-                            placeholder="Search products by name or ID..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                    </div>
-                </div>
+                <SellerNavbar title="Store Products" />
 
                 {/* Notifications */}
                 {error && <div className="prd-alert-error">{error}</div>}
@@ -295,15 +285,26 @@ function Product() {
 
                 {/* Header Row before Table */}
                 <div className="prd-header-action-row">
-                    <h2 className="sd-section-title">
-                        <Icon name="box" size={20} /> Store Products ({products.length})
+                    <h2 className="sd-section-title" style={{ margin: 0 }}>
+                        <Icon name="box" size={18} /> Products ({filteredProducts.length})
                     </h2>
-                    <button
-                        className="prd-add-btn"
-                        onClick={() => setIsAddModalOpen(true)}
-                    >
-                        <Icon name="plus" size={16} /> Add Products
-                    </button>
+                    <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+                        <div className="prd-search-box" style={{ width: "320px" }}>
+                            <Icon name="search" size={16} />
+                            <input
+                                type="text"
+                                placeholder="Search products by name or ID..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+                        <button
+                            className="prd-add-btn"
+                            onClick={() => setIsAddModalOpen(true)}
+                        >
+                            <Icon name="plus" size={16} /> Add Products
+                        </button>
+                    </div>
                 </div>
 
                 {/* Products Table */}

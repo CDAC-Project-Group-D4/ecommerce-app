@@ -7,8 +7,9 @@ import { useNavigate, Link } from "react-router-dom";
 
 function SignUp() {
 
-    const navigate = useNavigate();
-    const [formData, setFormData] = useState({
+    const navigate = useNavigate(); 
+
+    const [formData, setFormData] = useState({  //the initial value of the form is set to following.
         fullName: "",
         email: "",
         phone: "",
@@ -16,28 +17,29 @@ function SignUp() {
         role: "CUSTOMER"
     })
 
-    const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [success, setSuccess] = useState(null);
+    const [error, setError] = useState(null);  //show error coming from backend
+    const [loading, setLoading] = useState(false); //loading is used to track the API call state — when setLoading(true) is called, it means the API request is in progress (show "Signing Up..." and disable the button), and when setLoading(false) is called, it means the API call is completed, after which success or error messages are displayed.
+    const [success, setSuccess] = useState(null); //shows success message .. coming from frontend
 
+    //this function will update the form when user will type something. jis input box me user type kr raha hai usi field ka data change hona chahiye
     const handleChange = (e) => {
         setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
+            ...formData, //this is the initial values of the form 
+            [e.target.name]: e.target.value //this will map the changes to respective field. 
         })
     }
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true)
+        e.preventDefault();  //prevents from page reloading
+        setLoading(true) //reset everything before calling api
         setError(null)
         setSuccess(null)
 
         try {
-            const data = await signupUser(formData);
-            setSuccess("SignUp Succesful");
+            const data = await signupUser(formData); //calling backend api.. sending formData to the backend
+            setSuccess("SignUp Succesful");  //if successfull then setSuccess message as "signup successful"
 
-            setFormData({
+            setFormData({ //reset formdata
                 fullName: "",
                 email: "",
                 phone: "",
@@ -45,14 +47,13 @@ function SignUp() {
                 role: "CUSTOMER"
             })
 
-
             setTimeout(()=>{
-                navigate("/signin")
+                navigate("/signin") //if signup is successfull then navigate it to the signin page 
             }, 1000)
 
         }
         catch (err) {
-            setError(err.message);
+            setError(err.message); //if not successfull then return the error message coming from backend
         }
         finally {
             setLoading(false);
@@ -121,7 +122,7 @@ function SignUp() {
                 <div className="card signup-card" style={{ width: "400px" }}>
 
                     <h2 className="text-center mb-4 signup-title">Sign Up</h2>
-                    <form onSubmit={handleSubmit}>
+                    <form onSubmit={handleSubmit}> 
                         <div className="mb-3">
                             <input
                                 name="fullName"
@@ -179,13 +180,13 @@ function SignUp() {
                                 <option value="SELLER">Seller</option>
                             </select>
                         </div>
-                        <button type="submit" className="btn btn-primary w-100 custom-btn" disabled={loading}>
+                        <button type="submit" className="btn btn-primary w-100 custom-btn" disabled={loading}> {/* when loading=true button will be disabled and if loading=false then button will be clickable.. this should be done for preventing double clicking */}
                             {loading ? "Signing Up..." : "Sign Up"}
                         </button>
                     </form>
                     
                     <p className="text-center mt-12">
-                        Already have an account?{" "}
+                        Already have an account?{" "} {/* adding gap between text and link*/}
                         <Link to="/signin" className="font-semibold hover:underline">
                             Sign In
                         </Link>

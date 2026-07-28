@@ -1,15 +1,22 @@
 import { useState, useEffect, useRef } from "react";
 import Sidebar from "../components/sellerComponents/Sidebar";
+import SellerNavbar from "../components/sellerComponents/SellerNavbar";
 import Icon from "../components/sellerComponents/Icon";
 import { getMyStore, updateStore, deleteStore, uploadStoreMedia } from "../api/storeApi.js";
 import { getCurrentUser } from "../utils/authhelper.js";
+import { useSeller } from "../context/SellerContext.jsx";
 import "../css/SellerDashboard.css";
 import "../css/Store.css";
 import { useNavigate } from "react-router-dom";
 
 const getImageUrl = (url) => {
     if (!url) return null;
-    if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("data:") || url.startsWith("blob:")) {
+    if (
+        url.startsWith("http://") || 
+        url.startsWith("https://") || 
+        url.startsWith("data:") || 
+        url.startsWith("blob:")
+    ) {
         return url;
     }
     const cleanPath = url.replace(/\\/g, "/");
@@ -20,78 +27,68 @@ const getImageUrl = (url) => {
 function Store() {
 
     const navigate = useNavigate();
+    const { store: contextStore, setStore: setContextStore } = useSeller();
 
+    //intial values in formData
     const [formData, setFormData] = useState({
-        storeName: "",
-        description: ""
+        storeName: contextStore?.storeName || "",
+        description: contextStore?.description || ""
     });
-
-    const [store, setStore] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [store, setStore] = useState(contextStore);
+    const [loading, setLoading] = useState(!contextStore);
     const [error, setError] = useState(null);
     const [saving, setSaving] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
 
-    const bannerInputRef = useRef(null);
-    const photoInputRef = useRef(null);
-
     // The store DTO doesn't carry email/phone — those live on the user account.
-    const currentUser = getCurrentUser();
+    const currentUser = getCurrentUser(); //current user details will come from localStorage
 
+    //component mounting - call the api as soon as the page loads
     useEffect(() => {
-        getMyStore()
+        if (contextStore) {
+            setStore(contextStore);
+            setFormData({
+                storeName: contextStore.storeName || "",
+                description: contextStore.description || ""
+            });
+            setLoading(false);
+        }
+        getMyStore() //calling get api
             .then((data) => {
-                setStore(data);
-                setFormData({ storeName: data.storeName || "", description: data.description || "" });
+                setStore(data); //api se jo data aa rha hai usko store state me save karta hia aur ui ko update kar deta hai.
+                if (setContextStore) setContextStore(data);
+                setFormData({ storeName: data.storeName, //api se aya hua data ko form me show karega
+                    description: data.description
+                });
             })
             .catch((err) => setError(err.message || "Could not load store"))
             .finally(() => setLoading(false));
     }, []);
 
-    const handleImageChange = async (field, file) => {
-        if (!file || !store) return;
-        const payload = new FormData();
-        payload.append(field === "bannerUrl" ? "banner" : "profilePhoto", file);
 
-        setSaving(true);
-        setError(null);
-        try {
-            const media = await uploadStoreMedia(payload);
-            const newUrl = field === "bannerUrl"
-                ? (media.bannerUrl || media.url || media.banner)
-                : (media.profilePhotoUrl || media.profilePhoto || media.url);
-
-            const updated = await updateStore({
-                storeName: store.storeName,
-                description: store.description,
-                bannerUrl: field === "bannerUrl" ? newUrl : store.bannerUrl,
-                profilePhotoUrl: field === "profilePhotoUrl" ? newUrl : store.profilePhotoUrl,
-            });
-            setStore(updated);
-        } catch (err) {
-            setError(err.message || "Image upload failed");
-        } finally {
-            setSaving(false);
-        }
-    };
-
+    //this function will update the store form when user will type something. jis input box me user type kr raha hai usi field ka data change hona chahiye ..hamare project me bss storename aur description update ho skta hai
     const handleFormChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        setFormData({ 
+            ...formData, 
+            [e.target.name]: e.target.value 
+        });
     };
+
 
     const handleSaveDetails = async (e) => {
-        e.preventDefault();
+        e.preventDefault(); //prevents from page reloading
         setSaving(true);
         setError(null);
         try {
-            const updated = await updateStore({
+            const updated = await updateStore({ //calling backend api.. updating information and saving to there corresponding fields
                 storeName: formData.storeName,
                 description: formData.description,
                 bannerUrl: store.bannerUrl,
                 profilePhotoUrl: store.profilePhotoUrl,
             });
-            setStore(updated);
-            setIsEditing(false);
+            setStore(updated);  //updating the value of setStore with updated value.
+            if (setContextStore) setContextStore(updated);
+            setIsEditing(false);  //setting isEditing back to false so that it can show store information
         } catch (err) {
             setError(err.message || "Failed to update store");
         } finally {
@@ -104,8 +101,9 @@ function Store() {
         setSaving(true);
         setError(null);
         try {
-            await deleteStore();
-            setStore(null);
+            await deleteStore(); //calling deleteStore api from backend. 
+            setStore(null);  //updating the store info to null
+            if (setContextStore) setContextStore(null);
         } catch (err) {
             setError(err.message || "Failed to delete store");
         } finally {
@@ -113,35 +111,59 @@ function Store() {
         }
     };
 
-    const bannerImgUrl = getImageUrl(store?.bannerUrl);
-    const profileImgUrl = getImageUrl(store?.profilePhotoUrl);
+    //useRef is used to directly access and trigger DOM elements. Here it is used to programmatically click hidden file inputs when the user clicks a button.
+    const bannerInputRef = useRef(null);
+    const photoInputRef = useRef(null);
+
+    //field is bannerUrl or profilePhotoUrl anf file if selected image
+    const handleImageChange = async (field, file) => {
+        if (!file || !store) return; //if file is not present or store is not present then return
+        const payload = new FormData(); //formData creation
+        payload.append(field === "bannerUrl" ? "banner" : "profilePhoto", file); //if field is bannerUrl then banner ki file(image) jayegi agr field bannerUrl nahi hoga toh profilephoto is file(image) jayegi
+
+        setSaving(true); 
+        setError(null);
+        try {
+            const media = await uploadStoreMedia(payload); //image is given to backend. 
+            const newUrl = field === "bannerUrl"
+                ? (media.bannerUrl || media.url || media.banner) //bannerUrl bheja hoga toh backend se uss bannerUrl ka url milega
+                : (media.profilePhotoUrl || media.profilePhoto || media.url); //bannerUrl nahi bheja hoga toh backend se uss profilePhoto ka url milega
+
+            const updated = await updateStore({ //updating image url in backend
+                storeName: store.storeName,
+                description: store.description,
+                bannerUrl: field === "bannerUrl" ? newUrl : store.bannerUrl,
+                profilePhotoUrl: field === "profilePhotoUrl" ? newUrl : store.profilePhotoUrl,
+            });
+            setStore(updated); //updated values ke sath information set krte hai store me
+            if (setContextStore) setContextStore(updated);
+        } catch (err) {
+            setError(err.message || "Image upload failed");
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const bannerImgUrl = getImageUrl(store?.bannerUrl); //creating browser friendly url for banner 
+    const profileImgUrl = getImageUrl(store?.profilePhotoUrl); //creating browser friendly url for profileimage
 
     return (
         <div className="sd-shell">
             <Sidebar storeName={store?.storeName} />
 
             <main className="sd-main">
-                <div className="si-topbar">
-                    <h1 className="si-page-title">Store Information</h1>
-                    <div className="si-topbar-right">
-                        <button className="si-account-btn" type="button">
-                            <span className="si-account-avatar">
-                                <Icon name="user" size={16} />
-                            </span>
-                            <span>{currentUser?.name || "Seller"}</span>
-                            <Icon name="chevron" size={14} />
-                        </button>
-                    </div>
-                </div>
+                <SellerNavbar title="Store Information" />
 
                 {loading && <p>Loading...</p>}
                 {error && <div className="si-error">{error}</div>}
 
-                {!loading && store && (
+                {!loading && store && ( //if store exits then show on dashboard
+
+                    //this is for banner
                     <div className="si-card">
                         <div
                             className="si-banner"
-                            style={bannerImgUrl ? { backgroundImage: `url("${bannerImgUrl}")` } : undefined}
+                            style={bannerImgUrl ? { backgroundImage: `url("${bannerImgUrl}")` } : undefined}  //ui me banner show hoga
                         >
                             {bannerImgUrl && (
                                 <img
@@ -156,7 +178,7 @@ function Store() {
                             <button
                                 type="button"
                                 className="si-update-banner-btn"
-                                onClick={() => bannerInputRef.current?.click()}
+                                onClick={() => bannerInputRef.current?.click()} //with the help of this we can open the hidden file input and select the image we want to add
                                 disabled={saving}
                             >
                                 <Icon name="camera" size={14} /> Update Banner
@@ -166,17 +188,18 @@ function Store() {
                                 type="file"
                                 accept="image/*"
                                 hidden
-                                onChange={(e) => handleImageChange("bannerUrl", e.target.files[0])}
+                                onChange={(e) => handleImageChange("bannerUrl", e.target.files[0])} //yaha se selected image handleImageChange function me jayegi
                             />
                         </div>
 
-                        {/* Avatar + name row, overlapping the banner on the left */}
+                        
                         <div className="si-header-row">
+                            {/* this is for profile picture */}
                             <div className="si-avatar-wrap">
                                 <div
                                     className="si-avatar"
                                     onClick={() => photoInputRef.current?.click()}
-                                    style={profileImgUrl ? { backgroundImage: `url("${profileImgUrl}")` } : undefined}
+                                    style={profileImgUrl ? { backgroundImage: `url("${profileImgUrl}")` } : undefined} //ui me profilephoto show hogi
                                 >
                                     {profileImgUrl && (
                                         <img
@@ -207,6 +230,7 @@ function Store() {
                                 />
                             </div>
 
+                            {/* this is for displaying store name and store id beside the profile picture */}
                             <div className="si-title-block">
                                 <div className="si-heading-row">
                                     <h2 className="si-store-name">{store.storeName}</h2>
@@ -216,7 +240,7 @@ function Store() {
                         </div>
 
                         {/* Details list */}
-                        {!isEditing ? (
+                        {!isEditing ? (  //if isEditing is false then show this below ui where data is displayed.
                             <>
                                 <div className="si-details-list">
                                     <div className="si-detail-row">
@@ -246,16 +270,16 @@ function Store() {
                                 </div>
 
                                 <div className="si-actions">
-                                    <button className="si-btn si-btn-outline-primary" onClick={() => setIsEditing(true)}>
+                                    <button className="si-btn si-btn-outline-primary" onClick={() => setIsEditing(true)}> {/* when we will click on update button this will set the isEditing as true and the else part code will proceed */}
                                         <Icon name="edit" size={15} /> Update Store
                                     </button>
-                                    <button className="si-btn si-btn-outline-danger" onClick={handleDelete} disabled={saving}>
+                                    <button className="si-btn si-btn-outline-danger" onClick={handleDelete} disabled={saving}> {/* when delete button is clicked then it will go to a function called handleDelete where delete logic is applied */}
                                         <Icon name="trash" size={15} />
                                         {saving ? "Deleting..." : "Delete Store"}
                                     </button>
                                 </div>
                             </>
-                        ) : (
+                        ) : ( //if isEditing is true then show this ui where we will update the store name and description
                             <form className="si-edit-form" onSubmit={handleSaveDetails}>
                                 <div className="si-field">
                                     <label>Store Name</label>
@@ -282,7 +306,7 @@ function Store() {
                                     <button
                                         type="button"
                                         className="si-btn si-btn-secondary"
-                                        onClick={() => setIsEditing(false)}
+                                        onClick={() => setIsEditing(false)} //when clicked on cancel button setting isEditing as false meaning it will display the store information
                                         disabled={saving}
                                     >
                                         Cancel
@@ -293,7 +317,7 @@ function Store() {
                     </div>
                 )}
 
-                {!loading && !store && !error && (
+                {!loading && !store && !error && ( //no store found then navigate to create your store url
                     <div className="si-no-store">
                         <p>No store found</p>
 

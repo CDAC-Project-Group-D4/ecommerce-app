@@ -1,0 +1,13 @@
+/* ===== CustomerInfo.css ===== */
+
+.ci-avatar-thumb {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #fff4ec;
+    color: #f5691f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
