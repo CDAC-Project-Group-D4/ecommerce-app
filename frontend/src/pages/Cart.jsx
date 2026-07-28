@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
+import { useNavigate } from "react-router-dom";
 import "../css/Cart.css";
 function Cart() {
+    const navigate = useNavigate();
     const [itemToRemove, setItemToRemove] = useState(null);
     const [removing, setRemoving] = useState(false);
 
@@ -174,7 +176,10 @@ function Cart() {
                                         <strong>Grand Total</strong>
                                         <strong style={{ color: "#FF5C00" }}>₹{grandTotal.toFixed(2)}</strong>
                                     </div>
-                                    <button className="btn btn-accent w-100 rounded-3 py-2">
+                                    <button
+                                        className="btn btn-accent w-100 rounded-3 py-2"
+                                        onClick={() => navigate("/checkout")}
+                                    >
                                         Proceed to Checkout
                                     </button>
                                 </div>

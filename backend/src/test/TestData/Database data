@@ -1,0 +1,318 @@
+INSERT INTO customer_addresses
+(
+    created_at,
+    updated_at,
+    is_active,
+    full_name,
+    mobile_number,
+    label,
+    address_line_1,
+    address_line_2,
+    city,
+    state,
+    country,
+    pincode,
+    user_id
+)
+VALUES
+(
+    NOW(),
+    NOW(),
+    1,
+    'Ankita Narwade',
+    '9876543210',
+    'HOME',
+    'Flat No. 101, Sai Residency',
+    'Warje',
+    'Pune',
+    'Maharashtra',
+    'India',
+    '411058',
+    16
+);
+
+INSERT INTO categories (
+    is_active,
+    created_at,
+    updated_at,
+    name
+) VALUES
+(
+    b'1',
+    NOW(6),
+    NOW(6),
+    'Electronics'
+),
+(
+    b'1',
+    NOW(6),
+    NOW(6),
+    'Clothing'
+),
+(
+    b'1',
+    NOW(6),
+    NOW(6),
+    'Footwear'
+),
+(
+    b'1',
+    NOW(6),
+    NOW(6),
+    'Home & Kitchen'
+),
+(
+    b'1',
+    NOW(6),
+    NOW(6),
+    'Beauty & Personal Care'
+),
+(
+    b'1',
+    NOW(6),
+    NOW(6),
+    'Books'
+),
+(
+    b'1',
+    NOW(6),
+    NOW(6),
+    'Sports & Fitness'
+),
+(
+    b'1',
+    NOW(6),
+    NOW(6),
+    'Toys & Games'
+),
+(
+    b'1',
+    NOW(6),
+    NOW(6),
+    'Groceries'
+),
+(
+    b'1',
+    NOW(6),
+    NOW(6),
+    'Accessories'
+);
+
+
+INSERT INTO stores (
+    is_active,
+    on_holiday,
+    created_at,
+    updated_at,
+    user_id,
+    banner_url,
+    description,
+    profile_photo_url,
+    store_name
+) VALUES
+(
+    b'1',
+    b'0',
+    NOW(6),
+    NOW(6),
+    10,
+    'https://picsum.photos/seed/banner1/1200/300',
+    'Your one-stop destination for premium electronics.',
+    'https://picsum.photos/seed/store1/300/300',
+    'Tech World'
+),
+(
+    b'1',
+    b'0',
+    NOW(6),
+    NOW(6),
+    11,
+    'https://picsum.photos/seed/banner2/1200/300',
+    'Latest fashion and clothing for every occasion.',
+    'https://picsum.photos/seed/store2/300/300',
+    'Fashion Hub'
+),
+(
+    b'1',
+    b'0',
+    NOW(6),
+    NOW(6),
+    12,
+    'https://picsum.photos/seed/banner3/1200/300',
+    'Quality footwear for sports and casual wear.',
+    'https://picsum.photos/seed/store3/300/300',
+    'StepUp Footwear'
+),
+(
+    b'1',
+    b'0',
+    NOW(6),
+    NOW(6),
+    13,
+    'https://picsum.photos/seed/banner4/1200/300',
+    'Everything you need for your home and kitchen.',
+    'https://picsum.photos/seed/store4/300/300',
+    'Home Essentials'
+),
+(
+    b'1',
+    b'0',
+    NOW(6),
+    NOW(6),
+    15,
+    'https://picsum.photos/seed/banner5/1200/300',
+    'Health, beauty, and personal care products.',
+    'https://picsum.photos/seed/store5/300/300',
+    'Beauty Mart'
+);
+
+
+INSERT INTO products (
+    is_active,
+    low_stock_threshold,
+    price,
+    stock,
+    category_id,
+    created_at,
+    store_id,
+    updated_at,
+    image_url,
+    product_name
+) VALUES
+(
+    b'1',
+    5,
+    999.99,
+    20,
+    1,
+    NOW(6),
+    1,
+    NOW(6),
+    'https://picsum.photos/seed/laptop1/600/600',
+    'Gaming Laptop'
+),
+(
+    b'1',
+    10,
+    49.99,
+    100,
+    2,
+    NOW(6),
+    2,
+    NOW(6),
+    'https://picsum.photos/seed/tshirt1/600/600',
+    'Classic Cotton T-Shirt'
+),
+(
+    b'1',
+    5,
+    89.99,
+    40,
+    3,
+    NOW(6),
+    3,
+    NOW(6),
+    'https://picsum.photos/seed/shoes1/600/600',
+    'Sports Running Shoes'
+),
+(
+    b'1',
+    8,
+    149.99,
+    35,
+    4,
+    NOW(6),
+    4,
+    NOW(6),
+    'https://picsum.photos/seed/headphones1/600/600',
+    'Bluetooth Wireless Headphones'
+),
+(
+    b'1',
+    6,
+    199.99,
+    30,
+    1,
+    NOW(6),
+    5,
+    NOW(6),
+    'https://picsum.photos/seed/smartwatch1/600/600',
+    'Smart Fitness Watch'
+);
+
+
+
+INSERT INTO cart_items (
+    quantity,
+    added_at,
+    product_id,
+    user_id
+) VALUES
+(
+    1,
+    NOW(6),
+    1,
+    16
+),
+(
+    2,
+    NOW(6),
+    2,
+    16
+),
+(
+    1,
+    NOW(6),
+    3,
+    16
+),
+(
+    3,
+    NOW(6),
+    4,
+    16
+),
+(
+    1,
+    NOW(6),
+    5,
+    16
+);
+
+
+INSERT INTO cart_items (
+    quantity,
+    added_at,
+    product_id,
+    user_id
+) VALUES
+(
+    1,
+    NOW(6),
+    16,
+    16
+),
+(
+    2,
+    NOW(6),
+    17,
+    16
+),
+(
+    1,
+    NOW(6),
+    18,
+    16
+),
+(
+    3,
+    NOW(6),
+    19,
+    16
+),
+(
+    1,
+    NOW(6),
+    20,
+    16
+);

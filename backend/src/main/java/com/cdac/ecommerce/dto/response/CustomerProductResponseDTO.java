@@ -7,8 +7,11 @@ public record CustomerProductResponseDTO(
         Long storeId,
         Long categoryId,
         String name,
-        BigDecimal price
+        BigDecimal price,
+        String imageUrl
+
 
 ) {
 
 }
+
