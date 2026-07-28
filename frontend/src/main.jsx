@@ -6,6 +6,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { CartProvider } from "./context/CartContext.jsx";
 import { WishlistProvider } from "./context/WishlistContext.jsx";
 import { SellerProvider } from "./context/SellerContext.jsx";
+import { CheckoutProvider } from "./context/CheckoutContext.jsx";
+import { OrderProvider } from "./context/OrderContext.jsx";
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>
@@ -13,7 +15,11 @@ createRoot(document.getElementById('root')).render(
             <CartProvider>
                 <WishlistProvider>
                     <SellerProvider>
-                        <App />
+                        <CheckoutProvider>
+                            <OrderProvider>
+                                <App />
+                            </OrderProvider>
+                        </CheckoutProvider>
                     </SellerProvider>
                 </WishlistProvider>
             </CartProvider>

@@ -165,3 +165,88 @@ INSERT IGNORE INTO order_items (
 (4, 4, 101, 1, 2999.00, 2999.00, NOW(), NOW()), -- Order #4 (Item 1)
 (5, 4, 104, 1, 4200.00, 4200.00, NOW(), NOW()), -- Order #4 (Item 2)
 (6, 5, 104, 1, 4200.00, 4200.00, NOW(), NOW()); -- Order #5
+
+-- =================================================================
+-- 9. INSERT REVIEWS
+-- =================================================================
+INSERT IGNORE INTO reviews (
+    review_id, product_id, user_id, order_id, rating, body, is_active, created_at, updated_at
+) VALUES
+-- Review 1: Great review for Product 101 by User 1 (Order 1)
+(1, 101, 1, 1, 5, 'Absolutely loved this product! Excellent build quality and fast shipping.', 1, NOW(), NOW()),
+
+-- Review 2: Average review for Product 102 by User 1 (Order 2)
+(2, 102, 1, 2, 3, 'Decent quality for the price, but packaging was slightly damaged.', 1, NOW(), NOW()),
+
+-- Review 3: High rating for Product 104 by User 2 (Order 5)
+(3, 104, 2, 5, 4, 'Works as advertised. Very happy with the purchase!', 1, NOW(), NOW());
+
+-- =================================================================
+-- 10. INSERT RETURN REQUESTS (10 Comprehensive Test Cases)
+-- =================================================================
+INSERT IGNORE INTO return_requests (
+    return_request_id, order_id, order_item_id, user_id, reason, request_type,
+    seller_decision, seller_notes, seller_decided_at,
+    admin_user_id, admin_decision, admin_notes, admin_decided_at,
+    is_active, created_at, updated_at
+) VALUES
+
+-- [1] DISPUTED: Item Return - Seller Rejected, Admin Pending (Shows in status=DISPUTED)
+(1, 1, 1, 1, 'Product arrived shattered in transit.', 'RETURN',
+ 'REJECTED', 'Courier proof shows package was delivered intact.', NOW() - INTERVAL 2 DAY,
+ NULL, NULL, NULL, NULL,
+ 1, NOW() - INTERVAL 3 DAY, NOW()),
+
+-- [2] DISPUTED: Full Order Replace - Seller Rejected, Admin Pending (Shows in status=DISPUTED)
+(2, 2, NULL, 1, 'Wrong items sent across the whole shipment.', 'REPLACE',
+ 'REJECTED', 'Seller claims weight check matched invoice.', NOW() - INTERVAL 1 DAY,
+ NULL, NULL, NULL, NULL,
+ 1, NOW() - INTERVAL 2 DAY, NOW()),
+
+-- [3] SELLER APPROVED: Item Replacement accepted by seller
+(3, 3, 2, 2, 'Size too small, need one size larger.', 'REPLACE',
+ 'APPROVED', 'Replacement approved, reverse pickup scheduled.', NOW() - INTERVAL 1 DAY,
+ NULL, NULL, NULL, NULL,
+ 1, NOW() - INTERVAL 2 DAY, NOW()),
+
+-- [4] SELLER APPROVED: Full Order Return accepted by seller
+(4, 4, NULL, 2, 'Entire order delayed by 3 weeks, no longer needed.', 'RETURN',
+ 'APPROVED', 'Accepted late delivery return request.', NOW() - INTERVAL 2 DAY,
+ NULL, NULL, NULL, NULL,
+ 1, NOW() - INTERVAL 4 DAY, NOW()),
+
+-- [5] PENDING SELLER: Fresh Item Return request awaiting seller action
+(5, 1, 2, 3, 'Missing original box accessories.', 'RETURN',
+ NULL, NULL, NULL,
+ NULL, NULL, NULL, NULL,
+ 1, NOW() - INTERVAL 1 DAY, NOW()),
+
+-- [6] PENDING SELLER: Fresh Full Order Replace request awaiting seller action
+(6, 2, NULL, 3, 'Received completely different product category.', 'REPLACE',
+ NULL, NULL, NULL,
+ NULL, NULL, NULL, NULL,
+ 1, NOW() - INTERVAL 6 HOUR, NOW()),
+
+-- [7] ADMIN RESOLVED (OVERRIDDEN): Admin approved after Seller rejected
+(7, 3, 3, 1, 'Defective screen flickering on power on.', 'RETURN',
+ 'REJECTED', 'Seller claims physical damage after delivery.', NOW() - INTERVAL 5 DAY,
+ 1, 'APPROVED', 'Admin reviewed unboxing video provided by user. Refund granted.', NOW() - INTERVAL 1 DAY,
+ 1, NOW() - INTERVAL 6 DAY, NOW()),
+
+-- [8] ADMIN RESOLVED (UPHELD): Admin rejected after Seller rejected
+(8, 4, 1, 2, 'Did not like product aesthetics after opening.', 'RETURN',
+ 'REJECTED', 'Non-defective items non-returnable per category policy.', NOW() - INTERVAL 4 DAY,
+ 1, 'REJECTED', 'Admin upheld seller decision based on category terms.', NOW() - INTERVAL 1 DAY,
+ 1, NOW() - INTERVAL 5 DAY, NOW()),
+
+-- [9] DISPUTED: Item Replacement - Seller Rejected, Admin Pending (Shows in status=DISPUTED)
+(9, 5, 2, 3, 'Electrical component non-functional out of box.', 'REPLACE',
+ 'REJECTED', 'Seller requested service center certificate first.', NOW() - INTERVAL 12 HOUR,
+ NULL, NULL, NULL, NULL,
+ 1, NOW() - INTERVAL 1 DAY, NOW()),
+
+-- [10] INACTIVE / CANCELLED: User cancelled return request
+(10, 5, NULL, 1, 'Accidental return request submission.', 'RETURN',
+ NULL, NULL, NULL,
+ NULL, NULL, NULL, NULL,
+ 0, NOW() - INTERVAL 7 DAY, NOW());
