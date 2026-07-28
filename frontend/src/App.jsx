@@ -5,6 +5,7 @@ import Cart from "./pages/Cart.jsx";
 import Wishlist from "./pages/Wishlist.jsx";
 import SellerDashboard from './pages/SellerDashboard.jsx';
 import CreateStore from './pages/CreateStore.jsx';
+import Checkout from "./pages/Checkout.jsx";
 
 function App(){
     return (
@@ -13,6 +14,7 @@ function App(){
                 <Route path='/signin' element={<SignIn />} />
                 <Route path='/signup' element={<SignUp />} />
                 <Route path="/cart" element={<Cart />} />
+                <Route path="/checkout" element={<Checkout />} />
                 <Route path='/wishlist' element={<Wishlist/>}/>
                 <Route path='/seller/dashboard' element={<SellerDashboard/>}/>
                 <Route path='/create-store' element={<CreateStore/>}/>

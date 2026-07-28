@@ -1,0 +1,45 @@
+.order-card{
+
+    border-radius:18px;
+    transition:.3s;
+
+}
+
+.order-card:hover{
+
+    transform:translateY(-4px);
+
+}
+
+.order-image{
+
+    width:100px;
+    height:100px;
+    object-fit:cover;
+    border-radius:15px;
+
+}
+
+.price{
+
+    color:#ff6b00;
+    font-weight:bold;
+
+}
+
+.btn-warning{
+
+    background:linear-gradient(135deg,#ff8c42,#ff6b00);
+    border:none;
+    color:white;
+    font-weight:600;
+    border-radius:10px;
+
+}
+
+.btn-warning:hover{
+
+    background:linear-gradient(135deg,#ff7a00,#ff5500);
+    color:white;
+
+}
