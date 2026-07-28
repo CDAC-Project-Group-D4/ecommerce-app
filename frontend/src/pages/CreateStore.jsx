@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { createStore } from "../api/storeApi";
 import "../css/CreateStore.css";
 
+//this is similar to the signup page
 function CreateStore() {
     
     const navigate = useNavigate();

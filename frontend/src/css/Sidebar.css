@@ -1,5 +1,5 @@
 /* ===== Sidebar.css ===== */
-/* Palette/radius/focus states aligned with SignUp.css (Poppins, #f4f5f7 fields, orange accent) */
+/* Palette/radius/focus states aligned with SignUp.css (Poppins, #f3f4f6 background, orange gradient accent) */
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
@@ -9,13 +9,14 @@
     height: 100vh;
     position: sticky;
     top: 0;
-    background-color: #f4f5f7;
+    background-color: #f3f4f6;
     padding: 22px 18px;
     display: flex;
     flex-direction: column;
     gap: 22px;
     font-family: 'Poppins', sans-serif;
     box-sizing: border-box;
+    border-right: 1px solid #e5e7eb;
 }
 
 .sd-brand {
@@ -23,9 +24,13 @@
     align-items: center;
     gap: 8px;
     font-weight: 700;
-    font-size: 18px;
+    font-size: 19px;
     color: #1a1a1a;
     padding: 0 6px;
+}
+
+.sd-brand svg {
+    color: #f5691f;
 }
 
 .sd-shop-switcher {
@@ -33,14 +38,15 @@
     align-items: center;
     gap: 10px;
     background-color: #ffffff;
-    border: 1px solid #ffffff;
-    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
     padding: 10px 12px;
     cursor: pointer;
     text-align: left;
     color: #1a1a1a;
     width: 100%;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
 }
 
 .sd-shop-switcher:hover {
@@ -49,16 +55,20 @@
 }
 
 .sd-shop-avatar {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     background: linear-gradient(160deg, #ff9a4d, #f5691f);
     flex-shrink: 0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .sd-shop-avatar.small {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
 }
 
 .sd-shop-text {
@@ -82,10 +92,10 @@
 .sd-nav {
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: 4px;
 }
 
-/* .sd-nav-item is a NavLink (renders as <a>) so reset link defaults */
+/* NavLinks */
 .sd-nav-item {
     display: flex;
     align-items: center;
@@ -93,27 +103,28 @@
     background: none;
     border: none;
     text-align: left;
-    padding: 10px 12px;
+    padding: 11px 14px;
     border-radius: 10px;
     font-size: 14px;
-    color: #4b4b4b;
+    color: #4b5563;
     cursor: pointer;
     text-decoration: none;
-    transition: background-color 0.15s ease, color 0.15s ease;
+    transition: background-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
     width: 100%;
     font-family: inherit;
 }
 
 .sd-nav-item:hover {
-    background-color: #ececea;
+    background-color: #e5e7eb;
     color: #1a1a1a;
 }
 
 .sd-nav-item.active {
     background-color: #ffffff;
-    color: #1a1a1a;
+    color: #f5691f;
     font-weight: 600;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 12px rgba(245, 105, 31, 0.08);
+    border-left: 3px solid #f5691f;
 }
 
 .sd-nav-item.active svg {
@@ -128,12 +139,12 @@
 }
 
 .sd-logout {
-    color: #d64545;
+    color: #ef4444;
 }
 
 .sd-logout:hover {
-    background-color: #fdeceb;
-    color: #c0392b;
+    background-color: #fef2f2;
+    color: #dc2626;
 }
 
 @media (max-width: 860px) {
@@ -142,5 +153,6 @@
         height: auto;
         position: relative;
         border-bottom: 1px solid #e5e7eb;
+        border-right: none;
     }
 }

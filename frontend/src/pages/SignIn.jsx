@@ -5,40 +5,45 @@ import { useNavigate } from "react-router-dom";
 import { getMyStore } from "../api/storeApi";
 
 function SignIn() {
+
     const navigate = useNavigate()
+
+    //the initial value of the form is set to the following
     const [formData, setFormData] = useState({
         email: "",
         password: ""
     });
 
-    const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [success, setSuccess] = useState(null);
+    const [error, setError] = useState(null); //show error coming from backend
+    const [loading, setLoading] = useState(false); //loading is used to track the API call state — when setLoading(true) is called, it means the API request is in progress (show "Signing Up..." and disable the button), and when setLoading(false) is called, it means the API call is completed, after which success or error messages are displayed.
+    const [success, setSuccess] = useState(null); //shows success message.. coming from frontend
 
+    //this function will update the form when user will type something. jis input box me user type kr raha hai usi field ka data change hona chahiye
     const handleChange = (e) => {
         setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
+            ...formData, //this is the initial values of the form 
+            [e.target.name]: e.target.value //this will map the changes to respective field.
         });
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
+        e.preventDefault();  //prevents from page reloading
+        setLoading(true);  //reset everything before calling api
         setError(null);
         setSuccess(null);
 
         try {
-            const data = await signinUser(formData);
-            setSuccess("Login Successful");
+            const data = await signinUser(formData);  //calling backend api.. sending formData to the backend
+            setSuccess("Login Successful"); //if succesfull then setSuccess message as "login successfull". we can also write data.success so the success msg will come from backend just like error one.
 
             if (data.jwtToken) {
-                localStorage.setItem("jwtToken", data.jwtToken);
+                localStorage.setItem("jwtToken", data.jwtToken); //store jwt token related to this current user in the browsers local storage
             }
 
-            localStorage.setItem("user", JSON.stringify(data));
+            localStorage.setItem("user", JSON.stringify(data)); //store users data on local storage for frontend use (for avoiding repeated api calls to user)
 
-            setFormData({
+            //reset formData
+            setFormData({  
                 email: "",
                 password: ""
             });
@@ -58,7 +63,7 @@ function SignIn() {
             }, 1000);
 
         } catch (err) {
-            setError(err.message);
+            setError(err.message); //if not successfull then return the error message coming from backend
         } finally {
             setLoading(false);
         }
@@ -98,14 +103,14 @@ function SignIn() {
                         <button
                             type="submit"
                             className="btn btn-primary w-100 custom-btn"
-                            disabled={loading}
-                        >
+                            disabled={loading}> {/* when loading=true button will be disabled and if loading=false then button will be clickable.. this should be done for preventing double clicking */}
+
                             {loading ? "Signing In..." : "Sign In"}
                         </button>
                     </form>
 
                     <p className="text-center mt-3">
-                        Don’t have an account?{" "}
+                        Don’t have an account?{" "} {/* adding gap between text and link*/}
                         <a href="/signup" className="font-semibold hover:underline">
                             Sign Up
                         </a>

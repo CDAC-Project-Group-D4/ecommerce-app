@@ -1,14 +1,18 @@
 import axios from "axios";
+axios.defaults.withCredentials = true;
 
 const BASE_URL = "http://localhost:8080/api/product";
 
-//get token
+// get token header helper
 const getAuthHeader = () => {
     const token = localStorage.getItem("jwtToken");
+    const headers = {};
+    if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+    }
     return {
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
+        withCredentials: true,
+        headers
     };
 };
 
