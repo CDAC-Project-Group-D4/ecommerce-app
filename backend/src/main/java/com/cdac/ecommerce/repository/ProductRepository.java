@@ -11,6 +11,9 @@ import java.util.Optional;
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
 
+    @Query("SELECT p FROM Product p WHERE p.store.id = :storeId AND p.stock <= p.low_stock_threshold AND p.is_active = true")
+    List<Product> findLowStockProductsByStoreId(@Param("storeId") Long storeId);
+
     // Used by CartService to validate a product is still sellable before adding to cart
     // NOTE: using an explicit @Query here instead of a derived method name (findByIs_active)
     // because Spring Data's name parser splits on underscores and gets confused by the

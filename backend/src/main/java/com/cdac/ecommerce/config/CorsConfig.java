@@ -24,7 +24,11 @@ public class CorsConfig {
             @Override
             public void addResourceHandlers(ResourceHandlerRegistry registry) {
                 registry.addResourceHandler("/uploads/**")
-                        .addResourceLocations("file:uploads/");
+                        .addResourceLocations(
+                                "file:uploads/",
+                                "file:backend/uploads/",
+                                "file:///D:/CDAC Major Project/ecommerce-app/backend/uploads/"
+                        );
             }
         };
     }
