@@ -1,0 +1,268 @@
+
+/*Order Details Page*/
+.order-details-page{
+
+    min-height:100vh;
+    background:#f5f6fa;
+
+}
+
+
+/*   Header*/
+
+.order-details-header{
+
+    background:linear-gradient(135deg,#ff8c42,#ff6b00);
+    color:white;
+    text-align:center;
+    padding:50px 20px;
+    border-bottom-left-radius:35px;
+    border-bottom-right-radius:35px;
+    box-shadow:0 8px 20px rgba(0,0,0,.15);
+
+}
+
+.order-details-header h2{
+
+    font-size:36px;
+    font-weight:700;
+    margin-bottom:10px;
+
+}
+
+.order-details-header p{
+
+    font-size:18px;
+    opacity:.9;
+
+}
+
+
+   /*Cards*/
+
+.card{
+
+    border-radius:18px;
+    overflow:hidden;
+    transition:.3s;
+
+}
+
+.card:hover{
+
+    transform:translateY(-3px);
+
+}
+
+
+   /*Product List*/
+
+
+.product-row{
+
+    display:flex;
+    align-items:center;
+    gap:20px;
+    padding:18px 0;
+    border-bottom:1px solid #eeeeee;
+
+}
+
+.product-row:last-child{
+
+    border-bottom:none;
+
+}
+
+.product-image{
+
+    width:90px;
+    height:90px;
+    object-fit:cover;
+    border-radius:12px;
+    border:1px solid #eee;
+
+}
+
+.product-row h5{
+
+    margin-bottom:6px;
+    font-weight:600;
+
+}
+
+.product-row p{
+
+    margin:0;
+    color:#666;
+
+}
+
+
+/*   Address*/
+.card-body h4{
+
+    font-weight:700;
+    color:#222;
+
+}
+
+.card-body h5{
+
+    font-weight:600;
+
+}
+
+.card-body p{
+
+    color:#555;
+    line-height:1.7;
+
+}
+
+/*   Summary*/
+
+.sticky-top{
+
+    top:25px;
+
+}
+
+.summary-row{
+
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:15px;
+
+}
+
+.summary-row span{
+
+    color:#666;
+
+}
+
+.summary-row strong{
+
+    color:#222;
+
+}
+
+/*   Status Badge*/
+
+.order-status{
+
+    display:inline-block;
+    padding:8px 18px;
+    border-radius:25px;
+    font-size:14px;
+    font-weight:600;
+    color:white;
+
+}
+
+.pending{
+
+    background:#ffc107;
+
+}
+
+.confirmed{
+
+    background:#17a2b8;
+
+}
+
+.shipped{
+
+    background:#0d6efd;
+
+}
+
+.delivered{
+
+    background:#28a745;
+
+}
+
+.completed{
+
+    background:#198754;
+
+}
+
+.cancelled{
+
+    background:#dc3545;
+
+}
+
+.payment_failed{
+
+    background:#6c757d;
+
+}
+
+/*   Buttons*/
+
+.btn-danger{
+
+    border-radius:10px;
+    font-weight:600;
+
+}
+
+.btn-warning{
+
+    background:linear-gradient(135deg,#ff8c42,#ff6b00);
+    border:none;
+    color:white;
+    border-radius:10px;
+    font-weight:600;
+
+}
+
+.btn-warning:hover{
+
+    background:linear-gradient(135deg,#ff7a00,#ff5500);
+    color:white;
+
+}
+
+
+/*   Responsive*/
+
+@media(max-width:992px){
+
+    .sticky-top{
+
+        position:relative !important;
+        top:0;
+
+    }
+
+}
+
+@media(max-width:768px){
+
+    .order-details-header h2{
+
+        font-size:28px;
+
+    }
+
+    .product-row{
+
+        flex-direction:column;
+        text-align:center;
+
+    }
+
+    .product-image{
+
+        width:120px;
+        height:120px;
+
+    }
+
+}
