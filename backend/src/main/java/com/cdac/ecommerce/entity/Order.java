@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-//@AllArgsConstructor
+@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
@@ -66,5 +66,13 @@ public class Order extends BaseClass {
         @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
         private List<OrderItem> orderItems = new ArrayList<>();
 
+        public boolean isReturnEligible(){
+                if(this.orderStatus != OrderStatus.DELIVERED || this.deliveredAt == null){
+                        return false;
+                }
+
+                LocalDateTime returnDeadLine = this.deliveredAt.plusDays(7);
+                return LocalDateTime.now().isBefore(returnDeadLine);
+        }
 
 }
