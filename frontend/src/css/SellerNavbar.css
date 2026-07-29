@@ -1,0 +1,137 @@
+/* ===== SellerNavbar.css ===== */
+
+.seller-navbar-divider {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    background-color: #f3f4f6;
+    border-bottom: 1px solid #e5e7eb;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-radius: 0;
+    margin: -20px -28px 24px -28px;
+    padding: 14px 28px;
+    width: calc(100% + 56px);
+    box-shadow: none;
+    box-sizing: border-box;
+}
+
+/* Page Title Section on Left with Icon */
+.sn-title-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sn-title-container svg {
+    color: #f5691f;
+    flex-shrink: 0;
+}
+
+.sn-page-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+    line-height: 1.2;
+    letter-spacing: -0.2px;
+}
+
+/* Right Side: Actions & Profile */
+.sn-actions-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+/* Notification Button */
+.sn-notify-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    color: #4b5563;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+    transition: all 0.2s ease;
+}
+
+.sn-notify-btn:hover {
+    background-color: #ffffff;
+    border-color: #f5821f;
+    color: #f5821f;
+    box-shadow: 0 0 0 3px rgba(245, 130, 31, 0.15);
+}
+
+.sn-notify-badge {
+    position: absolute;
+    top: 9px;
+    right: 9px;
+    width: 8px;
+    height: 8px;
+    background-color: #ef4444;
+    border-radius: 50%;
+    border: 2px solid #ffffff;
+}
+
+/* Seller User Info Card */
+.sn-user-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 6px 14px 6px 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+}
+
+.sn-user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(160deg, #ff9a4d, #f5691f);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.sn-user-details {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.25;
+}
+
+.sn-user-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.sn-user-email {
+    font-size: 11px;
+    color: #6b7280;
+}
+
+@media (max-width: 640px) {
+    .seller-navbar-divider {
+        margin: -20px -16px 20px -16px;
+        width: calc(100% + 32px);
+        padding: 12px 16px;
+        flex-direction: row;
+        align-items: center;
+    }
+    .sn-page-title {
+        font-size: 17px;
+    }
+}
