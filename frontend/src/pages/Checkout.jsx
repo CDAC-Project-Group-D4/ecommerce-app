@@ -27,9 +27,11 @@ function Checkout() {
         paymentMethod,
 
         loading,
+        savingAddress,
         error,
 
         loadCheckout,
+        handleAddAddress,
         handlePlaceOrder,
 
         setSelectedAddress,
@@ -49,7 +51,11 @@ function Checkout() {
 
         if (order) {
 
-            navigate("/orders");
+            navigate("/order-success", {
+                state: {
+                    orderId: order.orderId
+                }
+            });
 
         }
 
@@ -87,6 +93,8 @@ function Checkout() {
                             addresses={addresses}
                             selectedAddress={selectedAddress}
                             setSelectedAddress={setSelectedAddress}
+                            savingAddress={savingAddress}
+                            onAddAddress={handleAddAddress}
                         />
 
                         <PaymentSection
@@ -99,25 +107,27 @@ function Checkout() {
                     {/* Right Side */}
 
                     <div className="col-lg-4">
+                        <div className="checkout-sidebar">
 
-                        <OrderSummary
-                            cartItems={cartItems}
-                            subtotal={subtotal}
-                            grandTotal={grandTotal}
-                        />
+                            <OrderSummary
+                                cartItems={cartItems}
+                                subtotal={subtotal}
+                                grandTotal={grandTotal}
+                            />
 
-                        {
-                            error &&
-                            <div className="alert alert-danger mt-3">
-                                {error}
-                            </div>
-                        }
+                            {
+                                error &&
+                                <div className="alert alert-danger mt-3">
+                                    {error}
+                                </div>
+                            }
 
-                        <PlaceOrderButton
-                            loading={loading}
-                            handlePlaceOrder={placeOrder}
-                        />
+                            <PlaceOrderButton
+                                loading={loading}
+                                handlePlaceOrder={placeOrder}
+                            />
 
+                        </div>
                     </div>
 
                 </div>

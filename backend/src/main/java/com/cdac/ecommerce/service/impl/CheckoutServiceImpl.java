@@ -3,14 +3,19 @@ package com.cdac.ecommerce.service.impl;
 import com.cdac.ecommerce.dto.response.CartResponseDTO;
 import com.cdac.ecommerce.dto.response.CheckoutResponseDTO;
 import com.cdac.ecommerce.dto.response.CustomerAddressResponseDTO;
+import com.cdac.ecommerce.dto.request.CustomerAddressRequestDTO;
 import com.cdac.ecommerce.entity.Cart;
 import com.cdac.ecommerce.entity.CustomerAddress;
+import com.cdac.ecommerce.entity.User;
+import com.cdac.ecommerce.exception.ResourceNotFoundException;
 import com.cdac.ecommerce.mapper.CartMapper;
 import com.cdac.ecommerce.mapper.CustomerAddressMapper;
 import com.cdac.ecommerce.repository.CartRepository;
 import com.cdac.ecommerce.repository.CustomerAddressRepository;
+import com.cdac.ecommerce.repository.UserRepo;
 import com.cdac.ecommerce.service.CheckoutService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -19,15 +24,18 @@ import java.util.List;
 public class CheckoutServiceImpl implements CheckoutService {
     private final CartRepository cartRepository;
     private final CustomerAddressRepository addressRepository;
+    private final UserRepo userRepository;
     private final CartMapper cartMapper;
     private final CustomerAddressMapper addressMapper;
 
     public CheckoutServiceImpl(CartRepository cartRepository,
                                CustomerAddressRepository addressRepository,
+                               UserRepo userRepository,
                                CartMapper cartMapper,
                                CustomerAddressMapper addressMapper) {
         this.cartRepository = cartRepository;
         this.addressRepository = addressRepository;
+        this.userRepository = userRepository;
         this.cartMapper = cartMapper;
         this.addressMapper = addressMapper;
     }
@@ -70,6 +78,35 @@ public class CheckoutServiceImpl implements CheckoutService {
 
 
 
+    }
+
+    @Override
+    @Transactional
+    public CustomerAddressResponseDTO addAddress(
+            Long userId,
+            CustomerAddressRequestDTO request) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        CustomerAddress address = new CustomerAddress();
+        address.setUser(user);
+        address.setFullName(request.getFullName().trim());
+        address.setMobileNumber(request.getMobileNumber().trim());
+        address.setLabel(request.getLabel());
+        address.setAddressLine1(request.getAddressLine1().trim());
+        address.setAddressLine2(
+                request.getAddressLine2() == null
+                        ? null
+                        : request.getAddressLine2().trim()
+        );
+        address.setPincode(request.getPincode().trim());
+        address.setCity(request.getCity().trim());
+        address.setState(request.getState().trim());
+        address.setCountry(request.getCountry().trim());
+        address.setActive(true);
+
+        return addressMapper.toResponseDTO(addressRepository.save(address));
     }
 
 

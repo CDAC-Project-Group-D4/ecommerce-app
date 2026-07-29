@@ -1,7 +1,9 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { useOrders } from "../context/OrderContext";
+import WriteReviewButton from "../components/customerComponents/reviews/WriteReviewButton";
+import { getMyReviews } from "../api/reviewApi";
 
 import "../css/OrderDetails.css";
 
@@ -10,6 +12,7 @@ function OrderDetails() {
     const { orderId } = useParams();
 
     const navigate = useNavigate();
+    const [myReviews, setMyReviews] = useState([]);
 
     const {
         selectedOrder,
@@ -24,6 +27,12 @@ function OrderDetails() {
         loadOrder(orderId);
 
     }, [orderId]);
+
+    useEffect(() => {
+        getMyReviews()
+            .then(setMyReviews)
+            .catch(() => setMyReviews([]));
+    }, []);
 
     if (loading) {
 
@@ -67,7 +76,7 @@ function OrderDetails() {
 
             <div className="container py-4">
 
-                <div className="row">
+                <div className="row g-4 justify-content-center">
 
                     {/* Left Side */}
 
@@ -121,6 +130,29 @@ function OrderDetails() {
                                                 ₹{item.lineTotal}
 
                                             </h5>
+
+                                            {
+                                                (
+                                                    order.orderStatus === "DELIVERED" ||
+                                                    order.orderStatus === "COMPLETED"
+                                                ) &&
+                                                (
+                                                    myReviews.some(
+                                                        (review) =>
+                                                            review.orderId === order.orderId &&
+                                                            review.productId === item.productId
+                                                    )
+                                                        ?
+                                                        <span className="reviewed-badge">
+                                                            ✓ Reviewed
+                                                        </span>
+                                                        :
+                                                        <WriteReviewButton
+                                                            orderId={order.orderId}
+                                                            product={item}
+                                                        />
+                                                )
+                                            }
 
                                         </div>
 

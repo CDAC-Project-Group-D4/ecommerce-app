@@ -83,6 +83,39 @@
    Address
 =========================== */
 
+.address-section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.address-section-heading h3 {
+    margin: 0;
+}
+
+.add-address-btn {
+    padding: 9px 16px;
+    color: #ff6b00;
+    font-weight: 600;
+    background: #fff5ee;
+    border: 1px solid #ff7a00;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.add-address-btn:hover {
+    color: white;
+    background: #ff6b00;
+}
+
+.address-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
 .address-card {
 
     border: 2px solid #ececec;
@@ -97,6 +130,10 @@
 
     transition: .3s;
 
+}
+
+.address-list .address-card {
+    margin-bottom: 0;
 }
 
 .address-card:hover {
@@ -167,6 +204,107 @@
 
 }
 
+.address-form {
+    padding: 22px;
+    background: #fffaf6;
+    border: 1px solid #ffd4b8;
+    border-radius: 15px;
+}
+
+.address-form-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+}
+
+.address-form-header h4 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.address-form-close {
+    width: 34px;
+    height: 34px;
+    color: #666;
+    font-size: 25px;
+    line-height: 1;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.address-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.address-form-grid label {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    color: #444;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.address-form-grid input,
+.address-form-grid select {
+    width: 100%;
+    padding: 11px 12px;
+    color: #222;
+    font-size: 14px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 9px;
+    outline: none;
+}
+
+.address-form-grid input:focus,
+.address-form-grid select:focus {
+    border-color: #ff7a00;
+    box-shadow: 0 0 0 3px rgba(255, 122, 0, 0.12);
+}
+
+.address-field-wide {
+    grid-column: 1 / -1;
+}
+
+.address-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.address-save-btn,
+.address-cancel-btn {
+    padding: 11px 20px;
+    font-weight: 600;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.address-save-btn {
+    color: white;
+    background: linear-gradient(135deg, #ff8c42, #ff6b00);
+    border: none;
+}
+
+.address-cancel-btn {
+    color: #555;
+    background: white;
+    border: 1px solid #ccc;
+}
+
+.address-save-btn:disabled,
+.address-cancel-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
 /* ===========================
    Payment
 =========================== */
@@ -233,11 +371,14 @@
    Summary
 =========================== */
 
-.summary-card{
+.checkout-sidebar {
 
     position: sticky;
 
     top:20px;
+}
+
+.summary-card{
 
 }
 
@@ -401,7 +542,7 @@
 
     }
 
-    .summary-card{
+    .checkout-sidebar{
 
         position:static;
 
@@ -421,6 +562,33 @@
 
         flex-direction:column;
 
+    }
+
+    .address-section-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .address-list,
+    .address-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .address-field-wide {
+        grid-column: auto;
+    }
+
+    .address-form {
+        padding: 18px;
+    }
+
+    .address-form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .address-save-btn,
+    .address-cancel-btn {
+        width: 100%;
     }
 
     .summary-item img{
