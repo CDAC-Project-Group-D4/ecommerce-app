@@ -47,4 +47,5 @@ public interface UserRepo extends JpaRepository<User, Long> {
 
     @Query("SELECT u FROM User u JOIN u.store s WHERE u.role = com.cdac.ecommerce.entity.enums.Roles.SELLER AND s.active = true")
     List<User> findAllSellers();
+
 }
