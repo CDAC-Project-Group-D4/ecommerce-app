@@ -59,3 +59,15 @@ export const getStoreOrders = async () => {
     const response = await axios.get(`${BASE_URL}/orders`, getAuthHeader());
     return response.data;
 };
+
+//deactivate store (soft delete) api
+export const deactivateStore = async () => {
+    const response = await axios.put(`${BASE_URL}/deactivate-store`, {}, getAuthHeader());
+    return response.data;
+}
+
+//reactivate store api
+export const reactivateStore = async () => {
+    const response = await axios.put(`${BASE_URL}/reactivate-store`, {}, getAuthHeader());
+    return response.data;
+}

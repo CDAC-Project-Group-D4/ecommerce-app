@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import Sidebar from "../components/sellerComponents/Sidebar";
 import SellerNavbar from "../components/sellerComponents/SellerNavbar";
 import Icon from "../components/sellerComponents/Icon";
-import { getMyStore, updateStore, deleteStore, uploadStoreMedia } from "../api/storeApi.js";
+import { getMyStore, updateStore, deleteStore, uploadStoreMedia, deactivateStore, reactivateStore } from "../api/storeApi.js";
 import { getCurrentUser } from "../utils/authhelper.js";
 import { useSeller } from "../context/SellerContext.jsx";
 import "../css/SellerDashboard.css";
@@ -106,6 +106,35 @@ function Store() {
             if (setContextStore) setContextStore(null);
         } catch (err) {
             setError(err.message || "Failed to delete store");
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handleDeactivate = async () => {
+        if (!window.confirm("Deactivate your store? All your products will be hidden from shoppers.")) return;
+        setSaving(true);
+        setError(null);
+        try {
+            const updated = await deactivateStore();
+            setStore(updated);
+            if (setContextStore) setContextStore(updated);
+        } catch (err) {
+            setError(err.message || "Failed to deactivate store");
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handleReactivate = async () => {
+        setSaving(true);
+        setError(null);
+        try {
+            const updated = await reactivateStore();
+            setStore(updated);
+            if (setContextStore) setContextStore(updated);
+        } catch (err) {
+            setError(err.message || "Failed to reactivate store");
         } finally {
             setSaving(false);
         }
@@ -232,8 +261,18 @@ function Store() {
 
                             {/* this is for displaying store name and store id beside the profile picture */}
                             <div className="si-title-block">
-                                <div className="si-heading-row">
+                                <div className="si-heading-row" style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                                     <h2 className="si-store-name">{store.storeName}</h2>
+                                    <span style={{
+                                        padding: "4px 10px",
+                                        borderRadius: "12px",
+                                        fontSize: "12px",
+                                        fontWeight: "bold",
+                                        backgroundColor: store.active ? "#dcfce7" : "#fee2e2",
+                                        color: store.active ? "#166534" : "#991b1b"
+                                    }}>
+                                        {store.active ? "● Active" : "● Inactive"}
+                                    </span>
                                 </div>
                                 <span className="si-store-id">Store ID: ST{String(store.id).padStart(8, "0")}</span>
                             </div>
@@ -242,6 +281,12 @@ function Store() {
                         {/* Details list */}
                         {!isEditing ? (  //if isEditing is false then show this below ui where data is displayed.
                             <>
+                                {!store.active && (
+                                    <div style={{ backgroundColor: "#fef3c7", color: "#92400e", padding: "12px 16px", borderRadius: "8px", marginBottom: "16px", fontSize: "14px", border: "1px solid #fde68a" }}>
+                                        ⚠️ <strong>Your store is currently inactive.</strong> All associated products are hidden from customers on the platform.
+                                    </div>
+                                )}
+
                                 <div className="si-details-list">
                                     <div className="si-detail-row">
                                         <span className="si-detail-label">
@@ -273,9 +318,20 @@ function Store() {
                                     <button className="si-btn si-btn-outline-primary" onClick={() => setIsEditing(true)}> {/* when we will click on update button this will set the isEditing as true and the else part code will proceed */}
                                         <Icon name="edit" size={15} /> Update Store
                                     </button>
+
+                                    {store.active ? (
+                                        <button className="si-btn si-btn-outline-danger" style={{ borderColor: "#f59e0b", color: "#d97706" }} onClick={handleDeactivate} disabled={saving}>
+                                            ⏸️ {saving ? "Deactivating..." : "Deactivate Store"}
+                                        </button>
+                                    ) : (
+                                        <button className="si-btn si-btn-outline-primary" style={{ backgroundColor: "#16a34a", borderColor: "#16a34a", color: "#fff" }} onClick={handleReactivate} disabled={saving}>
+                                            ▶️ {saving ? "Reactivating..." : "Reactivate Store"}
+                                        </button>
+                                    )}
+
                                     <button className="si-btn si-btn-outline-danger" onClick={handleDelete} disabled={saving}> {/* when delete button is clicked then it will go to a function called handleDelete where delete logic is applied */}
                                         <Icon name="trash" size={15} />
-                                        {saving ? "Deleting..." : "Delete Store"}
+                                        {saving ? "Deleting..." : "Delete Store Permanently"}
                                     </button>
                                 </div>
                             </>

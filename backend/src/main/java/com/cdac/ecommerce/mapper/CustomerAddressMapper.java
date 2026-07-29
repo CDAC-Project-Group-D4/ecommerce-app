@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
 public class CustomerAddressMapper {
 
     // Entity -> Response DTO
-    public CustomerAddressResponseDTO toResponse(CustomerAddress address) {
+    public CustomerAddressResponseDTO toResponseDTO(CustomerAddress address) {
 
         CustomerAddressResponseDTO dto = new CustomerAddressResponseDTO();
 
@@ -54,20 +54,24 @@ public class CustomerAddressMapper {
         return dto;
     }
 
+    public CustomerAddressResponseDTO toResponse(CustomerAddress address) {
+        return toResponseDTO(address);
+    }
+
     // Request DTO -> Entity
     public CustomerAddress toEntity(CustomerAddressRequestDTO dto) {
 
         CustomerAddress address = new CustomerAddress();
 
-        address.setLabel(dto.label());
-        address.setFullName(dto.fullName());
-        address.setMobileNumber(dto.mobileNumber());
-        address.setAddressLine1(dto.addressLine1());
-        address.setAddressLine2(dto.addressLine2());
-        address.setPincode(dto.pincode());
-        address.setCity(dto.city());
-        address.setState(dto.state());
-        address.setCountry(dto.country());
+        address.setLabel(dto.getLabel());
+        address.setFullName(dto.getFullName());
+        address.setMobileNumber(dto.getMobileNumber());
+        address.setAddressLine1(dto.getAddressLine1());
+        address.setAddressLine2(dto.getAddressLine2());
+        address.setPincode(dto.getPincode());
+        address.setCity(dto.getCity());
+        address.setState(dto.getState());
+        address.setCountry(dto.getCountry());
 
         return address;
     }
@@ -76,14 +80,14 @@ public class CustomerAddressMapper {
     public void updateEntity(CustomerAddress address,
                              CustomerAddressRequestDTO dto) {
 
-        address.setLabel(dto.label());
-        address.setFullName(dto.fullName());
-        address.setMobileNumber(dto.mobileNumber());
-        address.setAddressLine1(dto.addressLine1());
-        address.setAddressLine2(dto.addressLine2());
-        address.setPincode(dto.pincode());
-        address.setCity(dto.city());
-        address.setState(dto.state());
-        address.setCountry(dto.country());
+        address.setLabel(dto.getLabel());
+        address.setFullName(dto.getFullName());
+        address.setMobileNumber(dto.getMobileNumber());
+        address.setAddressLine1(dto.getAddressLine1());
+        address.setAddressLine2(dto.getAddressLine2());
+        address.setPincode(dto.getPincode());
+        address.setCity(dto.getCity());
+        address.setState(dto.getState());
+        address.setCountry(dto.getCountry());
     }
 }
