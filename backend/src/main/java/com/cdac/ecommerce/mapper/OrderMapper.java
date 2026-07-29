@@ -50,7 +50,7 @@ public class OrderMapper {
         dto.setDeliveredAt(order.getDeliveredAt());
         dto.setCompletedAt(order.getCompletedAt());
 
-        dto.setAddress(addressMapper.toResponseDTO(order.getAddress()));
+        dto.setAddress(addressMapper.toResponse(order.getAddress()));
 
         List<OrderItemResponseDTO> items = new ArrayList<>();
 

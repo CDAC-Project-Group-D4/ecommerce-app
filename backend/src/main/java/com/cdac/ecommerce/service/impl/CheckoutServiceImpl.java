@@ -57,7 +57,7 @@ public class CheckoutServiceImpl implements CheckoutService {
 
         List<CustomerAddressResponseDTO> addressDTOs =
                 customerAddressList.stream()
-                        .map(addressMapper::toResponseDTO)
+                        .map(addressMapper::toResponse)
                         .toList();
 
         CheckoutResponseDTO response = new CheckoutResponseDTO();
