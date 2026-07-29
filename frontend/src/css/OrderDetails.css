@@ -7,6 +7,12 @@
 
 }
 
+.order-details-page .container {
+    width: calc(100% - 32px);
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
 
 /*   Header*/
 
@@ -40,7 +46,7 @@
 
    /*Cards*/
 
-.card{
+.order-details-page .card{
 
     border-radius:18px;
     overflow:hidden;
@@ -48,10 +54,14 @@
 
 }
 
-.card:hover{
+.order-details-page .card:hover{
 
     transform:translateY(-3px);
 
+}
+
+.order-details-page .card-body {
+    padding:25px;
 }
 
 
@@ -100,20 +110,20 @@
 
 
 /*   Address*/
-.card-body h4{
+.order-details-page .card-body h4{
 
     font-weight:700;
     color:#222;
 
 }
 
-.card-body h5{
+.order-details-page .card-body h5{
 
     font-weight:600;
 
 }
 
-.card-body p{
+.order-details-page .card-body p{
 
     color:#555;
     line-height:1.7;
@@ -122,7 +132,7 @@
 
 /*   Summary*/
 
-.sticky-top{
+.order-details-page .sticky-top{
 
     top:25px;
 
@@ -205,14 +215,14 @@
 
 /*   Buttons*/
 
-.btn-danger{
+.order-details-page .btn-danger{
 
     border-radius:10px;
     font-weight:600;
 
 }
 
-.btn-warning{
+.order-details-page .btn-warning{
 
     background:linear-gradient(135deg,#ff8c42,#ff6b00);
     border:none;
@@ -222,7 +232,7 @@
 
 }
 
-.btn-warning:hover{
+.order-details-page .btn-warning:hover{
 
     background:linear-gradient(135deg,#ff7a00,#ff5500);
     color:white;
@@ -234,9 +244,14 @@
 
 @media(max-width:992px){
 
-    .sticky-top{
+    .order-details-page .col-lg-8,
+    .order-details-page .col-lg-4 {
+        width:100%;
+    }
 
-        position:relative !important;
+    .order-details-page .sticky-top{
+
+        position:static !important;
         top:0;
 
     }
@@ -263,6 +278,56 @@
         width:120px;
         height:120px;
 
+    }
+
+}
+
+.write-review-btn {
+    padding:8px 14px;
+    color:#ff6b00;
+    font-size:13px;
+    font-weight:600;
+    white-space:nowrap;
+    background:#fff5ee;
+    border:1px solid #ff7a00;
+    border-radius:9px;
+    cursor:pointer;
+}
+
+.write-review-btn:hover {
+    color:white;
+    background:#ff6b00;
+}
+
+.reviewed-badge {
+    padding:8px 14px;
+    color:#166534;
+    font-size:13px;
+    font-weight:700;
+    white-space:nowrap;
+    background:#dcfce7;
+    border-radius:20px;
+}
+
+@media(max-width:576px){
+
+    .order-details-page .container {
+        width:calc(100% - 20px);
+        padding:12px 0;
+    }
+
+    .order-details-page .card-body {
+        padding:18px;
+    }
+
+    .product-row {
+        align-items:center;
+        flex-direction:column;
+        text-align:center;
+    }
+
+    .product-row > h5 {
+        width:100%;
     }
 
 }

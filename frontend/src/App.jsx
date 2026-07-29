@@ -11,6 +11,8 @@ import Store from './pages/Store.jsx';
 import Product from './pages/Product.jsx';
 import Orders from "./pages/Orders.jsx";
 import OrderDetails from "./pages/OrderDetails.jsx";
+import OrderSuccess from "./pages/OrderSuccess.jsx";
+import AddReview from "./pages/AddReview.jsx";
 
 
 function App(){
@@ -28,6 +30,8 @@ function App(){
                 <Route path='/seller/store-info' element={<Store/>}/>
                 <Route path='/seller/products' element={<Product/>}/>
                <Route path="/orders/:orderId" element={<OrderDetails />} />
+                <Route path="/order-success" element={<OrderSuccess />}/>
+                <Route path="/reviews/add" element={<AddReview />} />
             </Routes>
         </div>
     )

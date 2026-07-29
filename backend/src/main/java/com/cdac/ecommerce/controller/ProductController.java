@@ -3,7 +3,9 @@ package com.cdac.ecommerce.controller;
 import com.cdac.ecommerce.dto.request.ProductRequestDTO;
 import com.cdac.ecommerce.dto.request.UpdateProductRequestDTO;
 import com.cdac.ecommerce.dto.response.ProductResponseDTO;
+import com.cdac.ecommerce.dto.response.ReviewResponseDTO;
 import com.cdac.ecommerce.service.ProductService;
+import com.cdac.ecommerce.service.ReviewService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,7 @@ import java.util.List;
 @RequestMapping("/api/product")
 public class  ProductController {
     private final ProductService productService;
+    private final ReviewService reviewService;
 
     @PostMapping("/create-product")
     public ResponseEntity<ProductResponseDTO> createProduct(@Valid @RequestBody ProductRequestDTO productRequestDTO){
@@ -47,4 +50,13 @@ public class  ProductController {
         return ResponseEntity.ok(productResponseDTO);
     }
 
+
+    @GetMapping("/{productId}/reviews")
+    public ResponseEntity<List<ReviewResponseDTO>> getProductReviews(
+            @PathVariable Long productId) {
+
+        return ResponseEntity.ok(
+                reviewService.getReviewsByProduct(productId)
+        );
+    }
 }

@@ -13,9 +13,9 @@ function PaymentSection({
 
                 <div
                     className={`payment-card ${
-                        paymentMethod === "COD" ? "selected" : ""
+                        paymentMethod === "CASH_ON_DELIVERY" ? "selected" : ""
                     }`}
-                    onClick={() => setPaymentMethod("COD")}
+                    onClick={() => setPaymentMethod("CASH_ON_DELIVERY")}
                 >
 
                     <h4>💵 Cash On Delivery</h4>

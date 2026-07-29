@@ -21,6 +21,11 @@ export const getCheckout = async () => {
     return response.data;
 };
 
+export const addCheckoutAddress = async (addressData) => {
+    const response = await api.post("/checkout/addresses", addressData);
+    return response.data;
+};
+
 // POST /api/orders
 export const placeOrder = async (orderData) => {
     const response = await api.post("/orders", orderData);
