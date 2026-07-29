@@ -245,7 +245,7 @@ INSERT IGNORE INTO return_requests (
  NULL, NULL, NULL, NULL,
  0, NOW() - INTERVAL 7 DAY, NOW());
 
-INSERT IGNORE INTO customer_addresses (
+INSERT INTO customer_addresses (
     id,
     user_id,
     full_name,
