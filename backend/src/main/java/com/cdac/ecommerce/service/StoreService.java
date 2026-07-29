@@ -21,4 +21,8 @@ public interface StoreService {
     Map<String, String> uploadMedia(MultipartFile banner, MultipartFile profilePhoto);
 
     List<OrderResponseDTO> getStoreOrders();
+
+    StoreResponseDTO deactivateStore();
+
+    StoreResponseDTO reactivateStore();
 }
