@@ -1,13 +1,17 @@
 /* ===== SellerDashboard.css ===== */
-/* Palette/radius/focus states aligned with SignUp.css (Poppins, #f4f5f7 fields, orange accent) */
+/* Palette/radius/focus states aligned with SignUp.css (Poppins, #f3f4f6 background, orange accent) */
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+* {
+    font-family: 'Poppins', sans-serif;
+}
 
 .sd-shell {
     display: flex;
     width: 100%;
     min-height: 100vh;
-    background-color: #eceef1;
+    background-color: #f3f4f6;
     font-family: 'Poppins', sans-serif;
     color: #1a1a1a;
 }
@@ -28,13 +32,15 @@
 .sd-search {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     background-color: #ffffff;
-    border: 1px solid #ffffff;
+    border: 1px solid #e5e7eb;
     border-radius: 10px;
-    padding: 12px 16px;
-    max-width: 420px;
+    padding: 10px 16px;
+    width: 380px;
+    max-width: 100%;
     color: #9ca3af;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -50,7 +56,7 @@
     font-size: 14px;
     width: 100%;
     color: #1a1a1a;
-    font-family: inherit;
+    font-family: 'Poppins', sans-serif;
 }
 
 .sd-search input::placeholder {
@@ -65,7 +71,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 16px;
+    font-size: 16.5px;
     font-weight: 700;
     color: #1a1a1a;
     margin-bottom: 14px;
@@ -84,20 +90,27 @@
 .sd-stat-card,
 .sd-listing-card {
     background-color: #ffffff;
-    border: 1px solid #ffffff;
-    border-radius: 14px;
-    padding: 18px 22px;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 20px 22px;
     flex: 1;
     min-width: 170px;
     display: flex;
     flex-direction: column;
     gap: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.sd-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
 }
 
 .sd-stat-label {
     font-size: 12.5px;
-    color: #9ca3af;
+    color: #6b7280;
+    font-weight: 500;
 }
 
 .sd-stat-value {
@@ -123,10 +136,10 @@
 /* ---------- Pie Chart Section ---------- */
 .sd-pie-card {
     background-color: #ffffff;
-    border: 1px solid #ffffff;
-    border-radius: 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
     padding: 24px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
 }
 
 .sd-pie-content {
@@ -195,8 +208,8 @@
     min-width: 140px;
     padding: 16px 20px;
     border-radius: 12px;
-    background-color: #f8fafc;
-    border: 1px solid #f1f5f9;
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
 }
 
 .sd-legend-box.successful {
@@ -254,10 +267,10 @@
 /* ---------- Order Listing Table ---------- */
 .sd-table-card {
     background-color: #ffffff;
-    border: 1px solid #ffffff;
-    border-radius: 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
     overflow-x: auto;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
 }
 
 .sd-orders-table {
@@ -290,7 +303,7 @@
 }
 
 .sd-orders-table tbody tr:hover {
-    background-color: #f9fafb;
+    background-color: #fff4ec;
 }
 
 .sd-cell-code {

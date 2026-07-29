@@ -11,7 +11,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(origins = "http://localhost:5173")
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
+
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
@@ -32,6 +35,32 @@ public class AuthController {
             @Valid @RequestBody SignInRequestDTO signInRequestDTO) {
 
         SignInResponseDTO signInResponseDTO = authService.signIn(signInRequestDTO);
-        return ResponseEntity.ok(signInResponseDTO);
+
+        ResponseCookie cookie = ResponseCookie.from("jwtToken", signInResponseDTO.getJwtToken() != null ? signInResponseDTO.getJwtToken() : "")
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(24 * 60 * 60)
+                .sameSite("Lax")
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(signInResponseDTO);
+    }
+
+    @PostMapping("/signout")
+    public ResponseEntity<String> signOut() {
+        ResponseCookie cookie = ResponseCookie.from("jwtToken", "")
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(0)
+                .sameSite("Lax")
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body("Signed out successfully");
     }
 }

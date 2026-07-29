@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import Sidebar from "../components/sellerComponents/Sidebar";
+import SellerNavbar from "../components/sellerComponents/SellerNavbar";
 import Icon from "../components/sellerComponents/Icon";
 import { getMyStore, getStoreOrders } from "../api/storeApi.js";
+import { useSeller } from "../context/SellerContext";
 import "../css/SellerDashboard.css";
 
 function OrderPieChart({ successful, rejected, pending }) {
@@ -127,17 +129,21 @@ function getStatusCategory(status) {
 }
 
 function SellerDashboard() {
-    const [store, setStore] = useState(null);
+    const { store: contextStore, storeName } = useSeller();
+    const [store, setStore] = useState(contextStore);
     const [rawOrders, setRawOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
+        if (contextStore) setStore(contextStore);
+    }, [contextStore]);
+
+    useEffect(() => {
         setLoading(true);
-        Promise.all([getMyStore().catch(() => null), getStoreOrders().catch(() => [])])
-            .then(([storeData, ordersData]) => {
-                if (storeData) setStore(storeData);
+        getStoreOrders()
+            .then((ordersData) => {
                 setRawOrders(ordersData || []);
                 setError(null);
             })
@@ -148,8 +154,6 @@ function SellerDashboard() {
                 setLoading(false);
             });
     }, []);
-
-    const storeName = store?.storeName || "Your Store";
 
     // Flatten orders & orderItems for table rendering & statistics
     const itemList = [];
@@ -208,17 +212,7 @@ function SellerDashboard() {
             <Sidebar storeName={storeName} />
 
             <main className="sd-main">
-                <div className="sd-topbar">
-                    <div className="sd-search">
-                        <Icon name="search" size={16} />
-                        <input
-                            type="text"
-                            placeholder="Search Customer, Order ID or Product..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                    </div>
-                </div>
+                <SellerNavbar title="Seller Dashboard" />
 
                 {error && <div style={{ color: "red", marginBottom: "16px" }}>{error}</div>}
 
@@ -263,9 +257,20 @@ function SellerDashboard() {
 
                 {/* Section 3: Order Listing Table */}
                 <section className="sd-section">
-                    <h2 className="sd-section-title">
-                        <Icon name="message" size={18} /> Order Listing
-                    </h2>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px", flexWrap: "wrap", gap: "10px" }}>
+                        <h2 className="sd-section-title" style={{ margin: 0 }}>
+                            <Icon name="message" size={18} /> Order Listing
+                        </h2>
+                        <div className="sd-search" style={{ margin: 0 }}>
+                            <Icon name="search" size={16} />
+                            <input
+                                type="text"
+                                placeholder="Search Customer, Order ID or Product..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+                    </div>
                     <div className="sd-table-card">
                         <table className="sd-orders-table">
                             <thead>

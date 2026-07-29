@@ -1,13 +1,18 @@
 import axios from "axios";
+axios.defaults.withCredentials = true;
+
 const BASE_URL = "http://localhost:8080/api/store";
 
-// get token
+// get token header helper
 const getAuthHeader = () => {
     const token = localStorage.getItem("jwtToken");
+    const headers = {};
+    if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+    }
     return {
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
+        withCredentials: true,
+        headers
     };
 };
 
@@ -19,13 +24,13 @@ export const createStore = async (storeData) => {
 
 // get store api
 export const getMyStore = async () => {
-        const response = await axios.get(`${BASE_URL}/get-store`, getAuthHeader());
-        return response.data;
+    const response = await axios.get(`${BASE_URL}/get-store`, getAuthHeader());
+    return response.data;
 };
 
 // update store api
 export const updateStore = async (storeData) => {
-    const response = await axios.put(`${BASE_URL}/update-store`, storeData,getAuthHeader());
+    const response = await axios.put(`${BASE_URL}/update-store`, storeData, getAuthHeader());
     return response.data;
 };
 
@@ -38,14 +43,14 @@ export const deleteStore = async () => {
 // upload Banner + Profile Photo api
 export const uploadStoreMedia = async (formData) => {
     const token = localStorage.getItem("jwtToken");
-    const response = await axios.post(`${BASE_URL}/upload-media`, formData,
-        {
-            headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "multipart/form-data"
-            }
-        }
-    );
+    const headers = { "Content-Type": "multipart/form-data" };
+    if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+    }
+    const response = await axios.post(`${BASE_URL}/upload-media`, formData, {
+        withCredentials: true,
+        headers
+    });
     return response.data;
 };
 
