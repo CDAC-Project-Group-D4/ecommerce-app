@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
 public class CustomerAddressMapper {
 
     // Entity -> Response DTO
-    public CustomerAddressResponseDTO toResponse(CustomerAddress address) {
+    public CustomerAddressResponseDTO toResponseDto(CustomerAddress address) {
 
         CustomerAddressResponseDTO dto = new CustomerAddressResponseDTO();
 
