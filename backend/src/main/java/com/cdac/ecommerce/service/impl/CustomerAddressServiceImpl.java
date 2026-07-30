@@ -81,7 +81,7 @@ public class CustomerAddressServiceImpl implements CustomerAddressService {
 
         return customerAddressRepository.findByUser(user)
                 .stream()
-                .map(customerAddressMapper::toResponse)
+                .map(customerAddressMapper::toResponseDto)
                 .toList();
     }
 
@@ -96,7 +96,7 @@ public class CustomerAddressServiceImpl implements CustomerAddressService {
 
         CustomerAddress saved = customerAddressRepository.save(address);
 
-        return customerAddressMapper.toResponse(saved);
+        return customerAddressMapper.toResponseDto(saved);
     }
 
     @Override
@@ -108,7 +108,7 @@ public class CustomerAddressServiceImpl implements CustomerAddressService {
 
         CustomerAddress updated = customerAddressRepository.save(address);
 
-        return customerAddressMapper.toResponse(updated);
+        return customerAddressMapper.toResponseDto(updated);
     }
 
     @Override

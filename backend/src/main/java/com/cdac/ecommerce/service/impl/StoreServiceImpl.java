@@ -10,12 +10,13 @@ import com.cdac.ecommerce.exception.StoreAlreadyExistsException;
 import com.cdac.ecommerce.exception.UserNotFoundException;
 import com.cdac.ecommerce.dto.response.OrderResponseDTO;
 import com.cdac.ecommerce.entity.Order;
+import com.cdac.ecommerce.entity.Product;
 import com.cdac.ecommerce.mapper.OrderMapper;
 import com.cdac.ecommerce.repository.OrderRepository;
+import com.cdac.ecommerce.repository.ProductRepository;
 import com.cdac.ecommerce.repository.StoreRepository;
 import com.cdac.ecommerce.repository.UserRepo;
 import com.cdac.ecommerce.security.UserDetailsImpl;
-import com.cdac.ecommerce.service.AuthService;
 import com.cdac.ecommerce.service.StoreService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.management.relation.Role;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -41,10 +41,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class StoreServiceImpl implements StoreService {
 
+    private final ProductRepository productRepository;
     private final StoreRepository storeRepository;
     private final UserRepo userRepository;
     private final OrderRepository orderRepository;
-    private final OrderMapper orderMapper;
     private final ModelMapper modelMapper;
 
     @Override
@@ -118,10 +118,11 @@ public class StoreServiceImpl implements StoreService {
         return storeResponseDTO;
     }
 
+    //hard delete
     @Override
     @Transactional
     public StoreResponseDTO deleteStore() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
         UserDetailsImpl userDetails= (UserDetailsImpl) authentication.getPrincipal();
         String email= userDetails.getUsername();
         User user= userRepository.findByEmail(email).orElseThrow(()-> new UserNotFoundException("User not found"));
@@ -131,6 +132,8 @@ public class StoreServiceImpl implements StoreService {
             throw new RuntimeException("Store not found for this user");
         }
 
+        productRepository.deleteAll(store.getProductList()); //delete all the products associated with that store as well.
+
         user.setStore(null);
         userRepository.save(user);
         storeRepository.delete(store);
@@ -139,6 +142,70 @@ public class StoreServiceImpl implements StoreService {
         storeResponseDTO.setMessage("store deleted successfully");
         return storeResponseDTO;
     }
+
+    //soft delete(deactivate store)
+    @Override
+    @Transactional
+    public StoreResponseDTO deactivateStore() {
+        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpl userDetails= (UserDetailsImpl) authentication.getPrincipal();
+        String email= userDetails.getUsername();
+        User user= userRepository.findByEmail(email).orElseThrow(()-> new UserNotFoundException("User not found"));
+
+        Store store= user.getStore();
+        if(store == null){
+            throw new RuntimeException("Store not found for this user");
+        }
+
+        //deactivate store
+        store.setActive(false);
+
+        //deactivate products
+        if(store.getProductList()!=null){
+            for(Product product : store.getProductList()){
+                product.set_active(false);
+            }
+        }
+
+        Store updateStore = storeRepository.save(store);
+        StoreResponseDTO storeResponseDTO= modelMapper.map(updateStore, StoreResponseDTO.class);
+        storeResponseDTO.setMessage("store and all associated products are now inactive");
+        return storeResponseDTO;
+    }
+
+    //reactivate store
+    @Override
+    @Transactional
+    public StoreResponseDTO reactivateStore() {
+        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpl userDetails= (UserDetailsImpl) authentication.getPrincipal();
+        String email= userDetails.getUsername();
+        User user= userRepository.findByEmail(email).orElseThrow(()-> new UserNotFoundException("User not found"));
+
+        Store store= user.getStore();
+        if(store == null){
+            throw new RuntimeException("Store not found for this user");
+        }
+
+        //reactive store
+        store.setActive(true);
+
+        //reactive products (that have stock available > 0)
+        if(store.getProductList()!=null){
+            for(Product product : store.getProductList()){
+                if(product.getStock()>0){
+                    product.set_active(true);
+                }
+            }
+        }
+
+        Store updatedStore = storeRepository.save(store);
+        StoreResponseDTO storeResponseDTO= modelMapper.map(updatedStore, StoreResponseDTO.class);
+        storeResponseDTO.setMessage("store and products with stock>0 are reactivated");
+        return storeResponseDTO;
+
+    }
+
 
     @Override
     public Map<String, String> uploadMedia(MultipartFile banner, MultipartFile profilePhoto) {
@@ -194,4 +261,7 @@ public class StoreServiceImpl implements StoreService {
         List<Order> orders = orderRepository.findOrdersByStoreId(store.getId());
         return orders.stream().map(order -> modelMapper.map(order, OrderResponseDTO.class)).collect(Collectors.toList());
     }
+
+    
+   
 }

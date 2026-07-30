@@ -65,7 +65,7 @@ public class CheckoutServiceImpl implements CheckoutService {
 
         List<CustomerAddressResponseDTO> addressDTOs =
                 customerAddressList.stream()
-                        .map(addressMapper::toResponse)
+                        .map(addressMapper::toResponseDto)
                         .toList();
 
         CheckoutResponseDTO response = new CheckoutResponseDTO();
@@ -91,22 +91,22 @@ public class CheckoutServiceImpl implements CheckoutService {
 
         CustomerAddress address = new CustomerAddress();
         address.setUser(user);
-        address.setFullName(request.getFullName().trim());
-        address.setMobileNumber(request.getMobileNumber().trim());
-        address.setLabel(request.getLabel());
-        address.setAddressLine1(request.getAddressLine1().trim());
+        address.setFullName(request.fullName().trim());
+        address.setMobileNumber(request.mobileNumber().trim());
+        address.setLabel(request.label());
+        address.setAddressLine1(request.addressLine1().trim());
         address.setAddressLine2(
-                request.getAddressLine2() == null
+                request.addressLine2() == null
                         ? null
-                        : request.getAddressLine2().trim()
+                        : request.addressLine2().trim()
         );
-        address.setPincode(request.getPincode().trim());
-        address.setCity(request.getCity().trim());
-        address.setState(request.getState().trim());
-        address.setCountry(request.getCountry().trim());
+        address.setPincode(request.pincode().trim());
+        address.setCity(request.city().trim());
+        address.setState(request.state().trim());
+        address.setCountry(request.country().trim());
         address.setActive(true);
 
-        return addressMapper.toResponseDTO(addressRepository.save(address));
+        return addressMapper.toResponseDto(addressRepository.save(address));
     }
 
 
