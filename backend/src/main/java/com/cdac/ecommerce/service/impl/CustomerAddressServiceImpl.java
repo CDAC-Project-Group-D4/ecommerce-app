@@ -104,15 +104,7 @@ public class CustomerAddressServiceImpl implements CustomerAddressService {
         CustomerAddress address = customerAddressRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Address not found"));
 
-        address.setFullName(requestDTO.fullName());
-        address.setMobileNumber(requestDTO.mobileNumber());
-        address.setLabel(requestDTO.label());
-        address.setAddressLine1(requestDTO.addressLine1());
-        address.setAddressLine2(requestDTO.addressLine2());
-        address.setPincode(requestDTO.pincode());
-        address.setCity(requestDTO.city());
-        address.setState(requestDTO.state());
-        address.setCountry(requestDTO.country());
+        customerAddressMapper.updateEntity(address, requestDTO);
 
         CustomerAddress updated = customerAddressRepository.save(address);
 

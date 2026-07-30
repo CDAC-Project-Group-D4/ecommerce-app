@@ -51,11 +51,11 @@ function OrderSuccess() {
                     <div className="success-buttons">
 
                         <Link
-                            to="/products"
+                            to="/wishlist"
                             className="btn btn-warning"
                         >
 
-                            Continue Shopping
+                            View Wishlist
 
                         </Link>
 
