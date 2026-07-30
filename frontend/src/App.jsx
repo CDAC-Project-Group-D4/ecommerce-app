@@ -11,6 +11,12 @@ import Store from './pages/Store.jsx';
 import Product from './pages/Product.jsx';
 import Orders from "./pages/Orders.jsx";
 import OrderDetails from "./pages/OrderDetails.jsx";
+import OrderSuccess from "./pages/OrderSuccess.jsx";
+import AddReview from "./pages/AddReview.jsx";
+import CreateReturn from "./pages/CreateReturn.jsx";
+import MyReturns from "./pages/MyReturns.jsx";
+import SellerReturns from "./pages/SellerReturns.jsx";
+import ProtectedRoute from "./routes/ProtectedRoute.jsx";
 
 
 function App(){
@@ -28,6 +34,13 @@ function App(){
                 <Route path='/seller/store-info' element={<Store/>}/>
                 <Route path='/seller/products' element={<Product/>}/>
                <Route path="/orders/:orderId" element={<OrderDetails />} />
+                <Route element={<ProtectedRoute />}>
+                    <Route path="/order-success" element={<OrderSuccess />} />
+                    <Route path="/reviews/add" element={<AddReview />} />
+                    <Route path="/returns/new" element={<CreateReturn />} />
+                    <Route path="/returns" element={<MyReturns />} />
+                    <Route path="/seller/returns" element={<SellerReturns />} />
+                </Route>
             </Routes>
         </div>
     )
