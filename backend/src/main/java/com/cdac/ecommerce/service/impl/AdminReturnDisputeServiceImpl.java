@@ -1,10 +1,13 @@
 package com.cdac.ecommerce.service.impl;
 
+import com.cdac.ecommerce.annotation.LogAdminAction;
 import com.cdac.ecommerce.dto.request.AdminDisputeActionRequestDto;
 import com.cdac.ecommerce.dto.response.ReturnDisputeResponseDTO;
 import com.cdac.ecommerce.entity.ReturnRequest;
 import com.cdac.ecommerce.entity.User;
+import com.cdac.ecommerce.entity.enums.Action;
 import com.cdac.ecommerce.entity.enums.Decision;
+import com.cdac.ecommerce.entity.enums.EntityEnum;
 import com.cdac.ecommerce.exception.ReturnRequestNotFoundException;
 import com.cdac.ecommerce.exception.UserNotFoundException;
 import com.cdac.ecommerce.mapper.ReturnDisputeMapper;
@@ -41,6 +44,12 @@ public class AdminReturnDisputeServiceImpl implements AdminReturnDisputeService 
 
     @Override
     @Transactional
+    @LogAdminAction(
+            action = Action.APPROVE_RETURN,
+            entity = EntityEnum.RETURN_REQUEST,
+            entityId = "#returnRequestId",
+            description = "Return approved by admin"
+    )
     public Boolean acceptDispute(Long returnRequestId, Long adminId, AdminDisputeActionRequestDto dto) {
         ReturnRequest request = returnRequestRepo.findById(returnRequestId)
                 .orElseThrow(() -> new ReturnRequestNotFoundException("Return request not found!"));
@@ -59,6 +68,12 @@ public class AdminReturnDisputeServiceImpl implements AdminReturnDisputeService 
 
     @Override
     @Transactional
+    @LogAdminAction(
+            action = Action.APPROVE_REJECT,
+            entity = EntityEnum.RETURN_REQUEST,
+            entityId = "#returnRequestId",
+            description = "admin rejected the dispute"
+    )
     public boolean rejectDispute(Long returnRequestId, Long adminId, AdminDisputeActionRequestDto dto) {
         ReturnRequest request = returnRequestRepo.findById(returnRequestId)
                 .orElseThrow(() -> new ReturnRequestNotFoundException("Return request not found!"));

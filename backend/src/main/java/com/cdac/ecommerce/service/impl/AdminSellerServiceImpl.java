@@ -1,7 +1,10 @@
 package com.cdac.ecommerce.service.impl;
 
+import com.cdac.ecommerce.annotation.LogAdminAction;
 import com.cdac.ecommerce.dto.response.SellerResponseDTO;
 import com.cdac.ecommerce.entity.User;
+import com.cdac.ecommerce.entity.enums.Action;
+import com.cdac.ecommerce.entity.enums.EntityEnum;
 import com.cdac.ecommerce.exception.UserNotFoundException;
 import com.cdac.ecommerce.mapper.SellerMapper;
 import com.cdac.ecommerce.repository.UserRepo;
@@ -31,6 +34,12 @@ public class AdminSellerServiceImpl implements AdminSellerService {
     }
 
     @Override
+    @LogAdminAction(
+            action = Action.BLOCK,
+            entityId = "#sellerId",
+            entity = EntityEnum.USER,
+            description = "seller blocked by admin"
+    )
     public boolean blockSeller(Long sellerId) {
 
         User seller = userRepo.findById(sellerId).orElseThrow(() -> new UserNotFoundException("User not found!"));
@@ -43,6 +52,12 @@ public class AdminSellerServiceImpl implements AdminSellerService {
     }
 
     @Override
+    @LogAdminAction(
+            action = Action.UNBLOCK,
+            entity = EntityEnum.USER,
+            entityId = "#sellerId",
+            description = "seller was unblocked by admin"
+    )
     public boolean unblockSeller(Long sellerId) {
         User seller = userRepo.findById(sellerId).orElseThrow(() -> new UserNotFoundException("User not found!"));
 
@@ -55,6 +70,12 @@ public class AdminSellerServiceImpl implements AdminSellerService {
 
     @Override
     @Transactional
+    @LogAdminAction(
+            action = Action.DELETE,
+            entity = EntityEnum.USER,
+            entityId = "#sellerId",
+            description = "seller deleted by admin"
+    )
     public boolean deleteSeller(Long sellerId) {
         User seller = userRepo.findById(sellerId)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));

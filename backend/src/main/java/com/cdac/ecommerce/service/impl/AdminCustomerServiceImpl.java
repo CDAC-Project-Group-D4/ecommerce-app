@@ -1,7 +1,10 @@
 package com.cdac.ecommerce.service.impl;
 
+import com.cdac.ecommerce.annotation.LogAdminAction;
 import com.cdac.ecommerce.dto.response.CustomerResponseDTO;
 import com.cdac.ecommerce.entity.User;
+import com.cdac.ecommerce.entity.enums.Action;
+import com.cdac.ecommerce.entity.enums.EntityEnum;
 import com.cdac.ecommerce.exception.UserNotFoundException;
 import com.cdac.ecommerce.mapper.CustomerMapper;
 import com.cdac.ecommerce.repository.UserRepo;
@@ -31,6 +34,12 @@ public class AdminCustomerServiceImpl implements AdminCustomerService {
 
     @Override
     @Transactional
+    @LogAdminAction(
+            action = Action.DELETE,
+            entity = EntityEnum.USER,
+            entityId = "#customerId",
+            description = "A customer was deleted by admin"
+    )
     public boolean deleteCustomer(Long customerId) {
 
         User customer = userRepo.findById(customerId)
@@ -47,6 +56,12 @@ public class AdminCustomerServiceImpl implements AdminCustomerService {
     }
 
     @Override
+    @LogAdminAction(
+            action = Action.BLOCK,
+            entity = EntityEnum.USER,
+            entityId = "#customerId",
+            description = "customer was blocked by admin"
+    )
     public boolean blockCustomer(Long customerId) {
 
         User customer = userRepo.findById(customerId)
