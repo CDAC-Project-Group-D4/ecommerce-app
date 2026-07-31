@@ -8,6 +8,8 @@ import com.cdac.ecommerce.entity.User;
 import com.cdac.ecommerce.entity.enums.Action;
 import com.cdac.ecommerce.entity.enums.Decision;
 import com.cdac.ecommerce.entity.enums.EntityEnum;
+import com.cdac.ecommerce.entity.enums.RefundStatus;
+import com.cdac.ecommerce.entity.enums.RequestType;
 import com.cdac.ecommerce.exception.ReturnRequestNotFoundException;
 import com.cdac.ecommerce.exception.UserNotFoundException;
 import com.cdac.ecommerce.mapper.ReturnDisputeMapper;
@@ -15,12 +17,12 @@ import com.cdac.ecommerce.repository.ReturnRequestRepo;
 import com.cdac.ecommerce.repository.UserRepo;
 import com.cdac.ecommerce.service.AdminReturnDisputeService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -61,6 +63,11 @@ public class AdminReturnDisputeServiceImpl implements AdminReturnDisputeService 
         request.setAdminDecidedAt(LocalDateTime.now());
         request.setAdminNotes(dto.adminNotes() != null ? dto.adminNotes() : "Dispute accepted. Refund approved");
         request.setAdminDecision(Decision.APPROVED);
+        if (request.getRequestType() == RequestType.RETURN) {
+            request.setRefundStatus(RefundStatus.COMPLETED);
+            request.setRefundReference(
+                    "REF-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
+        }
 
         ReturnRequest savedRequest = returnRequestRepo.save(request);
         return true;
@@ -85,6 +92,9 @@ public class AdminReturnDisputeServiceImpl implements AdminReturnDisputeService 
         request.setAdminDecidedAt(LocalDateTime.now());
         request.setAdminNotes(dto.adminNotes() != null ? dto.adminNotes() : "Dispute rejected!");
         request.setAdminDecision(Decision.REJECTED);
+        if (request.getRequestType() == RequestType.RETURN) {
+            request.setRefundStatus(RefundStatus.REJECTED);
+        }
 
         ReturnRequest savedRequest = returnRequestRepo.save(request);
         return true;
