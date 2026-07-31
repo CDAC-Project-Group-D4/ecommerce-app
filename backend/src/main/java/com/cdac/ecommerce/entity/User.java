@@ -15,14 +15,17 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 @Setter
-@Table(name = "users")
+@Table(name = "users", uniqueConstraints = {
+            @UniqueConstraint(name = "uk_users_email", columnNames = "email")
+        }
+)
 @AttributeOverride(name = "userId", column = @Column(name = "id"))
 public class User extends BaseClass{
 
     @Column(name = "full_name", nullable = false)
     private String fullName;
 
-    @Column(name = "email", unique = true, length = 100)
+    @Column(name = "email", length = 100)
     private String email;
 
     @Column(length = 20)
