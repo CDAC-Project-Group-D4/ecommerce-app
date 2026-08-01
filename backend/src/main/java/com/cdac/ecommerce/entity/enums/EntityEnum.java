@@ -8,6 +8,7 @@ public enum EntityEnum {
     REVIEW,
     CATEGORY,
     RETURN_REQUEST,
-    STORE
+    STORE,
+    COMPLAINT
 
 }
