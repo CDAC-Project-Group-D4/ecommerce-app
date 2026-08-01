@@ -1,6 +1,9 @@
 package com.cdac.ecommerce.repository;
 
+import com.cdac.ecommerce.dto.response.CustomerComplaintResponseDTO;
 import com.cdac.ecommerce.entity.CustomerComplaint;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -13,4 +16,8 @@ public interface CustomerComplaintRepo extends JpaRepository<CustomerComplaint, 
 
     @Query("select c from CustomerComplaint c where c.customer.id = ?1")
     List<CustomerComplaint> findByCustomer_Id(Long id);
+
+    Page<CustomerComplaint> findByResolvedAtNotNull(Pageable pageable);
+
+    Page<CustomerComplaint> findByResolvedAtNull(Pageable pageable);
 }
