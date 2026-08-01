@@ -26,38 +26,6 @@ INSERT IGNORE INTO users (id, full_name, email, phone, image_url, password, is_a
 INSERT IGNORE INTO users (id, full_name, email, phone, image_url, password, is_active, is_blocked, created_at, updated_at) VALUES
 (15, 'System Admin 2', 'admin2@ecommerce.com', '+19995551122', NULL, '$2a$10$eXpAnDlEpAsSwOrD000015', 1, 0, NOW(), NOW());
 
-
--- =================================================================
--- 2. INSERT ROLES INTO JOIN TABLE (user_roles)
--- =================================================================
-
--- Customer Roles
-INSERT IGNORE INTO user_roles (user_id, role) VALUES
-(1, 'CUSTOMER'),
-(2, 'CUSTOMER'),
-(3, 'CUSTOMER'),
-(4, 'CUSTOMER'),
-(5, 'CUSTOMER'),
-(6, 'CUSTOMER'),
-(7, 'CUSTOMER'),
-(8, 'CUSTOMER'),
-(9, 'CUSTOMER'),
-(10, 'CUSTOMER');
-
--- Seller Roles (Demonstrating multi-role support: Sellers who are also Customers!)
-INSERT IGNORE INTO user_roles (user_id, role) VALUES
-(11, 'SELLER'),
-(12, 'SELLER'),
-(13, 'SELLER'),
-(14, 'SELLER'),
--- Optional: If sellers can also buy items as customers, add their customer roles here:
-(11, 'CUSTOMER'),
-(12, 'CUSTOMER');
-
--- Admin Role
-INSERT IGNORE INTO user_roles (user_id, role) VALUES
-(15, 'ADMIN');
-
 -- =================================================================
 -- 3. INSERT STORES (Belong to Sellers 11, 12, 13, 14)
 -- =================================================================
