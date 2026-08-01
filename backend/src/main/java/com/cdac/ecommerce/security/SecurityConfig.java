@@ -75,6 +75,7 @@ public class SecurityConfig {
                                 "/",
                                 "/api/auth/**",
                                 "/api/v1/admin/**",
+                                "/api/v1/users",
                                 "/api/v1/products/**",
                                 "/api/customer/**",
                                 "/uploads/**",

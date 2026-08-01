@@ -9,6 +9,7 @@ public enum EntityEnum {
     CATEGORY,
     RETURN_REQUEST,
     STORE,
+    PLATFORM_SETTINGS,
     COMPLAINT
 
 }
