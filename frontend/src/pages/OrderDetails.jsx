@@ -1,23 +1,26 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import { useOrders } from "../context/OrderContext";
 import WriteReviewButton from "../components/customerComponents/reviews/WriteReviewButton";
 import { getMyReviews } from "../api/reviewApi";
+import { getMyReturns } from "../api/returnApi";
 
 import "../css/OrderDetails.css";
+import "../css/Returns.css";
 
 function OrderDetails() {
 
     const { orderId } = useParams();
 
     const navigate = useNavigate();
+    const location = useLocation();
     const [myReviews, setMyReviews] = useState([]);
+    const [myReturns, setMyReturns] = useState([]);
 
     const {
         selectedOrder,
         loading,
-        error,
         loadOrder,
         handleCancelOrder
     } = useOrders();
@@ -29,9 +32,15 @@ function OrderDetails() {
     }, [orderId]);
 
     useEffect(() => {
-        getMyReviews()
-            .then(setMyReviews)
-            .catch(() => setMyReviews([]));
+        Promise.allSettled([getMyReviews(), getMyReturns()])
+            .then(([reviewsResult, returnsResult]) => {
+                setMyReviews(
+                    reviewsResult.status === "fulfilled" ? reviewsResult.value : []
+                );
+                setMyReturns(
+                    returnsResult.status === "fulfilled" ? returnsResult.value : []
+                );
+            });
     }, []);
 
     if (loading) {
@@ -55,6 +64,13 @@ function OrderDetails() {
     }
 
     const order = selectedOrder;
+    const returnDeadline = order.deliveredAt
+        ? new Date(new Date(order.deliveredAt).getTime() + 7 * 24 * 60 * 60 * 1000)
+        : null;
+    const returnEligibleStatus =
+        order.orderStatus === "DELIVERED" || order.orderStatus === "COMPLETED";
+    const returnWindowOpen =
+        returnEligibleStatus && returnDeadline && new Date() <= returnDeadline;
 
     return (
 
@@ -75,6 +91,22 @@ function OrderDetails() {
             </div>
 
             <div className="container py-4">
+
+                {location.state?.message && (
+                    <div className="alert alert-success" role="status">
+                        {location.state.message}
+                    </div>
+                )}
+
+                <div className="d-flex justify-content-end mb-3">
+                    <button
+                        type="button"
+                        className="btn btn-outline-warning"
+                        onClick={() => navigate("/returns")}
+                    >
+                        My Returns
+                    </button>
+                </div>
 
                 <div className="row g-4 justify-content-center">
 
@@ -131,28 +163,58 @@ function OrderDetails() {
 
                                             </h5>
 
-                                            {
-                                                (
-                                                    order.orderStatus === "DELIVERED" ||
-                                                    order.orderStatus === "COMPLETED"
-                                                ) &&
-                                                (
-                                                    myReviews.some(
-                                                        (review) =>
-                                                            review.orderId === order.orderId &&
-                                                            review.productId === item.productId
+                                            <div className="return-item-actions">
+                                                {
+                                                    returnEligibleStatus &&
+                                                    (
+                                                        myReviews.some(
+                                                            (review) =>
+                                                                review.orderId === order.orderId &&
+                                                                review.productId === item.productId
+                                                        )
+                                                            ?
+                                                            <span className="reviewed-badge">
+                                                                ✓ Reviewed
+                                                            </span>
+                                                            :
+                                                            <WriteReviewButton
+                                                                orderId={order.orderId}
+                                                                product={item}
+                                                            />
                                                     )
-                                                        ?
-                                                        <span className="reviewed-badge">
-                                                            ✓ Reviewed
-                                                        </span>
-                                                        :
-                                                        <WriteReviewButton
-                                                            orderId={order.orderId}
-                                                            product={item}
-                                                        />
-                                                )
-                                            }
+                                                }
+
+                                                {
+                                                    returnEligibleStatus &&
+                                                    (
+                                                        myReturns.some(
+                                                            (request) =>
+                                                                String(request.orderItemId) ===
+                                                                String(item.orderItemId)
+                                                        )
+                                                            ?
+                                                            <span className="return-requested-badge">
+                                                                Return requested
+                                                            </span>
+                                                            :
+                                                            returnWindowOpen
+                                                                ?
+                                                                <button
+                                                                    type="button"
+                                                                    className="return-request-btn"
+                                                                    onClick={() => navigate(
+                                                                        `/returns/new?orderId=${order.orderId}&orderItemId=${item.orderItemId}`
+                                                                    )}
+                                                                >
+                                                                    Return / Replace
+                                                                </button>
+                                                                :
+                                                                <span className="return-window-closed">
+                                                                    Return window closed
+                                                                </span>
+                                                    )
+                                                }
+                                            </div>
 
                                         </div>
 

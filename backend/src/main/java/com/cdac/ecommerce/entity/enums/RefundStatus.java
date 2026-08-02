@@ -1,9 +1,8 @@
 package com.cdac.ecommerce.entity.enums;
 
-public enum Decision {
-
+public enum RefundStatus {
+    NOT_APPLICABLE,
     PENDING,
-    APPROVED,
+    COMPLETED,
     REJECTED
-
 }

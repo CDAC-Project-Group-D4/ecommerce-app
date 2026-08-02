@@ -26,38 +26,6 @@ INSERT IGNORE INTO users (id, full_name, email, phone, image_url, password, is_a
 INSERT IGNORE INTO users (id, full_name, email, phone, image_url, password, is_active, is_blocked, created_at, updated_at) VALUES
 (15, 'System Admin 2', 'admin2@ecommerce.com', '+19995551122', NULL, '$2a$10$eXpAnDlEpAsSwOrD000015', 1, 0, NOW(), NOW());
 
-
--- =================================================================
--- 2. INSERT ROLES INTO JOIN TABLE (user_roles)
--- =================================================================
-
--- Customer Roles
-INSERT IGNORE INTO user_roles (user_id, role) VALUES
-(1, 'CUSTOMER'),
-(2, 'CUSTOMER'),
-(3, 'CUSTOMER'),
-(4, 'CUSTOMER'),
-(5, 'CUSTOMER'),
-(6, 'CUSTOMER'),
-(7, 'CUSTOMER'),
-(8, 'CUSTOMER'),
-(9, 'CUSTOMER'),
-(10, 'CUSTOMER');
-
--- Seller Roles (Demonstrating multi-role support: Sellers who are also Customers!)
-INSERT IGNORE INTO user_roles (user_id, role) VALUES
-(11, 'SELLER'),
-(12, 'SELLER'),
-(13, 'SELLER'),
-(14, 'SELLER'),
--- Optional: If sellers can also buy items as customers, add their customer roles here:
-(11, 'CUSTOMER'),
-(12, 'CUSTOMER');
-
--- Admin Role
-INSERT IGNORE INTO user_roles (user_id, role) VALUES
-(15, 'ADMIN');
-
 -- =================================================================
 -- 3. INSERT STORES (Belong to Sellers 11, 12, 13, 14)
 -- =================================================================
@@ -93,18 +61,23 @@ INSERT IGNORE INTO products (id, product_name, price, stock, low_stock_threshold
 -- 6. INSERT CUSTOMER ADDRESSES
 -- =================================================================
 INSERT IGNORE INTO customer_addresses (
-    id, user_id, full_name, mobile_number, label, address_line_1, address_line_2, pincode, city, state, country, is_active, created_at, updated_at
+    id, user_id, full_name, mobile_number, label,
+    address_line_1, address_line_2, pincode, city, state, country,
+    is_active, created_at, updated_at
 ) VALUES
-(1, 1, 'Akanksha More', '9876543210', 'HOME', 'Flat 101', 'Near Phoenix Mall', '411014', 'Pune', 'Maharashtra', 'India', 1, NOW(), NOW()),
-(2, 1, 'Akanksha More', '9876543210', 'OFFICE', 'Rajiv Gandhi Infotech Park', 'Phase 1', '411057', 'Pune', 'Maharashtra', 'India', 1, NOW(), NOW()),
-(3, 2, 'Michael Brown', '9876543211', 'HOME', '221 Baker Street', NULL, '400001', 'Mumbai', 'Maharashtra', 'India', 1, NOW(), NOW()),
-(4, 3, 'Emily Davis', '9876543212', 'HOME', 'MG Road', 'Near Metro Station', '560001', 'Bengaluru', 'Karnataka', 'India', 1, NOW(), NOW()),
-(5, 4, 'David Wilson', '9876543213', 'OTHER', 'Plot No. 56', 'Sector 18', '201301', 'Noida', 'Uttar Pradesh', 'India', 1, NOW(), NOW());
-
-
--- =================================================================
--- 7. INSERT ORDERS
--- =================================================================
+(1, 1, 'Alice Johnson', '9876543210', 'HOME',
+ 'Flat 101', 'Near Phoenix Mall', '411014', 'Pune', 'Maharashtra', 'India',
+ 1, NOW(), NOW()),
+(2, 2, 'Michael Brown', '9876543211', 'OFFICE',
+ 'Rajiv Gandhi Infotech Park', 'Phase 1', '411057', 'Pune', 'Maharashtra', 'India',
+ 1, NOW(), NOW()),
+(3, 3, 'Emily Davis', '9876543212', 'HOME',
+ 'MG Road', 'Near Metro Station', '560001', 'Bengaluru', 'Karnataka', 'India',
+ 1, NOW(), NOW()),
+(4, 4, 'David Wilson', '9876543213', 'OTHER',
+ 'Plot No. 56', 'Sector 18', '201301', 'Noida', 'Uttar Pradesh', 'India',
+ 1, NOW(), NOW());
+>>>>>>> c0d488d2adabf20059534eb4300ac78b5ddbe051
 
 -- Order 1: DELIVERED RECENTLY
 INSERT IGNORE INTO orders (
@@ -202,49 +175,89 @@ INSERT IGNORE INTO return_requests (
  1, NOW() - INTERVAL 2 DAY, NOW()),
 
 -- [3] SELLER APPROVED: Item Replacement accepted by seller
-(3, 3, 2, 2, 'Size too small, need one size larger.', 'REPLACE',
+(3, 5, 6, 2, 'Keyboard was defective, replacement requested.', 'REPLACE',
  'APPROVED', 'Replacement approved, reverse pickup scheduled.', NOW() - INTERVAL 1 DAY,
  NULL, NULL, NULL, NULL,
  1, NOW() - INTERVAL 2 DAY, NOW()),
 
 -- [4] SELLER APPROVED: Full Order Return accepted by seller
-(4, 4, NULL, 2, 'Entire order delayed by 3 weeks, no longer needed.', 'RETURN',
+(4, 1, NULL, 1, 'Entire order is no longer needed.', 'RETURN',
  'APPROVED', 'Accepted late delivery return request.', NOW() - INTERVAL 2 DAY,
  NULL, NULL, NULL, NULL,
  1, NOW() - INTERVAL 4 DAY, NOW()),
 
 -- [5] PENDING SELLER: Fresh Item Return request awaiting seller action
-(5, 1, 2, 3, 'Missing original box accessories.', 'RETURN',
+(5, 2, 2, 1, 'Missing original box accessories.', 'RETURN',
  NULL, NULL, NULL,
  NULL, NULL, NULL, NULL,
  1, NOW() - INTERVAL 1 DAY, NOW()),
 
 -- [6] PENDING SELLER: Fresh Full Order Replace request awaiting seller action
-(6, 2, NULL, 3, 'Received completely different product category.', 'REPLACE',
+(6, 5, NULL, 2, 'Received a defective product.', 'REPLACE',
  NULL, NULL, NULL,
  NULL, NULL, NULL, NULL,
  1, NOW() - INTERVAL 6 HOUR, NOW()),
 
 -- [7] ADMIN RESOLVED (OVERRIDDEN): Admin approved after Seller rejected
-(7, 3, 3, 1, 'Defective screen flickering on power on.', 'RETURN',
+(7, 1, 1, 1, 'Headphones stopped working after delivery.', 'RETURN',
  'REJECTED', 'Seller claims physical damage after delivery.', NOW() - INTERVAL 5 DAY,
- 1, 'APPROVED', 'Admin reviewed unboxing video provided by user. Refund granted.', NOW() - INTERVAL 1 DAY,
+ 15, 'APPROVED', 'Admin reviewed evidence provided by the customer. Refund granted.', NOW() - INTERVAL 1 DAY,
  1, NOW() - INTERVAL 6 DAY, NOW()),
 
 -- [8] ADMIN RESOLVED (UPHELD): Admin rejected after Seller rejected
-(8, 4, 1, 2, 'Did not like product aesthetics after opening.', 'RETURN',
+(8, 2, 2, 1, 'Did not like product aesthetics after opening.', 'RETURN',
  'REJECTED', 'Non-defective items non-returnable per category policy.', NOW() - INTERVAL 4 DAY,
- 1, 'REJECTED', 'Admin upheld seller decision based on category terms.', NOW() - INTERVAL 1 DAY,
+ 15, 'REJECTED', 'Admin upheld seller decision based on category terms.', NOW() - INTERVAL 1 DAY,
  1, NOW() - INTERVAL 5 DAY, NOW()),
 
 -- [9] DISPUTED: Item Replacement - Seller Rejected, Admin Pending (Shows in status=DISPUTED)
-(9, 5, 2, 3, 'Electrical component non-functional out of box.', 'REPLACE',
+(9, 5, 6, 2, 'Electrical component non-functional out of box.', 'REPLACE',
  'REJECTED', 'Seller requested service center certificate first.', NOW() - INTERVAL 12 HOUR,
  NULL, NULL, NULL, NULL,
  1, NOW() - INTERVAL 1 DAY, NOW()),
 
 -- [10] INACTIVE / CANCELLED: User cancelled return request
-(10, 5, NULL, 1, 'Accidental return request submission.', 'RETURN',
+(10, 5, NULL, 2, 'Accidental return request submission.', 'RETURN',
  NULL, NULL, NULL,
  NULL, NULL, NULL, NULL,
+<<<<<<< HEAD
  0, NOW() - INTERVAL 7 DAY, NOW());
+=======
+ 0, NOW() - INTERVAL 7 DAY, NOW());
+
+-- =================================================================
+-- 11. INSERT CART ITEMS
+-- =================================================================
+INSERT IGNORE INTO cart_items (id, user_id, product_id, quantity, added_at) VALUES
+(1, 3, 101, 1, NOW()),
+(2, 3, 103, 2, NOW()),
+(3, 4, 102, 1, NOW());
+
+-- =================================================================
+-- 12. INSERT WISHLISTS
+-- =================================================================
+INSERT IGNORE INTO wishlists (
+    id, user_id, product_id, created_at, updated_at
+) VALUES
+(1, 1, 103, NOW(), NOW()),
+(2, 2, 101, NOW(), NOW()),
+(3, 3, 102, NOW(), NOW()),
+(4, 4, 104, NOW(), NOW());
+
+-- =================================================================
+-- 13. INSERT CUSTOMER COMPLAINTS
+-- =================================================================
+INSERT IGNORE INTO customer_complaints (
+    id, order_id, customer_id, resolved_by, subject, body,
+    resolved_at, is_active, created_at, updated_at
+) VALUES
+(1, 1, 1, NULL, 'Delivery packaging issue',
+ 'The outer package was damaged when the order arrived.',
+ NULL, 1, NOW() - INTERVAL 2 DAY, NOW()),
+(2, 2, 1, 15, 'Payment receipt required',
+ 'Please provide a payment receipt for this order.',
+ NOW() - INTERVAL 1 DAY, 0, NOW() - INTERVAL 3 DAY, NOW()),
+(3, 5, 2, NULL, 'Product support required',
+ 'I need help setting up the keyboard.',
+ NULL, 1, NOW() - INTERVAL 1 DAY, NOW());
+>>>>>>> c0d488d2adabf20059534eb4300ac78b5ddbe051

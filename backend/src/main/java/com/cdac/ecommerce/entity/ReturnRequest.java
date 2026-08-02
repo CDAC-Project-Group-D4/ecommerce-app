@@ -2,10 +2,12 @@ package com.cdac.ecommerce.entity;
 
 import com.cdac.ecommerce.entity.enums.RequestType;
 import com.cdac.ecommerce.entity.enums.Decision;
+import com.cdac.ecommerce.entity.enums.RefundStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.math.BigDecimal;
 
 @Entity
 @Getter
@@ -58,6 +60,16 @@ public class ReturnRequest extends BaseClass {
 
     @Column(name = "admin_decided_at")
     private LocalDateTime adminDecidedAt;
+
+    @Column(name = "refund_status")
+    @Enumerated(EnumType.STRING)
+    private RefundStatus refundStatus = RefundStatus.NOT_APPLICABLE;
+
+    @Column(name = "refund_amount")
+    private BigDecimal refundAmount;
+
+    @Column(name = "refund_reference")
+    private String refundReference;
 
     @Column(name = "is_active", nullable = false)
     private Boolean active = true;

@@ -1,10 +1,15 @@
 package com.cdac.ecommerce.service.impl;
 
+import com.cdac.ecommerce.annotation.LogAdminAction;
 import com.cdac.ecommerce.dto.request.AdminDisputeActionRequestDto;
 import com.cdac.ecommerce.dto.response.ReturnDisputeResponseDTO;
 import com.cdac.ecommerce.entity.ReturnRequest;
 import com.cdac.ecommerce.entity.User;
+import com.cdac.ecommerce.entity.enums.Action;
 import com.cdac.ecommerce.entity.enums.Decision;
+import com.cdac.ecommerce.entity.enums.EntityEnum;
+import com.cdac.ecommerce.entity.enums.RefundStatus;
+import com.cdac.ecommerce.entity.enums.RequestType;
 import com.cdac.ecommerce.exception.ReturnRequestNotFoundException;
 import com.cdac.ecommerce.exception.UserNotFoundException;
 import com.cdac.ecommerce.mapper.ReturnDisputeMapper;
@@ -12,12 +17,12 @@ import com.cdac.ecommerce.repository.ReturnRequestRepo;
 import com.cdac.ecommerce.repository.UserRepo;
 import com.cdac.ecommerce.service.AdminReturnDisputeService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +46,12 @@ public class AdminReturnDisputeServiceImpl implements AdminReturnDisputeService 
 
     @Override
     @Transactional
+    @LogAdminAction(
+            action = Action.APPROVE_RETURN,
+            entity = EntityEnum.RETURN_REQUEST,
+            entityId = "#returnRequestId",
+            description = "Return approved by admin"
+    )
     public Boolean acceptDispute(Long returnRequestId, Long adminId, AdminDisputeActionRequestDto dto) {
         ReturnRequest request = returnRequestRepo.findById(returnRequestId)
                 .orElseThrow(() -> new ReturnRequestNotFoundException("Return request not found!"));
@@ -52,6 +63,11 @@ public class AdminReturnDisputeServiceImpl implements AdminReturnDisputeService 
         request.setAdminDecidedAt(LocalDateTime.now());
         request.setAdminNotes(dto.adminNotes() != null ? dto.adminNotes() : "Dispute accepted. Refund approved");
         request.setAdminDecision(Decision.APPROVED);
+        if (request.getRequestType() == RequestType.RETURN) {
+            request.setRefundStatus(RefundStatus.COMPLETED);
+            request.setRefundReference(
+                    "REF-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
+        }
 
         ReturnRequest savedRequest = returnRequestRepo.save(request);
         return true;
@@ -59,6 +75,12 @@ public class AdminReturnDisputeServiceImpl implements AdminReturnDisputeService 
 
     @Override
     @Transactional
+    @LogAdminAction(
+            action = Action.APPROVE_REJECT,
+            entity = EntityEnum.RETURN_REQUEST,
+            entityId = "#returnRequestId",
+            description = "admin rejected the dispute"
+    )
     public boolean rejectDispute(Long returnRequestId, Long adminId, AdminDisputeActionRequestDto dto) {
         ReturnRequest request = returnRequestRepo.findById(returnRequestId)
                 .orElseThrow(() -> new ReturnRequestNotFoundException("Return request not found!"));
@@ -70,6 +92,9 @@ public class AdminReturnDisputeServiceImpl implements AdminReturnDisputeService 
         request.setAdminDecidedAt(LocalDateTime.now());
         request.setAdminNotes(dto.adminNotes() != null ? dto.adminNotes() : "Dispute rejected!");
         request.setAdminDecision(Decision.REJECTED);
+        if (request.getRequestType() == RequestType.RETURN) {
+            request.setRefundStatus(RefundStatus.REJECTED);
+        }
 
         ReturnRequest savedRequest = returnRequestRepo.save(request);
         return true;

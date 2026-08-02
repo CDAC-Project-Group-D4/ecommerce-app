@@ -1,9 +1,9 @@
 package com.cdac.ecommerce.entity.enums;
 
-public enum Decision {
+public enum PaymentStatus {
 
     PENDING,
-    APPROVED,
-    REJECTED
+    COMPLETED,
+    FAILED
 
 }

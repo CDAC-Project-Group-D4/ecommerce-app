@@ -46,6 +46,21 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(ResourceAlreadyExistsException.class)
+    public ResponseEntity<ApiErrorResponse> handleAlreadyExists(
+            ResourceAlreadyExistsException exception) {
+        return new ResponseEntity<>(
+                new ApiErrorResponse(HttpStatus.CONFLICT.value(), exception.getMessage()),
+                HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler({IllegalStateException.class, IllegalArgumentException.class})
+    public ResponseEntity<ApiErrorResponse> handleBadRequest(RuntimeException exception) {
+        return new ResponseEntity<>(
+                new ApiErrorResponse(HttpStatus.BAD_REQUEST.value(), exception.getMessage()),
+                HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleGlobalException(Exception e){
 
