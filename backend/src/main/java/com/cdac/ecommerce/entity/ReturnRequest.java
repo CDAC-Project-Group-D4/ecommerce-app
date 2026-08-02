@@ -8,6 +8,8 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -70,6 +72,10 @@ public class ReturnRequest extends BaseClass {
 
     @Column(name = "refund_reference")
     private String refundReference;
+
+    @OneToMany(mappedBy = "returnRequest", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("id ASC")
+    private List<ReturnRequestImage> images = new ArrayList<>();
 
     @Column(name = "is_active", nullable = false)
     private Boolean active = true;
