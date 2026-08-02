@@ -216,6 +216,15 @@ function SellerDashboard() {
 
                 {error && <div style={{ color: "red", marginBottom: "16px" }}>{error}</div>}
 
+                {store && !store.active && (
+                    <div style={{ backgroundColor: "#fef3c7", color: "#92400e", padding: "14px 18px", borderRadius: "10px", marginBottom: "20px", display: "flex", justifyContent: "space-between", alignItems: "center", border: "1px solid #fde68a" }}>
+                        <span>⚠️ <strong>Your store is currently Inactive.</strong> Your products are hidden from shoppers until you reactivate your store.</span>
+                        <a href="/seller/store-info" style={{ backgroundColor: "#92400e", color: "#ffffff", padding: "6px 14px", borderRadius: "6px", textDecoration: "none", fontSize: "13px", fontWeight: "bold" }}>
+                            Manage Store
+                        </a>
+                    </div>
+                )}
+
                 {/* Section 1: Stats Overview */}
                 <section className="sd-section">
                     <h2 className="sd-section-title">
