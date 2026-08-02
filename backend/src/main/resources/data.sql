@@ -92,14 +92,18 @@ INSERT IGNORE INTO products (id, product_name, price, stock, low_stock_threshold
 -- =================================================================
 -- 6. INSERT CUSTOMER ADDRESSES
 -- =================================================================
+INSERT IGNORE INTO customer_addresses (
+    id, user_id, full_name, mobile_number, label, address_line_1, address_line_2, pincode, city, state, country, is_active, created_at, updated_at
+) VALUES
+(1, 1, 'Akanksha More', '9876543210', 'HOME', 'Flat 101', 'Near Phoenix Mall', '411014', 'Pune', 'Maharashtra', 'India', 1, NOW(), NOW()),
+(2, 1, 'Akanksha More', '9876543210', 'OFFICE', 'Rajiv Gandhi Infotech Park', 'Phase 1', '411057', 'Pune', 'Maharashtra', 'India', 1, NOW(), NOW()),
+(3, 2, 'Michael Brown', '9876543211', 'HOME', '221 Baker Street', NULL, '400001', 'Mumbai', 'Maharashtra', 'India', 1, NOW(), NOW()),
+(4, 3, 'Emily Davis', '9876543212', 'HOME', 'MG Road', 'Near Metro Station', '560001', 'Bengaluru', 'Karnataka', 'India', 1, NOW(), NOW()),
+(5, 4, 'David Wilson', '9876543213', 'OTHER', 'Plot No. 56', 'Sector 18', '201301', 'Noida', 'Uttar Pradesh', 'India', 1, NOW(), NOW());
 
 
 -- =================================================================
 -- 7. INSERT ORDERS
--- =================================================================
-
--- =================================================================
--- 7. INSERT ORDERS (Fixed PaymentMethod enum strings)
 -- =================================================================
 
 -- Order 1: DELIVERED RECENTLY
@@ -164,7 +168,7 @@ INSERT IGNORE INTO order_items (
 -- 9. INSERT REVIEWS
 -- =================================================================
 INSERT IGNORE INTO reviews (
-    review_id, product_id, user_id, order_id, rating, body, is_active, created_at, updated_at
+    review_id, product_id, user_id, order_id, rating, comment, is_active, created_at, updated_at
 ) VALUES
 -- Review 1: Great review for Product 101 by User 1 (Order 1)
 (1, 101, 1, 1, 5, 'Absolutely loved this product! Excellent build quality and fast shipping.', 1, NOW(), NOW()),
@@ -244,101 +248,3 @@ INSERT IGNORE INTO return_requests (
  NULL, NULL, NULL,
  NULL, NULL, NULL, NULL,
  0, NOW() - INTERVAL 7 DAY, NOW());
-
-INSERT INTO customer_addresses (
-    id,
-    user_id,
-    full_name,
-    mobile_number,
-    label,
-    address_line_1,
-    address_line_2,
-    pincode,
-    city,
-    state,
-    country,
-    is_active,
-    created_at,
-    updated_at
-)
-VALUES
-(
-    1,
-    1,
-    'Akanksha More',
-    '9876543210',
-    'HOME',
-    'Flat 101',
-    'Near Phoenix Mall',
-    '411014',
-    'Pune',
-    'Maharashtra',
-    'India',
-    1,
-    NOW(),
-    NOW()
-),
-(
-    2,
-    1,
-    'Akanksha More',
-    '9876543210',
-    'OFFICE',
-    'Rajiv Gandhi Infotech Park',
-    'Phase 1',
-    '411057',
-    'Pune',
-    'Maharashtra',
-    'India',
-    1,
-    NOW(),
-    NOW()
-),
-(
-    3,
-    2,
-    'Michael Brown',
-    '9876543211',
-    'HOME',
-    '221 Baker Street',
-    NULL,
-    '400001',
-    'Mumbai',
-    'Maharashtra',
-    'India',
-    1,
-    NOW(),
-    NOW()
-),
-(
-    4,
-    3,
-    'Emily Davis',
-    '9876543212',
-    'HOME',
-    'MG Road',
-    'Near Metro Station',
-    '560001',
-    'Bengaluru',
-    'Karnataka',
-    'India',
-    1,
-    NOW(),
-    NOW()
-),
-(
-    5,
-    4,
-    'David Wilson',
-    '9876543213',
-    'OTHER',
-    'Plot No. 56',
-    'Sector 18',
-    '201301',
-    'Noida',
-    'Uttar Pradesh',
-    'India',
-    1,
-    NOW(),
-    NOW()
-);
