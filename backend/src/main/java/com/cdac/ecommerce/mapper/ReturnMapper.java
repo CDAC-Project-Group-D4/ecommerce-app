@@ -5,6 +5,8 @@ import com.cdac.ecommerce.entity.OrderItem;
 import com.cdac.ecommerce.entity.ReturnRequest;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class ReturnMapper {
 
@@ -17,6 +19,9 @@ public class ReturnMapper {
         dto.setCustomerName(request.getUser().getFullName());
         dto.setRequestType(request.getRequestType());
         dto.setReason(request.getReason());
+        dto.setImageUrls(request.getImages() == null
+                ? List.of()
+                : request.getImages().stream().map(image -> image.getImageUrl()).toList());
         dto.setSellerDecision(request.getSellerDecision());
         dto.setSellerNotes(request.getSellerNotes());
         dto.setSellerDecidedAt(request.getSellerDecidedAt());

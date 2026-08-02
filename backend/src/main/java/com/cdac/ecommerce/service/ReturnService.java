@@ -5,13 +5,15 @@ import com.cdac.ecommerce.dto.response.ReturnResponseDTO;
 import com.cdac.ecommerce.dto.request.SellerReturnDecisionDTO;
 
 import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface ReturnService {
 
     // Create a return/refund request
     ReturnResponseDTO createReturnRequest(
             Long userId,
-            ReturnRequestDTO requestDTO
+            ReturnRequestDTO requestDTO,
+            List<MultipartFile> images
     );
 
     // Get all return requests of the logged-in customer

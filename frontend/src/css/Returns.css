@@ -72,6 +72,7 @@
 
 .return-form-card select,
 .return-form-card textarea,
+.return-form-card input[type="file"],
 .seller-return-card textarea {
     width: 100%;
     padding: 12px;
@@ -79,6 +80,30 @@
     border-radius: 10px;
     font: inherit;
 }
+
+.return-upload-help { color: #68707d; font-size: 13px; font-weight: 400; }
+.return-image-previews, .return-evidence-gallery { display: flex; flex-wrap: wrap; gap: 10px; }
+.return-image-preview { position: relative; }
+.return-image-preview img, .return-evidence-gallery img {
+    width: 92px;
+    height: 92px;
+    object-fit: cover;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+}
+.return-image-preview button {
+    position: absolute;
+    right: 4px;
+    bottom: 4px;
+    padding: 4px 7px;
+    color: white;
+    background: rgba(153, 27, 27, .9);
+    border: 0;
+    border-radius: 6px;
+    font-size: 11px;
+}
+.return-evidence-gallery { margin: 12px 0; }
+.return-evidence-gallery a { display: block; }
 
 .return-form-hint,
 .refund-box,

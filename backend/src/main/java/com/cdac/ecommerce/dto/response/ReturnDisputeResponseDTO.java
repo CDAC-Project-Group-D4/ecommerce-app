@@ -4,6 +4,7 @@ import com.cdac.ecommerce.entity.enums.Decision;
 import com.cdac.ecommerce.entity.enums.RequestType;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record ReturnDisputeResponseDTO(
 
@@ -16,7 +17,8 @@ public record ReturnDisputeResponseDTO(
         RequestType requestType,
         Decision sellerDecision,
         String sellerNotes,
-        LocalDateTime sellerDecidedAt
+        LocalDateTime sellerDecidedAt,
+        List<String> imageUrls
 
 ) {
 }

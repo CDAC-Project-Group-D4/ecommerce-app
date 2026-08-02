@@ -67,6 +67,15 @@ function MyReturns() {
                                 <span className="return-status">{getStatus(request)}</span>
                             </div>
                             <p><strong>{request.requestType}</strong> · {request.reason}</p>
+                            {request.imageUrls?.length > 0 && (
+                                <div className="return-evidence-gallery">
+                                    {request.imageUrls.map((imageUrl, index) => (
+                                        <a href={`http://localhost:8080${imageUrl}`} target="_blank" rel="noreferrer" key={imageUrl}>
+                                            <img src={`http://localhost:8080${imageUrl}`} alt={`Return evidence ${index + 1}`} />
+                                        </a>
+                                    ))}
+                                </div>
+                            )}
                             {request.sellerNotes && <p>Seller: {request.sellerNotes}</p>}
                             {request.adminNotes && <p>Admin: {request.adminNotes}</p>}
                             {request.refundAmount && (
