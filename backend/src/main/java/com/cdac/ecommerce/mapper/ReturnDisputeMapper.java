@@ -13,5 +13,6 @@ public interface ReturnDisputeMapper {
     @Mapping(target = "orderItemId", source = "orderItem.id")
     @Mapping(target = "userId", source = "user.id")
     @Mapping(target = "userEmail", source = "user.email")
+    @Mapping(target = "imageUrls", expression = "java(request.getImages().stream().map(image -> image.getImageUrl()).toList())")
     ReturnDisputeResponseDTO toDto(ReturnRequest request);
 }

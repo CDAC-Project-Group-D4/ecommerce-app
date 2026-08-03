@@ -77,10 +77,7 @@ INSERT IGNORE INTO customer_addresses (
 (4, 4, 'David Wilson', '9876543213', 'OTHER',
  'Plot No. 56', 'Sector 18', '201301', 'Noida', 'Uttar Pradesh', 'India',
  1, NOW(), NOW());
-
--- =================================================================
--- 7. INSERT ORDERS (Fixed PaymentMethod enum strings)
--- =================================================================
+>>>>>>> c0d488d2adabf20059534eb4300ac78b5ddbe051
 
 -- Order 1: DELIVERED RECENTLY
 INSERT IGNORE INTO orders (
@@ -223,6 +220,9 @@ INSERT IGNORE INTO return_requests (
 (10, 5, NULL, 2, 'Accidental return request submission.', 'RETURN',
  NULL, NULL, NULL,
  NULL, NULL, NULL, NULL,
+<<<<<<< HEAD
+ 0, NOW() - INTERVAL 7 DAY, NOW());
+=======
  0, NOW() - INTERVAL 7 DAY, NOW());
 
 -- =================================================================
@@ -260,3 +260,4 @@ INSERT IGNORE INTO customer_complaints (
 (3, 5, 2, NULL, 'Product support required',
  'I need help setting up the keyboard.',
  NULL, 1, NOW() - INTERVAL 1 DAY, NOW());
+>>>>>>> c0d488d2adabf20059534eb4300ac78b5ddbe051

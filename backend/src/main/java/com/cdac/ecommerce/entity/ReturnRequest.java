@@ -73,12 +73,8 @@ public class ReturnRequest extends BaseClass {
     @Column(name = "refund_reference")
     private String refundReference;
 
-    @OneToMany(
-            fetch = FetchType.LAZY,
-            mappedBy = "returnRequest",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
+    @OneToMany(mappedBy = "returnRequest", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("id ASC")
     private List<ReturnRequestImage> images = new ArrayList<>();
 
     @Column(name = "is_active", nullable = false)

@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @Setter
@@ -22,6 +23,8 @@ public class ReturnResponseDTO {
     private String productName;
 
     private String productImage;
+
+    private List<String> imageUrls;
 
     private Integer quantity;
 

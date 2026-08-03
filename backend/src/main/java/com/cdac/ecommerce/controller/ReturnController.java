@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.MediaType;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -23,12 +25,13 @@ public class ReturnController {
 
     private final ReturnService returnService;
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ReturnResponseDTO> create(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @Valid @RequestBody ReturnRequestDTO requestDTO) {
+            @Valid @RequestPart("request") ReturnRequestDTO requestDTO,
+            @RequestPart("images") List<MultipartFile> images) {
         return new ResponseEntity<>(
-                returnService.createReturnRequest(userDetails.getId(), requestDTO),
+                returnService.createReturnRequest(userDetails.getId(), requestDTO, images),
                 HttpStatus.CREATED);
     }
 
