@@ -1,13 +1,16 @@
 package com.cdac.ecommerce.controller;
 
 import com.cdac.ecommerce.dto.request.ReturnRequestDTO;
+import com.cdac.ecommerce.dto.response.ReturnRequestResponseDTO;
 import com.cdac.ecommerce.dto.response.ReturnResponseDTO;
 import com.cdac.ecommerce.security.UserDetailsImpl;
 import com.cdac.ecommerce.service.ReturnService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +30,21 @@ public class ReturnController {
         return new ResponseEntity<>(
                 returnService.createReturnRequest(userDetails.getId(), requestDTO),
                 HttpStatus.CREATED);
+    }
+
+    @PostMapping(value = "/with-images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('CUSTOMER')")
+    public ResponseEntity<ReturnRequestResponseDTO> createRequestWithImage(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @Valid @ModelAttribute ReturnRequestDTO requestDTO) {
+
+        ReturnRequestResponseDTO returnRequestResponseDTO = returnService.createReturnRequestWithImages(
+                requestDTO,
+                requestDTO.getImages(),
+                userDetails.getUser()
+        );
+
+        return ResponseEntity.ok(returnRequestResponseDTO);
     }
 
     @GetMapping
