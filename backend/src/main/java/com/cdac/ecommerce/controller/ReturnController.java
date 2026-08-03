@@ -35,20 +35,20 @@ public class ReturnController {
                 HttpStatus.CREATED);
     }
 
-    @PostMapping(value = "/with-images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasRole('CUSTOMER')")
-    public ResponseEntity<ReturnRequestResponseDTO> createRequestWithImage(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @Valid @ModelAttribute ReturnRequestDTO requestDTO) {
-
-        ReturnRequestResponseDTO returnRequestResponseDTO = returnService.createReturnRequestWithImages(
-                requestDTO,
-                requestDTO.getImages(),
-                userDetails.getUser()
-        );
-
-        return ResponseEntity.ok(returnRequestResponseDTO);
-    }
+//    @PostMapping(value = "/with-images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//    @PreAuthorize("hasRole('CUSTOMER')")
+//    public ResponseEntity<ReturnRequestResponseDTO> createRequestWithImage(
+//            @AuthenticationPrincipal UserDetailsImpl userDetails,
+//            @Valid @ModelAttribute ReturnRequestDTO requestDTO) {
+//
+//        ReturnRequestResponseDTO returnRequestResponseDTO = returnService.createReturnRequestWithImages(
+//                requestDTO,
+//                requestDTO.getImages(),
+//                userDetails.getUser()
+//        );
+//
+//        return ResponseEntity.ok(returnRequestResponseDTO);
+//    }
 
     @GetMapping
     public ResponseEntity<List<ReturnResponseDTO>> getMyReturns(
