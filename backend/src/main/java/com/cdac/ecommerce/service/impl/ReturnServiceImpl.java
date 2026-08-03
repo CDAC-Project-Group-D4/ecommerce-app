@@ -2,27 +2,25 @@ package com.cdac.ecommerce.service.impl;
 
 import com.cdac.ecommerce.dto.request.ReturnRequestDTO;
 import com.cdac.ecommerce.dto.request.SellerReturnDecisionDTO;
+import com.cdac.ecommerce.dto.response.ReturnRequestResponseDTO;
 import com.cdac.ecommerce.dto.response.ReturnResponseDTO;
-import com.cdac.ecommerce.entity.Order;
-import com.cdac.ecommerce.entity.OrderItem;
-import com.cdac.ecommerce.entity.ReturnRequest;
-import com.cdac.ecommerce.entity.User;
+import com.cdac.ecommerce.entity.*;
 import com.cdac.ecommerce.entity.enums.Decision;
 import com.cdac.ecommerce.entity.enums.OrderStatus;
 import com.cdac.ecommerce.entity.enums.RefundStatus;
 import com.cdac.ecommerce.entity.enums.RequestType;
+import com.cdac.ecommerce.exception.OrderNotFoundException;
 import com.cdac.ecommerce.exception.ResourceAlreadyExistsException;
 import com.cdac.ecommerce.exception.ResourceNotFoundException;
 import com.cdac.ecommerce.exception.ReturnRequestNotFoundException;
 import com.cdac.ecommerce.mapper.ReturnMapper;
-import com.cdac.ecommerce.repository.OrderItemRepository;
-import com.cdac.ecommerce.repository.OrderRepository;
-import com.cdac.ecommerce.repository.ReturnRequestRepo;
-import com.cdac.ecommerce.repository.UserRepo;
+import com.cdac.ecommerce.repository.*;
+import com.cdac.ecommerce.service.FileStorageService;
 import com.cdac.ecommerce.service.ReturnService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,6 +35,8 @@ public class ReturnServiceImpl implements ReturnService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final UserRepo userRepository;
+    private final FileStorageService fileStorageService;
+    private final ReturnRequestImageRepository returnRequestImageRepository;
     private final ReturnMapper returnMapper;
 
     @Override
@@ -152,5 +152,45 @@ public class ReturnServiceImpl implements ReturnService {
         }
 
         return returnMapper.toDto(returnRequestRepo.save(request));
+    }
+
+    @Override
+    @Transactional
+    public ReturnRequestResponseDTO createReturnRequestWithImages(
+            ReturnRequestDTO requestDTO,
+            List<MultipartFile> images,
+            User user) {
+
+
+        Order order = orderRepository.findById(requestDTO.getOrderId())
+                .orElseThrow(() -> new OrderNotFoundException("Order doesn't exists with id: " + requestDTO.getOrderId()));
+
+        OrderItem orderItem = orderItemRepository.findById(requestDTO.getOrderItemId())
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + requestDTO.getOrderItemId()));
+
+        ReturnRequest request = new ReturnRequest();
+        request.setUser(user);
+        request.setRequestType(requestDTO.getRequestType());
+        request.setOrder(order);
+        request.setOrderItem(orderItem);
+        request.setReason(requestDTO.getReason());
+
+        ReturnRequest savedRequest = returnRequestRepo.save(request);
+
+        if(images != null && !images.isEmpty()){
+            List<String> imageUrls = fileStorageService.uploadMultipleFiles(images, "return-images");
+
+            List<ReturnRequestImage> returnRequestImages = imageUrls.stream().map(url ->
+                    ReturnRequestImage.builder()
+                            .returnRequest(savedRequest)
+                            .imageUrl(url)
+                            .build()).toList();
+
+            List<ReturnRequestImage> savedImages = returnRequestImageRepository.saveAll(returnRequestImages);
+
+            savedRequest.setImages(savedImages);
+        }
+
+        return returnMapper.toDtoWithImage(savedRequest);
     }
 }
