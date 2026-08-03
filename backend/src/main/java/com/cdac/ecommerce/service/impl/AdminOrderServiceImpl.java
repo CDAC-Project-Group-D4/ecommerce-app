@@ -9,6 +9,7 @@ import com.cdac.ecommerce.mapper.OrderMapper;
 import com.cdac.ecommerce.repository.OrderRepository;
 import com.cdac.ecommerce.service.AdminOrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,8 @@ public class AdminOrderServiceImpl implements AdminOrderService {
     private final OrderMapper orderMapper;
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional(readOnly = true)
     public List<OrderResponseDTO> getAllOrders() {
 
         List<OrderResponseDTO> orderResponseDTOS = orderRepository
@@ -37,6 +40,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public boolean simulateOutForDelivery(Long id) {
 
         Order order = orderRepository
@@ -53,6 +57,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public boolean simulateDelivered(Long id) {
 
         Order order = orderRepository

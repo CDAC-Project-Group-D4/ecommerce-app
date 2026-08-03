@@ -17,6 +17,7 @@ import com.cdac.ecommerce.repository.ReturnRequestRepo;
 import com.cdac.ecommerce.repository.UserRepo;
 import com.cdac.ecommerce.service.AdminReturnDisputeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +34,8 @@ public class AdminReturnDisputeServiceImpl implements AdminReturnDisputeService 
     private final UserRepo userRepo;
 
     @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ADMIN')")
     public List<ReturnDisputeResponseDTO> getDisputeRequests() {
 
         List<ReturnRequest> returnRequests = returnRequestRepo.findDisputedReturnRequests(Decision.REJECTED);
@@ -52,6 +55,7 @@ public class AdminReturnDisputeServiceImpl implements AdminReturnDisputeService 
             entityId = "#returnRequestId",
             description = "Return approved by admin"
     )
+    @PreAuthorize("hasRole('ADMIN')")
     public Boolean acceptDispute(Long returnRequestId, Long adminId, AdminDisputeActionRequestDto dto) {
         ReturnRequest request = returnRequestRepo.findById(returnRequestId)
                 .orElseThrow(() -> new ReturnRequestNotFoundException("Return request not found!"));
@@ -81,6 +85,7 @@ public class AdminReturnDisputeServiceImpl implements AdminReturnDisputeService 
             entityId = "#returnRequestId",
             description = "admin rejected the dispute"
     )
+    @PreAuthorize("hasRole('ADMIN')")
     public boolean rejectDispute(Long returnRequestId, Long adminId, AdminDisputeActionRequestDto dto) {
         ReturnRequest request = returnRequestRepo.findById(returnRequestId)
                 .orElseThrow(() -> new ReturnRequestNotFoundException("Return request not found!"));

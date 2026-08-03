@@ -10,7 +10,9 @@ import com.cdac.ecommerce.mapper.AdminCategoryMapper;
 import com.cdac.ecommerce.repository.AdminCategoryRepository;
 import com.cdac.ecommerce.service.AdminCategoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -25,6 +27,8 @@ public class AdminCategoryServiceImpl implements AdminCategoryService{
             entityId = "#result.id",
             description = "A new category was added by the admin"
     )
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
     public AdminCategoryResponseDTO addCategories(AdminCategoryRequestDTO requestDTO) {
         Category category = adminCategoryMapper.toEntity(requestDTO);
 
@@ -48,6 +52,8 @@ public class AdminCategoryServiceImpl implements AdminCategoryService{
             entityId = "#id",
             description = "A category was updated by the admin"
     )
+    @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public AdminCategoryResponseDTO updateCategory(Long id, AdminCategoryRequestDTO requestDTO) {
         Category category = adminCategoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Category not found"));
@@ -77,6 +83,8 @@ public class AdminCategoryServiceImpl implements AdminCategoryService{
             entityId = "#id",
             description = "A category was deleted by the admin"
     )
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
     public void deleteCategory(Long id) {
 
         Category category = adminCategoryRepository.findById(id)

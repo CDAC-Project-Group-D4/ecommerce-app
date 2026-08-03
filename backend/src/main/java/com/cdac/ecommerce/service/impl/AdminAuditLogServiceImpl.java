@@ -13,12 +13,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
-@Repository
+@Service
 @RequiredArgsConstructor
 public class AdminAuditLogServiceImpl implements AdminAuditLogService {
 
@@ -26,6 +28,8 @@ public class AdminAuditLogServiceImpl implements AdminAuditLogService {
     private final AdminAuditMapper adminAuditMapper;
 
     @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ADMIN')")
     public Page<AdminAuditLogsResponseDTO> getAuditLogs(
             Long adminId,
             String entityName,
@@ -46,6 +50,7 @@ public class AdminAuditLogServiceImpl implements AdminAuditLogService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public void logAction(User admin, Action action, EntityEnum entity, Long entityId, String description) {
         AdminAuditLog log = new AdminAuditLog();
 
