@@ -10,6 +10,7 @@ import com.cdac.ecommerce.mapper.SellerMapper;
 import com.cdac.ecommerce.repository.UserRepo;
 import com.cdac.ecommerce.service.AdminSellerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,8 @@ public class AdminSellerServiceImpl implements AdminSellerService {
     private final SellerMapper sellerMapper;
 
     @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ADMIN')")
     public List<SellerResponseDTO> getAllSellers() {
 
         List<User> sellers = userRepo.findAllSellers();
@@ -40,6 +43,8 @@ public class AdminSellerServiceImpl implements AdminSellerService {
             entity = EntityEnum.USER,
             description = "seller blocked by admin"
     )
+    @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public boolean blockSeller(Long sellerId) {
 
         User seller = userRepo.findById(sellerId).orElseThrow(() -> new UserNotFoundException("User not found!"));
@@ -58,6 +63,8 @@ public class AdminSellerServiceImpl implements AdminSellerService {
             entityId = "#sellerId",
             description = "seller was unblocked by admin"
     )
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
     public boolean unblockSeller(Long sellerId) {
         User seller = userRepo.findById(sellerId).orElseThrow(() -> new UserNotFoundException("User not found!"));
 
@@ -76,6 +83,7 @@ public class AdminSellerServiceImpl implements AdminSellerService {
             entityId = "#sellerId",
             description = "seller deleted by admin"
     )
+    @PreAuthorize("hasRole('ADMIN')")
     public boolean deleteSeller(Long sellerId) {
         User seller = userRepo.findById(sellerId)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
