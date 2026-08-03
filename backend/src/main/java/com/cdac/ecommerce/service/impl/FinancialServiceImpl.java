@@ -19,6 +19,7 @@ import com.cdac.ecommerce.service.FinancialService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +36,7 @@ public class FinancialServiceImpl implements FinancialService {
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ADMIN')")
     public PlatformSetting getLatestCommission() {
         return platformSettingRepository.findFirstByIdNotNullOrderByCreatedAtDesc()
                 .orElseThrow(() -> new ResourceNotFoundException("No platform commission setting found."));
@@ -47,6 +49,7 @@ public class FinancialServiceImpl implements FinancialService {
             entity = EntityEnum.PLATFORM_SETTINGS,
             description = "Created a new append only global commission rate entry"
     )
+    @PreAuthorize("hasRole('ADMIN')")
     public PlatformSetting createGlobalCommission(AdminCommissionRequestDTO commissionRequestDTO, User adminUser) {
         PlatformSetting newSetting = new PlatformSetting();
         newSetting.setCommissionPercentage(commissionRequestDTO.percentage());
@@ -57,6 +60,7 @@ public class FinancialServiceImpl implements FinancialService {
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ADMIN')")
     public Page<SellerPayout> getAllPayouts(PaymentStatus status, Pageable pageable) {
         if(status != null){
             return sellerPayoutRepository.findByStatus(status, pageable);
@@ -65,6 +69,14 @@ public class FinancialServiceImpl implements FinancialService {
     }
 
     @Override
+    @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
+    @LogAdminAction(
+            action = Action.UPDATE,
+            entity = EntityEnum.SELLER_PAYOUT,
+            entityId = "#sellerId",
+            description = "seller payout was released by admin"
+    )
     public SellerPayout releaseSellerPayout(Long sellerId, User adminUser) {
         SellerPayout payout = sellerPayoutRepository.findBySeller_IdAndStatus(sellerId, PaymentStatus.PENDING)
                 .orElseThrow(() -> new ResourceNotFoundException("No pending payout record found for seller Id: " + sellerId));
@@ -76,6 +88,14 @@ public class FinancialServiceImpl implements FinancialService {
     }
 
     @Override
+    @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
+    @LogAdminAction(
+            action = Action.CREATE,
+            entity = EntityEnum.SELLER_COMMISSION_OVERRIDE,
+            entityId = "#sellerId",
+            description = "New commission was set by admin"
+    )
     public SellerCommissionOverride setSellerOverride(Long sellerId, AdminCommissionRequestDTO requestDTO, User adminUser) {
         User seller = userRepo.findById(sellerId)
                 .orElseThrow(() -> new UserNotFoundException("Seller not found!"));
