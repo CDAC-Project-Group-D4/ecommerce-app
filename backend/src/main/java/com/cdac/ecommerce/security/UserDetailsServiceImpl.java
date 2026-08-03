@@ -21,17 +21,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        // MODIFIED: Adapted to User entity and AuthRepository
+
         User user = authRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
-
-        // MODIFIED: Updated status checks using User active and blocked fields
-        if (!user.isActive()) {
-            throw new DisabledException("User account is inactive.");
-        }
-        if (user.isBlocked()) {
-            throw new LockedException("Your account has been blocked.");
-        }
 
         return UserDetailsImpl.build(user);
     }
