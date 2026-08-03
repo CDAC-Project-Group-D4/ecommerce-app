@@ -39,5 +39,5 @@ public interface ReturnService {
             SellerReturnDecisionDTO requestDTO
     );
 
-    ReturnRequestResponseDTO createReturnRequestWithImages(@Valid ReturnRequestDTO requestDTO, List<MultipartFile> images, User user);
+//    ReturnRequestResponseDTO createReturnRequestWithImages(@Valid ReturnRequestDTO requestDTO, List<MultipartFile> images, User user);
 }
