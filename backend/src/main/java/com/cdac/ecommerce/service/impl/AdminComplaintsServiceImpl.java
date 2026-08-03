@@ -14,6 +14,7 @@ import com.cdac.ecommerce.service.AdminComplaintsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,8 @@ public class AdminComplaintsServiceImpl implements AdminComplaintsService {
     private final CustomerComplaintMapper complaintMapper;
 
     @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ADMIN')")
     public Page<CustomerComplaintResponseDTO> getComplaints(Boolean resolved, Pageable pageable) {
         if(resolved == null){
             Page<CustomerComplaint> customerComplaints = complaintRepo.findAll(pageable);
@@ -47,6 +50,7 @@ public class AdminComplaintsServiceImpl implements AdminComplaintsService {
             entityId = "#id",
             description = "Complaint was resolved by admin"
     )
+    @PreAuthorize("hasRole('ADMIN')")
     public CustomerComplaintResponseDTO resolveComplaint(Long id, ResolveComplaintRequestDTO resolveComplaintRequestDTO, User adminUser) {
         CustomerComplaint complaint = complaintRepo
                 .findById(id)
