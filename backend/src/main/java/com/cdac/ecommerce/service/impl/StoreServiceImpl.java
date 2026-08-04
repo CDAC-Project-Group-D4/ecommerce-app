@@ -5,17 +5,25 @@ import com.cdac.ecommerce.dto.response.StoreResponseDTO;
 import com.cdac.ecommerce.entity.Store;
 import com.cdac.ecommerce.entity.User;
 import com.cdac.ecommerce.entity.enums.Roles;
+import com.cdac.ecommerce.exception.ResourceNotFoundException;
 import com.cdac.ecommerce.exception.SellerCreateStoreException;
 import com.cdac.ecommerce.exception.StoreAlreadyExistsException;
 import com.cdac.ecommerce.exception.UserNotFoundException;
 import com.cdac.ecommerce.dto.response.OrderResponseDTO;
+import com.cdac.ecommerce.dto.response.OrderItemResponseDTO;
 import com.cdac.ecommerce.entity.Order;
 import com.cdac.ecommerce.entity.Product;
 import com.cdac.ecommerce.mapper.OrderMapper;
+import com.cdac.ecommerce.entity.enums.OrderStatus;
+import com.cdac.ecommerce.repository.CartRepository;
+import com.cdac.ecommerce.repository.OrderItemRepository;
 import com.cdac.ecommerce.repository.OrderRepository;
 import com.cdac.ecommerce.repository.ProductRepository;
+import com.cdac.ecommerce.repository.ReturnRequestRepo;
+import com.cdac.ecommerce.repository.ReviewRepository;
 import com.cdac.ecommerce.repository.StoreRepository;
 import com.cdac.ecommerce.repository.UserRepo;
+import com.cdac.ecommerce.repository.WishlistRepository;
 import com.cdac.ecommerce.security.UserDetailsImpl;
 import com.cdac.ecommerce.service.StoreService;
 import jakarta.transaction.Transactional;
@@ -31,6 +39,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +54,13 @@ public class StoreServiceImpl implements StoreService {
     private final StoreRepository storeRepository;
     private final UserRepo userRepository;
     private final OrderRepository orderRepository;
+    private final CartRepository cartRepository;
+    private final WishlistRepository wishlistRepository;
+    private final ReviewRepository reviewRepository;
+    private final OrderItemRepository orderItemRepository;
+    private final ReturnRequestRepo returnRequestRepo;
     private final ModelMapper modelMapper;
+    private final OrderMapper orderMapper;
 
     @Override
     public StoreResponseDTO createStore(StoreRequestDTO storeRequestDTO) {
@@ -80,7 +95,7 @@ public class StoreServiceImpl implements StoreService {
 
         Store store = user.getStore();
         if (store == null) {
-            throw new RuntimeException("Store not found for this user");
+            throw new ResourceNotFoundException("Store not found for this user");
         }
         return modelMapper.map(store, StoreResponseDTO.class);
     }
@@ -94,7 +109,7 @@ public class StoreServiceImpl implements StoreService {
 
         Store store= user.getStore();
         if(store == null){
-            throw new RuntimeException("Store not found for this user");
+            throw new ResourceNotFoundException("Store not found for this user");
         }
 
         if(storeRequestDTO.getStoreName()!=null){
@@ -129,11 +144,37 @@ public class StoreServiceImpl implements StoreService {
 
         Store store= user.getStore();
         if(store == null){
-            throw new RuntimeException("Store not found for this user");
+            throw new ResourceNotFoundException("Store not found for this user");
         }
 
-        productRepository.deleteAll(store.getProductList()); //delete all the products associated with that store as well.
+        // 1. Check if store has any active/pending orders before allowing permanent deletion
+        List<Order> storeOrders = orderRepository.findOrdersByStoreId(store.getId());
+        boolean hasPendingOrders = storeOrders != null && storeOrders.stream().anyMatch(order -> 
+            order.getOrderStatus() == OrderStatus.PENDING ||
+            order.getOrderStatus() == OrderStatus.CONFIRMED ||
+            order.getOrderStatus() == OrderStatus.SHIPPED ||
+            order.getOrderStatus() == OrderStatus.OUT_FOR_DELIVERY
+        );
 
+        if (hasPendingOrders) {
+            throw new IllegalStateException("Cannot delete store permanently while you have active/pending orders. Please fulfill or cancel your orders first.");
+        }
+
+        // 2. Clean up products and all associated dependent records
+        List<Product> products = store.getProductList();
+        if (products != null && !products.isEmpty()) {
+            List<Long> productIds = products.stream().map(Product::getId).toList();
+
+            returnRequestRepo.deleteByProduct_IdIn(productIds);
+            orderItemRepository.deleteByProduct_IdIn(productIds);
+            cartRepository.deleteByProduct_IdIn(productIds);
+            wishlistRepository.deleteByProduct_IdIn(productIds);
+            reviewRepository.deleteByProduct_IdIn(productIds);
+
+            productRepository.deleteAll(products);
+        }
+
+        // 3. Disassociate and delete store
         user.setStore(null);
         userRepository.save(user);
         storeRepository.delete(store);
@@ -154,7 +195,7 @@ public class StoreServiceImpl implements StoreService {
 
         Store store= user.getStore();
         if(store == null){
-            throw new RuntimeException("Store not found for this user");
+            throw new ResourceNotFoundException("Store not found for this user");
         }
 
         //deactivate store
@@ -184,7 +225,7 @@ public class StoreServiceImpl implements StoreService {
 
         Store store= user.getStore();
         if(store == null){
-            throw new RuntimeException("Store not found for this user");
+            throw new ResourceNotFoundException("Store not found for this user");
         }
 
         //reactive store
@@ -255,11 +296,33 @@ public class StoreServiceImpl implements StoreService {
 
         Store store = user.getStore();
         if (store == null) {
-            throw new RuntimeException("Store not found for this user");
+            return Collections.emptyList();
         }
 
-        List<Order> orders = orderRepository.findOrdersByStoreId(store.getId());
-        return orders.stream().map(order -> modelMapper.map(order, OrderResponseDTO.class)).collect(Collectors.toList());
+        Long storeId = store.getId();
+        List<Order> orders = orderRepository.findOrdersByStoreId(storeId);
+        
+        return orders.stream().map(order -> {
+            OrderResponseDTO dto = orderMapper.toOrderResponseDTO(order);
+            if (order.getOrderItems() != null) {
+                List<OrderItemResponseDTO> storeOnlyItems = order.getOrderItems().stream()
+                    .filter(item -> item.getProduct() != null && item.getProduct().getStore() != null && item.getProduct().getStore().getId().equals(storeId))
+                    .map(item -> {
+                        OrderItemResponseDTO itemDto = new OrderItemResponseDTO();
+                        itemDto.setOrderItemId(item.getId());
+                        itemDto.setProductId(item.getProduct().getId());
+                        itemDto.setProductName(item.getProduct().getName());
+                        itemDto.setProductImage(item.getProduct().getImageUrl());
+                        itemDto.setQuantity(item.getQuantity());
+                        itemDto.setPrice(item.getPrice());
+                        itemDto.setLineTotal(item.getLineTotal());
+                        return itemDto;
+                    })
+                    .collect(Collectors.toList());
+                dto.setOrderItems(storeOnlyItems);
+            }
+            return dto;
+        }).collect(Collectors.toList());
     }
 
     

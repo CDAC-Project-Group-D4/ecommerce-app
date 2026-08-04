@@ -13,10 +13,15 @@ export const SellerProvider = ({ children }) => {
             setLoadingStore(true);
             setErrorStore(null);
             const data = await getMyStore();
-            setStore(data);
+            setStore(data || null);
             return data;
         } catch (err) {
             console.error("SellerContext load store error:", err);
+            if (err.response && err.response.status === 404) {
+                setStore(null);
+                setErrorStore(null);
+                return null;
+            }
             setErrorStore(err.message || "Could not load store");
         } finally {
             setLoadingStore(false);

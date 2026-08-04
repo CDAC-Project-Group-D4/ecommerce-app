@@ -9,10 +9,13 @@ import java.math.BigDecimal;
 @Data
 public class UpdateProductRequestDTO {
 
+    private String name;
+
     @Positive(message = "price must be greater than 0")
     private BigDecimal price;
 
     @Min(value = 0, message = "stock cannot be negative")
     private Integer stock;
 
+    private String imageUrl;
 }

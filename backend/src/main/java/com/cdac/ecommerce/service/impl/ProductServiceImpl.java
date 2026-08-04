@@ -42,13 +42,16 @@ public class ProductServiceImpl implements ProductService {
 
         Store store = user.getStore();
         if (store == null) {
-            throw new RuntimeException("Store not found for this user");
+            throw new ResourceNotFoundException("Cannot create product: Store not found for this user. Please create a store first.");
         }
 
         Category category= categoryRepository.findById(productRequestDTO.getCategory_id()).orElseThrow(()-> new ResourceNotFoundException("Category not found with given id"));
         Product product= modelMapper.map(productRequestDTO, Product.class);
         product.setStore(store);
         product.setCategory(category);
+        if (productRequestDTO.getImageUrl() != null && !productRequestDTO.getImageUrl().isBlank()) {
+            product.setImageUrl(productRequestDTO.getImageUrl());
+        }
 
         Product newProduct= productRepository.save(product);
         ProductResponseDTO productResponseDTO= modelMapper.map(newProduct, ProductResponseDTO.class);
@@ -68,7 +71,7 @@ public class ProductServiceImpl implements ProductService {
         //get the sellers store
         Store store = user.getStore();
         if (store == null) {
-            throw new RuntimeException("Store not found for this user");
+            throw new ResourceNotFoundException("Store not found for this user");
         }
 
         //finding the product
@@ -79,13 +82,21 @@ public class ProductServiceImpl implements ProductService {
             throw new RuntimeException("unauthorized!! cannot delete product");
         }
 
-        //updating the price and stock of the product
+        //updating the name, price and stock of the product
+        if (updateProductRequestDTO.getName() != null && !updateProductRequestDTO.getName().isBlank()) {
+            product.setName(updateProductRequestDTO.getName());
+        }
+
         if (updateProductRequestDTO.getPrice() != null) {
             product.setPrice(updateProductRequestDTO.getPrice());
         }
 
         if (updateProductRequestDTO.getStock() != null) {
             product.setStock(updateProductRequestDTO.getStock());
+        }
+
+        if (updateProductRequestDTO.getImageUrl() != null && !updateProductRequestDTO.getImageUrl().isBlank()) {
+            product.setImageUrl(updateProductRequestDTO.getImageUrl());
         }
 
         Product updateProduct=productRepository.save(product);
@@ -106,7 +117,7 @@ public class ProductServiceImpl implements ProductService {
         //get the sellers store
         Store store = user.getStore();
         if (store == null) {
-            throw new RuntimeException("Store not found for this user");
+            throw new ResourceNotFoundException("Store not found for this user");
         }
 
         //finding the product
@@ -135,7 +146,7 @@ public class ProductServiceImpl implements ProductService {
         //get the sellers store
         Store store = user.getStore();
         if (store == null) {
-            throw new RuntimeException("Store not found for this user");
+            return java.util.Collections.emptyList();
         }
 
         //fetching all products belongs to the given store
@@ -154,7 +165,7 @@ public class ProductServiceImpl implements ProductService {
         //get the sellers store
         Store store = user.getStore();
         if (store == null) {
-            throw new RuntimeException("Store not found for this user");
+            return java.util.Collections.emptyList();
         }
 
         List<Product> lowStockProducts = productRepository.findLowStockProductsByStoreId(store.getId());
