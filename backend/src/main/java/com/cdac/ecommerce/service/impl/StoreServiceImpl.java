@@ -5,6 +5,7 @@ import com.cdac.ecommerce.dto.response.StoreResponseDTO;
 import com.cdac.ecommerce.entity.Store;
 import com.cdac.ecommerce.entity.User;
 import com.cdac.ecommerce.entity.enums.Roles;
+import com.cdac.ecommerce.exception.ResourceNotFoundException;
 import com.cdac.ecommerce.exception.SellerCreateStoreException;
 import com.cdac.ecommerce.exception.StoreAlreadyExistsException;
 import com.cdac.ecommerce.exception.UserNotFoundException;
@@ -80,7 +81,7 @@ public class StoreServiceImpl implements StoreService {
 
         Store store = user.getStore();
         if (store == null) {
-            throw new RuntimeException("Store not found for this user");
+            throw new ResourceNotFoundException("Store not found for this user");
         }
         return modelMapper.map(store, StoreResponseDTO.class);
     }
