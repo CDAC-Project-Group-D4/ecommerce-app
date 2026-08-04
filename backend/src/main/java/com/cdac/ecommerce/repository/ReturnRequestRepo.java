@@ -3,8 +3,10 @@ package com.cdac.ecommerce.repository;
 import com.cdac.ecommerce.entity.ReturnRequest;
 import com.cdac.ecommerce.entity.enums.Decision;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,4 +31,9 @@ public interface ReturnRequestRepo extends JpaRepository<ReturnRequest, Long> {
     List<ReturnRequest> findByOrder_Id(Long orderId);
 
     List<ReturnRequest> findByOrderItem_Product_Store_User_IdOrderByCreatedAtDesc(Long sellerId);
+
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM ReturnRequest rr WHERE rr.orderItem.id IN (SELECT oi.id FROM OrderItem oi WHERE oi.product.id IN :productIds)")
+    void deleteByProduct_IdIn(@Param("productIds") List<Long> productIds);
 }

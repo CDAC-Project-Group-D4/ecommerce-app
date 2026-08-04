@@ -24,8 +24,15 @@ export const createStore = async (storeData) => {
 
 // get store api
 export const getMyStore = async () => {
-    const response = await axios.get(`${BASE_URL}/get-store`, getAuthHeader());
-    return response.data;
+    try {
+        const response = await axios.get(`${BASE_URL}/get-store`, getAuthHeader());
+        return response.data;
+    } catch (err) {
+        if (err.response && err.response.status === 404) {
+            return null;
+        }
+        throw err;
+    }
 };
 
 // update store api

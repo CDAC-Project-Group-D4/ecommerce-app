@@ -55,13 +55,16 @@ function Store() {
         }
         getMyStore() //calling get api
             .then((data) => {
-                setStore(data); //api se jo data aa rha hai usko store state me save karta hia aur ui ko update kar deta hai.
-                if (setContextStore) setContextStore(data);
-                setFormData({ storeName: data.storeName, //api se aya hua data ko form me show karega
-                    description: data.description
-                });
+                setStore(data || null); //api se jo data aa rha hai usko store state me save karta hia aur ui ko update kar deta hai.
+                if (setContextStore) setContextStore(data || null);
+                if (data) {
+                    setFormData({ 
+                        storeName: data.storeName || "", //api se aya hua data ko form me show karega
+                        description: data.description || ""
+                    });
+                }
             })
-            .catch((err) => setError(err.message || "Could not load store"))
+            .catch((err) => setError(err.response?.data?.message || err.message || "Could not load store"))
             .finally(() => setLoading(false));
     }, []);
 
@@ -90,7 +93,7 @@ function Store() {
             if (setContextStore) setContextStore(updated);
             setIsEditing(false);  //setting isEditing back to false so that it can show store information
         } catch (err) {
-            setError(err.message || "Failed to update store");
+            setError(err.response?.data?.message || err.message || "Failed to update store");
         } finally {
             setSaving(false);
         }
@@ -105,7 +108,7 @@ function Store() {
             setStore(null);  //updating the store info to null
             if (setContextStore) setContextStore(null);
         } catch (err) {
-            setError(err.message || "Failed to delete store");
+            setError(err.response?.data?.message || err.message || "Failed to delete store");
         } finally {
             setSaving(false);
         }
@@ -120,7 +123,7 @@ function Store() {
             setStore(updated);
             if (setContextStore) setContextStore(updated);
         } catch (err) {
-            setError(err.message || "Failed to deactivate store");
+            setError(err.response?.data?.message || err.message || "Failed to deactivate store");
         } finally {
             setSaving(false);
         }
@@ -134,7 +137,7 @@ function Store() {
             setStore(updated);
             if (setContextStore) setContextStore(updated);
         } catch (err) {
-            setError(err.message || "Failed to reactivate store");
+            setError(err.response?.data?.message || err.message || "Failed to reactivate store");
         } finally {
             setSaving(false);
         }

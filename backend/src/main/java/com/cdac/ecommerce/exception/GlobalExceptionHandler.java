@@ -61,6 +61,17 @@ public class GlobalExceptionHandler {
                 HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
+    public ResponseEntity<ApiErrorResponse> handleDataIntegrityViolation(org.springframework.dao.DataIntegrityViolationException ex) {
+        return new ResponseEntity<>(
+                new ApiErrorResponse(
+                        HttpStatus.CONFLICT.value(),
+                        "Cannot complete action because related data exists (database constraint)."
+                ),
+                HttpStatus.CONFLICT
+        );
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleGlobalException(Exception e){
 
