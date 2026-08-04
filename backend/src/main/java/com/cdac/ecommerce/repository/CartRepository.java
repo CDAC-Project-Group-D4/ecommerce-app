@@ -9,6 +9,9 @@ import org.springframework.data.repository.query.Param;
 
 import com.cdac.ecommerce.entity.Cart;
 
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.transaction.annotation.Transactional;
+
 public interface CartRepository extends JpaRepository<Cart, Long>{
 	    // Checks if the given product already exists in the user's cart
 		Optional<Cart> findByUser_IdAndProduct_Id(Long userId,Long productId);
@@ -23,5 +26,8 @@ public interface CartRepository extends JpaRepository<Cart, Long>{
 		// Cleanup after successful checkout — remove only the ordered items, not the whole cart
 	    void deleteByIdIn(List<Long> cartItemIds);
 	    
-		
+	    @Modifying
+	    @Transactional
+	    @Query("DELETE FROM Cart c WHERE c.product.id IN :productIds")
+	    void deleteByProduct_IdIn(@Param("productIds") List<Long> productIds);
 }

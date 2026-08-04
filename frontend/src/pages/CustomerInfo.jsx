@@ -67,7 +67,8 @@ function CustomerInfo() {
                 setError(null);
             })
             .catch((err) => {
-                setError(err.message || "Failed to load customer information");
+                const msg = err?.response?.data?.message || (typeof err === "string" ? err : err.message) || "Failed to load customer information";
+                setError(msg);
             })
             .finally(() => {
                 setLoading(false);

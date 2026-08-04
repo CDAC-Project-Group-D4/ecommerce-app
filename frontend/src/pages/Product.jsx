@@ -105,14 +105,19 @@ function Product() {
             formData.append("banner", file);
             const res = await uploadStoreMedia(formData);
             return res.bannerUrl || res.url || null;
-        } catch {
-            return URL.createObjectURL(file); // fallback preview blob URL
+        } catch (err) {
+            console.error("Failed to upload image:", err);
+            return null;
         }
     };
 
     // Handle Add Product Form Submission
     const handleAddSubmit = async (e) => {
         e.preventDefault();
+        if (!store) {
+            setError("You cannot create a product without a store. Please create a store first.");
+            return;
+        }
         setAddLoading(true);
         setError(null);
         setSuccess(null);
@@ -130,7 +135,7 @@ function Product() {
                 stock: parseInt(newProductData.stock, 10),
                 low_stock_threshold: parseInt(newProductData.low_stock_threshold || "5", 10),
                 category_id: parseInt(newProductData.category_id || "1", 10),
-                imageUrl: uploadedCoverUrl || coverPreview || null
+                imageUrl: uploadedCoverUrl
             };
 
             const createdProd = await createProduct(payload);
@@ -191,6 +196,7 @@ function Product() {
             }
 
             const payload = {
+                name: updateProductData.name,
                 price: parseFloat(updateProductData.price),
                 stock: parseInt(updateProductData.stock, 10),
                 imageUrl: updatedCoverUrl
@@ -283,6 +289,15 @@ function Product() {
                 {error && <div className="prd-alert-error">{error}</div>}
                 {success && <div className="prd-alert-success">{success}</div>}
 
+                {!loading && !store && (
+                    <div style={{ backgroundColor: "#fef3c7", color: "#92400e", padding: "14px 18px", borderRadius: "10px", marginBottom: "20px", display: "flex", justifyContent: "space-between", alignItems: "center", border: "1px solid #fde68a" }}>
+                        <span>⚠️ <strong>No Store Found.</strong> You cannot add or manage products without a store. Please create your store first.</span>
+                        <a href="/create-store" style={{ backgroundColor: "#92400e", color: "#ffffff", padding: "6px 14px", borderRadius: "6px", textDecoration: "none", fontSize: "13px", fontWeight: "bold" }}>
+                            Create Store
+                        </a>
+                    </div>
+                )}
+
                 {/* Header Row before Table */}
                 <div className="prd-header-action-row">
                     <h2 className="sd-section-title" style={{ margin: 0 }}>
@@ -300,7 +315,13 @@ function Product() {
                         </div>
                         <button
                             className="prd-add-btn"
-                            onClick={() => setIsAddModalOpen(true)}
+                            onClick={() => {
+                                if (!store) {
+                                    setError("You don't have a store yet! Please create a store first to add products.");
+                                    return;
+                                }
+                                setIsAddModalOpen(true);
+                            }}
                         >
                             <Icon name="plus" size={16} /> Add Products
                         </button>

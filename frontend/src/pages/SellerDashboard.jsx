@@ -116,10 +116,48 @@ function OrderPieChart({ successful, rejected, pending }) {
     );
 }
 
+function formatStatusLabel(status) {
+    if (!status) return "Pending";
+    const s = String(status).toUpperCase();
+    switch (s) {
+        case "PENDING": return "Pending";
+        case "PLACED": return "Placed";
+        case "CONFIRMED": return "Confirmed";
+        case "SHIPPED": return "Shipped";
+        case "OUT_FOR_DELIVERY": return "Out for Delivery";
+        case "DELIVERED": return "Delivered";
+        case "COMPLETED": return "Completed";
+        case "CANCELLED": return "Cancelled";
+        case "RETURNED": return "Returned";
+        default: return status;
+    }
+}
+
+function getStatusBadgeClass(status) {
+    if (!status) return "badge-pending";
+    const s = String(status).toUpperCase();
+    switch (s) {
+        case "DELIVERED":
+        case "COMPLETED":
+            return "badge-delivered";
+        case "SHIPPED":
+        case "OUT_FOR_DELIVERY":
+        case "CONFIRMED":
+        case "PLACED":
+            return "badge-shipped";
+        case "CANCELLED":
+            return "badge-cancelled";
+        case "RETURNED":
+            return "badge-returned";
+        default:
+            return "badge-pending";
+    }
+}
+
 function getStatusCategory(status) {
     if (!status) return "Pending";
     const s = String(status).toUpperCase();
-    if (["CONFIRMED", "SHIPPED", "OUT_FOR_DELIVERY", "DELIVERED", "COMPLETED", "SUCCESSFUL"].includes(s)) {
+    if (["DELIVERED", "COMPLETED"].includes(s)) {
         return "Successful";
     }
     if (["CANCELLED", "RETURNED", "REJECTED"].includes(s)) {
@@ -310,8 +348,8 @@ function SellerDashboard() {
                                             <td className="sd-cell-qty">{item.quantity}</td>
                                             <td>₹{Number(item.totalAmt).toFixed(2)}</td>
                                             <td>
-                                                <span className={`sd-status-badge badge-${item.statusCategory.toLowerCase()}`}>
-                                                    {item.statusCategory}
+                                                <span className={`sd-status-badge ${getStatusBadgeClass(item.rawStatus)}`}>
+                                                    {formatStatusLabel(item.rawStatus)}
                                                 </span>
                                             </td>
                                         </tr>
