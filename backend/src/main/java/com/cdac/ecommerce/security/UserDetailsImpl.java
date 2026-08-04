@@ -2,10 +2,10 @@
 package com.cdac.ecommerce.security;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-// MODIFIED: Updated entity import to User
 import com.cdac.ecommerce.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -13,14 +13,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDetailsImpl implements UserDetails {
 
-    // MODIFIED: Changed Users to User
+    @JsonIgnore
     private User user;
     // MODIFIED: Changed Integer to Long to match BaseClass id
     private Long id;
@@ -43,8 +43,14 @@ public class UserDetailsImpl implements UserDetails {
 
     public static UserDetailsImpl build(User user){
 
+        String roleName = user.getRole() != null ? user.getRole().name() : "";
+
+        if (!roleName.isEmpty() && !roleName.startsWith("ROLE_")) {
+            roleName = "ROLE_" + roleName;
+        }
+
         List<GrantedAuthority> authorities = user.getRole() != null ?
-                List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name())) :
+                List.of(new SimpleGrantedAuthority(roleName)) :
                 List.of();
 
         UserDetailsImpl userDetails = new UserDetailsImpl(

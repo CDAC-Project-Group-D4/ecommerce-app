@@ -10,6 +10,7 @@ import com.cdac.ecommerce.mapper.CustomerMapper;
 import com.cdac.ecommerce.repository.UserRepo;
 import com.cdac.ecommerce.service.AdminCustomerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +26,7 @@ public class AdminCustomerServiceImpl implements AdminCustomerService {
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ADMIN')")
     public List<CustomerResponseDTO> getAllCustomers() {
 
         List<CustomerResponseDTO> customers = userRepo.findAllCustomers().stream().map(customerMapper::toDto).collect(Collectors.toList());
@@ -40,6 +42,7 @@ public class AdminCustomerServiceImpl implements AdminCustomerService {
             entityId = "#customerId",
             description = "A customer was deleted by admin"
     )
+    @PreAuthorize("hasRole('ADMIN')")
     public boolean deleteCustomer(Long customerId) {
 
         User customer = userRepo.findById(customerId)
@@ -62,6 +65,8 @@ public class AdminCustomerServiceImpl implements AdminCustomerService {
             entityId = "#customerId",
             description = "customer was blocked by admin"
     )
+    @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public boolean blockCustomer(Long customerId) {
 
         User customer = userRepo.findById(customerId)
@@ -78,6 +83,8 @@ public class AdminCustomerServiceImpl implements AdminCustomerService {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional(readOnly = true)
     public CustomerResponseDTO getCustomerById(Long customerId) {
 
         User customer = userRepo.findById(customerId)

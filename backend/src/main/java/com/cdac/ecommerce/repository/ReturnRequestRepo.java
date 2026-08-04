@@ -30,6 +30,9 @@ public interface ReturnRequestRepo extends JpaRepository<ReturnRequest, Long> {
     // Returns of an order
     List<ReturnRequest> findByOrder_Id(Long orderId);
 
+    /* Retrieves all return requests for a seller by traversing:
+      ReturnRequest -> OrderItem -> Product -> Store -> User.
+      Results are ordered by creation date in descending order (latest first)*/
     List<ReturnRequest> findByOrderItem_Product_Store_User_IdOrderByCreatedAtDesc(Long sellerId);
 
     @Modifying

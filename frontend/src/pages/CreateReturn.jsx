@@ -12,6 +12,9 @@ const isWithinReturnWindow = (order) => {
     return new Date() <= deadline;
 };
 
+const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+
 function CreateReturn() {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
@@ -21,6 +24,7 @@ function CreateReturn() {
     const [item, setItem] = useState(null);
     const [requestType, setRequestType] = useState("RETURN");
     const [reason, setReason] = useState("");
+    const [images, setImages] = useState([]);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState("");
@@ -63,17 +67,24 @@ function CreateReturn() {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        if (!reason.trim()) return;
+        if (!reason.trim() || images.length < 1 || images.length > 5) return;
 
         try {
             setSubmitting(true);
             setError("");
-            await createReturnRequest({
+            const request = {
                 orderId: Number(orderId),
                 orderItemId: Number(orderItemId),
                 requestType,
                 reason: reason.trim()
-            });
+            };
+            const formData = new FormData();
+            formData.append(
+                "request",
+                new Blob([JSON.stringify(request)], { type: "application/json" })
+            );
+            images.forEach(({ file }) => formData.append("images", file));
+            await createReturnRequest(formData);
             navigate("/returns", {
                 replace: true,
                 state: { message: "Return request submitted successfully." }
@@ -86,6 +97,35 @@ function CreateReturn() {
         } finally {
             setSubmitting(false);
         }
+    };
+
+    const handleImageSelection = (event) => {
+        const selected = Array.from(event.target.files || []);
+        event.target.value = "";
+        if (images.length + selected.length > 5) {
+            setError("You can upload a maximum of 5 product images.");
+            return;
+        }
+        if (selected.some((image) => !ALLOWED_IMAGE_TYPES.includes(image.type))) {
+            setError("Only JPG, PNG, and WebP images are allowed.");
+            return;
+        }
+        if (selected.some((image) => image.size > MAX_IMAGE_SIZE)) {
+            setError("Each image must be 5 MB or smaller.");
+            return;
+        }
+        setError("");
+        setImages((current) => [
+            ...current,
+            ...selected.map((file) => ({ file, previewUrl: URL.createObjectURL(file) }))
+        ]);
+    };
+
+    const removeImage = (index) => {
+        setImages((current) => {
+            URL.revokeObjectURL(current[index].previewUrl);
+            return current.filter((_, itemIndex) => itemIndex !== index);
+        });
     };
 
     if (loading) {
@@ -147,6 +187,33 @@ function CreateReturn() {
                         />
                     </label>
 
+                    <label>
+                        Product photos (1–5 required)
+                        <input
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp"
+                            multiple
+                            onChange={handleImageSelection}
+                            disabled={images.length >= 5}
+                        />
+                        <span className="return-upload-help">
+                            Upload clear JPG, PNG, or WebP photos, up to 5 MB each.
+                        </span>
+                    </label>
+
+                    {images.length > 0 && (
+                        <div className="return-image-previews">
+                            {images.map(({ file, previewUrl }, index) => (
+                                <div className="return-image-preview" key={`${file.name}-${file.lastModified}-${index}`}>
+                                    <img src={previewUrl} alt={`Product evidence ${index + 1}`} />
+                                    <button type="button" onClick={() => removeImage(index)}>
+                                        Remove
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
                     <div className="return-form-hint">
                         {requestType === "RETURN"
                             ? "An approved return receives a simulated refund for this item's total."
@@ -158,7 +225,7 @@ function CreateReturn() {
                     <button
                         type="submit"
                         className="return-primary"
-                        disabled={submitting || !reason.trim()}
+                        disabled={submitting || !reason.trim() || images.length < 1 || images.length > 5}
                     >
                         {submitting ? "Submitting..." : "Submit Request"}
                     </button>

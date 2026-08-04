@@ -71,6 +71,15 @@ function SellerReturns() {
                                 </div>
                                 <p>Customer: {request.customerName}</p>
                                 <p><strong>{request.requestType}</strong> · {request.reason}</p>
+                                {request.imageUrls?.length > 0 && (
+                                    <div className="return-evidence-gallery">
+                                        {request.imageUrls.map((imageUrl, index) => (
+                                            <a href={`http://localhost:8080${imageUrl}`} target="_blank" rel="noreferrer" key={imageUrl}>
+                                                <img src={`http://localhost:8080${imageUrl}`} alt={`Customer evidence ${index + 1}`} />
+                                            </a>
+                                        ))}
+                                    </div>
+                                )}
 
                                 {pending ? (
                                     <>

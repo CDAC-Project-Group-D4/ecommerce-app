@@ -6,6 +6,7 @@ import com.cdac.ecommerce.dto.response.ReturnResponseDTO;
 import com.cdac.ecommerce.entity.Order;
 import com.cdac.ecommerce.entity.OrderItem;
 import com.cdac.ecommerce.entity.ReturnRequest;
+import com.cdac.ecommerce.entity.ReturnRequestImage;
 import com.cdac.ecommerce.entity.User;
 import com.cdac.ecommerce.entity.enums.Decision;
 import com.cdac.ecommerce.entity.enums.OrderStatus;
@@ -23,8 +24,16 @@ import com.cdac.ecommerce.service.ReturnService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Map;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,6 +42,16 @@ import java.util.UUID;
 @Transactional
 public class ReturnServiceImpl implements ReturnService {
 
+    private static final int MIN_IMAGES = 1;
+    private static final int MAX_IMAGES = 5;
+    private static final long MAX_IMAGE_SIZE = 5L * 1024 * 1024;
+    private static final Path RETURN_UPLOAD_DIR = Paths.get("uploads", "returns");
+    private static final Map<String, String> ALLOWED_IMAGE_TYPES = Map.of(
+            "image/jpeg", ".jpg",
+            "image/png", ".png",
+            "image/webp", ".webp"
+    );
+
     private final ReturnRequestRepo returnRequestRepo;
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
@@ -40,7 +59,10 @@ public class ReturnServiceImpl implements ReturnService {
     private final ReturnMapper returnMapper;
 
     @Override
-    public ReturnResponseDTO createReturnRequest(Long userId, ReturnRequestDTO dto) {
+    public ReturnResponseDTO createReturnRequest(
+            Long userId, ReturnRequestDTO dto, List<MultipartFile> images) {
+        validateImages(images);
+
         Order order = orderRepository.findByIdAndUser_Id(dto.getOrderId(), userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found."));
 
@@ -77,6 +99,32 @@ public class ReturnServiceImpl implements ReturnService {
         request.setSellerDecision(Decision.PENDING);
         request.setActive(true);
 
+        List<Path> savedFiles = new ArrayList<>();
+        try {
+            Files.createDirectories(RETURN_UPLOAD_DIR);
+            for (MultipartFile image : images) {
+                String contentType = image.getContentType().toLowerCase();
+                String filename = UUID.randomUUID() + ALLOWED_IMAGE_TYPES.get(contentType);
+                Path destination = RETURN_UPLOAD_DIR.resolve(filename).normalize();
+                if (!destination.startsWith(RETURN_UPLOAD_DIR.normalize())) {
+                    throw new IllegalArgumentException("Invalid image filename.");
+                }
+                Files.copy(image.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
+                savedFiles.add(destination);
+
+                ReturnRequestImage requestImage = new ReturnRequestImage();
+                requestImage.setReturnRequest(request);
+                requestImage.setImageUrl("/uploads/returns/" + filename);
+                requestImage.setOriginalFilename(image.getOriginalFilename());
+                requestImage.setContentType(contentType);
+                requestImage.setFileSize(image.getSize());
+                request.getImages().add(requestImage);
+            }
+        } catch (IOException exception) {
+            savedFiles.forEach(this::deleteQuietly);
+            throw new IllegalStateException("Unable to save return images.", exception);
+        }
+
         if (dto.getRequestType() == RequestType.RETURN) {
             request.setRefundStatus(RefundStatus.PENDING);
             request.setRefundAmount(item.getLineTotal());
@@ -84,7 +132,41 @@ public class ReturnServiceImpl implements ReturnService {
             request.setRefundStatus(RefundStatus.NOT_APPLICABLE);
         }
 
-        return returnMapper.toDto(returnRequestRepo.save(request));
+        try {
+            return returnMapper.toDto(returnRequestRepo.save(request));
+        } catch (RuntimeException exception) {
+            savedFiles.forEach(this::deleteQuietly);
+            throw exception;
+        }
+    }
+
+    private void validateImages(List<MultipartFile> images) {
+        if (images == null || images.size() < MIN_IMAGES) {
+            throw new IllegalArgumentException("At least 1 product image is required.");
+        }
+        if (images.size() > MAX_IMAGES) {
+            throw new IllegalArgumentException("A maximum of 5 product images is allowed.");
+        }
+        for (MultipartFile image : images) {
+            if (image == null || image.isEmpty()) {
+                throw new IllegalArgumentException("Product images cannot be empty.");
+            }
+            if (image.getSize() > MAX_IMAGE_SIZE) {
+                throw new IllegalArgumentException("Each image must be 5 MB or smaller.");
+            }
+            String contentType = image.getContentType();
+            if (contentType == null || !ALLOWED_IMAGE_TYPES.containsKey(contentType.toLowerCase())) {
+                throw new IllegalArgumentException("Only JPG, PNG, and WebP images are allowed.");
+            }
+        }
+    }
+
+    private void deleteQuietly(Path path) {
+        try {
+            Files.deleteIfExists(path);
+        } catch (IOException ignored) {
+            // Best-effort cleanup after a failed request.
+        }
     }
 
     @Override
