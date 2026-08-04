@@ -2,6 +2,8 @@ package com.cdac.ecommerce.service.impl;
 
 import com.cdac.ecommerce.annotation.LogAdminAction;
 import com.cdac.ecommerce.dto.request.AdminCommissionRequestDTO;
+import com.cdac.ecommerce.dto.response.PlatformSettingResponseDTO;
+import com.cdac.ecommerce.dto.response.SellerPayoutResponseDTO;
 import com.cdac.ecommerce.entity.PlatformSetting;
 import com.cdac.ecommerce.entity.SellerCommissionOverride;
 import com.cdac.ecommerce.entity.SellerPayout;
@@ -11,6 +13,8 @@ import com.cdac.ecommerce.entity.enums.EntityEnum;
 import com.cdac.ecommerce.entity.enums.PaymentStatus;
 import com.cdac.ecommerce.exception.ResourceNotFoundException;
 import com.cdac.ecommerce.exception.UserNotFoundException;
+import com.cdac.ecommerce.mapper.PlatformSettingMapper;
+import com.cdac.ecommerce.mapper.SellerPayoutMapper;
 import com.cdac.ecommerce.repository.PlatformSettingRepository;
 import com.cdac.ecommerce.repository.SellerCommissionOverrideRepository;
 import com.cdac.ecommerce.repository.SellerPayoutRepository;
@@ -32,14 +36,18 @@ public class FinancialServiceImpl implements FinancialService {
     private final PlatformSettingRepository platformSettingRepository;
     private final SellerCommissionOverrideRepository sellerCommissionOverrideRepository;
     private final SellerPayoutRepository sellerPayoutRepository;
+    private final PlatformSettingMapper platformSettingMapper;
+    private final SellerPayoutMapper sellerPayoutMapper;
     private final UserRepo userRepo;
 
     @Override
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('ADMIN')")
-    public PlatformSetting getLatestCommission() {
-        return platformSettingRepository.findFirstByIdNotNullOrderByCreatedAtDesc()
-                .orElseThrow(() -> new ResourceNotFoundException("No platform commission setting found."));
+    public PlatformSettingResponseDTO getLatestCommission() {
+        PlatformSetting setting = platformSettingRepository.findFirstByIdNotNullOrderByCreatedAtDesc()
+                .orElseThrow(() -> new ResourceNotFoundException("Platform commission setting not found"));
+
+        return platformSettingMapper.toResponseDto(setting);
     }
 
     @Override
@@ -50,22 +58,28 @@ public class FinancialServiceImpl implements FinancialService {
             description = "Created a new append only global commission rate entry"
     )
     @PreAuthorize("hasRole('ADMIN')")
-    public PlatformSetting createGlobalCommission(AdminCommissionRequestDTO commissionRequestDTO, User adminUser) {
+    public PlatformSettingResponseDTO createGlobalCommission(AdminCommissionRequestDTO commissionRequestDTO, User adminUser) {
         PlatformSetting newSetting = new PlatformSetting();
         newSetting.setCommissionPercentage(commissionRequestDTO.percentage());
         newSetting.setUpdatedBy(adminUser);
 
-        return platformSettingRepository.save(newSetting);
+        PlatformSetting savedSetting = platformSettingRepository.save(newSetting);
+        return platformSettingMapper.toResponseDto(savedSetting);
     }
 
     @Override
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('ADMIN')")
-    public Page<SellerPayout> getAllPayouts(PaymentStatus status, Pageable pageable) {
-        if(status != null){
-            return sellerPayoutRepository.findByStatus(status, pageable);
+    public Page<SellerPayoutResponseDTO> getAllPayouts(PaymentStatus status, Pageable pageable) {
+        Page<SellerPayout> payouts;
+        if (status != null) {
+            payouts = sellerPayoutRepository.findByStatus(status, pageable);
+        } else {
+            payouts = sellerPayoutRepository.findAll(pageable);
         }
-        return sellerPayoutRepository.findAll(pageable);
+
+        // Fixes type mismatch & converts Lazy Proxy entities to DTOs
+        return payouts.map(sellerPayoutMapper::toResponseDto);
     }
 
     @Override
@@ -77,14 +91,15 @@ public class FinancialServiceImpl implements FinancialService {
             entityId = "#sellerId",
             description = "seller payout was released by admin"
     )
-    public SellerPayout releaseSellerPayout(Long sellerId, User adminUser) {
+    public SellerPayoutResponseDTO releaseSellerPayout(Long sellerId, User adminUser) {
         SellerPayout payout = sellerPayoutRepository.findBySeller_IdAndStatus(sellerId, PaymentStatus.PENDING)
                 .orElseThrow(() -> new ResourceNotFoundException("No pending payout record found for seller Id: " + sellerId));
 
         payout.setStatus(PaymentStatus.COMPLETED);
         payout.setProcessedAt(LocalDateTime.now());
 
-        return sellerPayoutRepository.save(payout);
+        SellerPayout savedPayout = sellerPayoutRepository.save(payout);
+        return sellerPayoutMapper.toResponseDto(savedPayout);
     }
 
     @Override
@@ -109,6 +124,4 @@ public class FinancialServiceImpl implements FinancialService {
 
         return sellerCommissionOverrideRepository.save(override);
     }
-
-
 }
