@@ -1,6 +1,8 @@
 package com.cdac.ecommerce.controller;
 
 import com.cdac.ecommerce.dto.request.AdminCommissionRequestDTO;
+import com.cdac.ecommerce.dto.response.PlatformSettingResponseDTO;
+import com.cdac.ecommerce.dto.response.SellerPayoutResponseDTO;
 import com.cdac.ecommerce.entity.PlatformSetting;
 import com.cdac.ecommerce.entity.SellerCommissionOverride;
 import com.cdac.ecommerce.entity.SellerPayout;
@@ -26,12 +28,12 @@ public class AdminFinancialController {
     private final FinancialService financialService;
 
     @GetMapping("/settings/commission")
-    public ResponseEntity<PlatformSetting> getLatestCommission(){
+    public ResponseEntity<PlatformSettingResponseDTO> getLatestCommission(){
         return ResponseEntity.ok(financialService.getLatestCommission());
     }
 
     @PutMapping("/settings/commission")
-    public ResponseEntity<PlatformSetting> updateGlobalCommission(
+    public ResponseEntity<PlatformSettingResponseDTO> updateGlobalCommission(
             @Valid @RequestBody AdminCommissionRequestDTO commissionRequestDTO,
             @AuthenticationPrincipal User adminUser
             ){
@@ -49,7 +51,7 @@ public class AdminFinancialController {
     }
 
     @GetMapping("/payouts")
-    public ResponseEntity<Page<SellerPayout>> getAllPayouts(
+    public ResponseEntity<Page<SellerPayoutResponseDTO>> getAllPayouts(
             @RequestParam(required = false)PaymentStatus status,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
             ){
@@ -58,7 +60,7 @@ public class AdminFinancialController {
     }
 
     @PostMapping("/payouts/{sellerId}/release")
-    public ResponseEntity<SellerPayout> releaseSellerPayout(
+    public ResponseEntity<SellerPayoutResponseDTO> releaseSellerPayout(
             @PathVariable Long sellerId,
             @AuthenticationPrincipal User adminUser
     ){
