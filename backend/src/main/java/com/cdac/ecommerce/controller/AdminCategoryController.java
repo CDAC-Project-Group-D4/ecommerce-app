@@ -18,6 +18,13 @@ public class AdminCategoryController {
 
     private final AdminCategoryService adminCategoryService;
 
+    @GetMapping
+    public ResponseEntity<List<AdminCategoryResponseDTO>> getAllCategories() {
+        return new ResponseEntity<>(
+                adminCategoryService.getAllCategories(),
+                HttpStatus.OK);
+    }
+
     @PostMapping
     public ResponseEntity<AdminCategoryResponseDTO> addCategory(
             @RequestBody AdminCategoryRequestDTO requestDTO) {
@@ -35,7 +42,7 @@ public class AdminCategoryController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteCategory(Long id){
+    public ResponseEntity<String> deleteCategory(@PathVariable Long id){
         adminCategoryService.deleteCategory(id);
         return  new ResponseEntity<>("Category deleted successfully",HttpStatus.OK);
     }

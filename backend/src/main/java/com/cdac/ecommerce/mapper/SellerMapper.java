@@ -9,8 +9,7 @@ import org.mapstruct.Mapping;
 public interface SellerMapper {
 
     @Mapping(target = "sellerId", source = "id")
-    @Mapping(target = "storeId", source = "store.id")
-    @Mapping(target = "storeName", source = "store.storeName")
+    @Mapping(target = "name", source = "fullName")
     SellerResponseDTO toDTO(User user);
 
 }

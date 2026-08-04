@@ -3,6 +3,8 @@ package com.cdac.ecommerce.service;
 import com.cdac.ecommerce.dto.request.AdminCategoryRequestDTO;
 import com.cdac.ecommerce.dto.response.AdminCategoryResponseDTO;
 
+import java.util.List;
+
 public interface AdminCategoryService {
     AdminCategoryResponseDTO addCategories(AdminCategoryRequestDTO requestDTO);
 
@@ -10,4 +12,6 @@ public interface AdminCategoryService {
     AdminCategoryResponseDTO updateCategory(Long id, AdminCategoryRequestDTO requestDTO);
 
     void deleteCategory(Long id);
+
+    List<AdminCategoryResponseDTO> getAllCategories();
 }

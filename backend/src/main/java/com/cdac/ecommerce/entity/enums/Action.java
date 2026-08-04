@@ -6,8 +6,14 @@ public enum Action {
     DELETE,
     BLOCK,
     UNBLOCK,
+    APPROVE,
+    REJECT,
     APPROVE_RETURN,
+    REJECT_RETURN,
     APPROVE_REJECT,
+    BAN,
+    UNBAN,
     UPDATE_COMMISSION,
-    UPDATE_CATEGORY
+    UPDATE_CATEGORY,
+    RESOLVE
 }

@@ -1,6 +1,7 @@
 package com.cdac.ecommerce.entity;
 
 import com.cdac.ecommerce.entity.enums.PaymentStatus;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,6 +21,7 @@ public class SellerPayout extends BaseClass{
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seller_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "password", "roles"})
     private User seller;
 
     @Column(name = "amount", nullable = false, precision = 12, scale = 2)
