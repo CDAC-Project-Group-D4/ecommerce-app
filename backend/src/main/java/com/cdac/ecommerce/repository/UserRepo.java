@@ -45,7 +45,7 @@ public interface UserRepo extends JpaRepository<User, Long> {
     @Modifying
     int blockCustomer(Long customerId);
 
-    @Query("SELECT u FROM User u JOIN u.store s WHERE u.role = com.cdac.ecommerce.entity.enums.Roles.SELLER AND s.active = true")
+    @Query("SELECT u FROM User u WHERE u.role = com.cdac.ecommerce.entity.enums.Roles.SELLER")
     List<User> findAllSellers();
 
 }
