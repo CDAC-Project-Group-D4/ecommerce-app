@@ -14,6 +14,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @Service
 public class AdminCategoryServiceImpl implements AdminCategoryService{
@@ -94,5 +96,12 @@ public class AdminCategoryServiceImpl implements AdminCategoryService{
 
         adminCategoryRepository.save(category);
 
+    }
+
+    @Override
+    public List<AdminCategoryResponseDTO> getAllCategories() {
+        List<Category> categories = adminCategoryRepository.findByIsActiveTrue();
+
+        return categories.stream().map(adminCategoryMapper::toResponse).toList();
     }
 }
