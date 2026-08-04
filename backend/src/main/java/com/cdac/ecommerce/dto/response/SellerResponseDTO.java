@@ -5,8 +5,7 @@ import java.time.LocalDateTime;
 public record SellerResponseDTO(
 
         long sellerId,
-        long storeId,
-        String storeName,
+        String name,
         String email,
         String phone,
         String imageUrl,
