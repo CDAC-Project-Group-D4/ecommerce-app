@@ -25,7 +25,7 @@ export const SellerProvider = ({ children }) => {
 
     useEffect(() => {
         const userStr = localStorage.getItem("user");
-        if (userStr) {
+        if (userStr?.role === "SELLER" || userStr?.role === "ROLE_SELLER") {
             refreshStore();
         } else {
             setLoadingStore(false);
