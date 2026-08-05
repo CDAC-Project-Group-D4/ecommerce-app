@@ -27,11 +27,21 @@ export const adminApi = {
   markDelivered: (orderId) => api.patch(`/admin/orders/${orderId}/delivered`),
 
   // --- DISPUTED RETURNS ---
+
+  getReturnsByStatus: (status) => {
+    const url = status && status !== "ALL" 
+      ? `/admin/returns?status=${status}` 
+      : `/admin/returns`;
+    return api.get(url);
+  },
+
   getDisputedReturns: () => api.get("/admin/returns?status=DISPUTED"),
-  acceptDispute: (returnId) =>
-    api.patch(`/admin/returns/${returnId}/accept-dispute`),
-  rejectDispute: (returnId) =>
-    api.patch(`/admin/returns/${returnId}/reject-dispute`),
+  
+  acceptDispute: (returnId, payload = {}) =>
+    api.patch(`/admin/returns/${returnId}/accept-dispute`, payload),
+    
+  rejectDispute: (returnId, payload = {}) =>
+    api.patch(`/admin/returns/${returnId}/reject-dispute`, payload),
 
   // --- FINANCIAL & COMMISSION SETTINGS ---
   getCommissionSetting: () => api.get("/admin/settings/commission"),
