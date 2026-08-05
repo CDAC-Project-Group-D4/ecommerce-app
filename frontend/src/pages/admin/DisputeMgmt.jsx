@@ -8,12 +8,15 @@ import {
   ChevronRight,
   User,
   ShieldAlert,
-  Calendar,
   AlertCircle,
   RefreshCw,
   CheckCircle,
   XCircle,
   FileText,
+  Store,
+  Image as ImageIcon,
+  MessageSquare,
+  X,
 } from "lucide-react";
 
 const DisputeMgmt = () => {
@@ -29,69 +32,133 @@ const DisputeMgmt = () => {
   // Expanded details state
   const [expandedRow, setExpandedRow] = useState(null);
 
+  // Image Preview Modal State
+  const [previewImage, setPreviewImage] = useState(null);
+
+  // Action Modal State
+  const [activeModal, setActiveModal] = useState({
+    show: false,
+    returnId: null,
+    actionType: null, // 'ACCEPT' or 'REJECT'
+  });
+  const [adminNotes, setAdminNotes] = useState("");
+
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  // Single memoized fetch function for initial mount & manual refresh
   const fetchDisputes = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      // Endpoint: GET /api/admin/disputes
       const response = await adminApi.getDisputedReturns();
       setDisputes(response.data || []);
     } catch (err) {
-      console.error(err);
-      setError("Failed to fetch disputes. Please try again.");
+      console.error("Error fetching disputes:", err);
+      setError("Failed to fetch disputed returns. Please try again.");
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    let isMounted = true;
-
-    if (isMounted) {
-      fetchDisputes();
-    }
-
-    return () => {
-      isMounted = false;
-    };
+    fetchDisputes();
   }, [fetchDisputes]);
 
   const toggleRow = (id) => {
     setExpandedRow((prev) => (prev === id ? null : id));
   };
 
-  // Status Change Handler
-  const handleUpdateStatus = async (disputeId, newStatus) => {
+  const openActionModal = (returnId, actionType) => {
+    setAdminNotes("");
+    setActiveModal({
+      show: true,
+      returnId,
+      actionType,
+    });
+  };
+
+  const closeModal = () => {
+    setActiveModal({ show: false, returnId: null, actionType: null });
+    setAdminNotes("");
+  };
+
+  const handleConfirmAction = async () => {
+    const { returnId, actionType } = activeModal;
+    if (!returnId) return;
+
+    let currentAdminId = null;
+    try {
+      const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+      currentAdminId = storedUser.id || storedUser.userId;
+    } catch (e) {
+      console.error("Error parsing user from localStorage", e);
+    }
+
     try {
       setActionLoading(true);
       setError(null);
-      // Endpoint: PATCH /api/admin/disputes/:id
-      await adminApi.updateDisputeStatus(disputeId, { status: newStatus });
 
-      // Update local state smoothly
-      setDisputes((prev) =>
-        prev.map((d) => (d.id === disputeId ? { ...d, status: newStatus } : d)),
-      );
+      const payload = {
+        adminId: currentAdminId,
+        adminNotes:
+          adminNotes.trim() ||
+          (actionType === "ACCEPT"
+            ? "Dispute accepted. Refund approved"
+            : "Dispute rejected!"),
+      };
+
+      if (actionType === "ACCEPT") {
+        await adminApi.acceptDispute(returnId, payload);
+        setDisputes((prev) =>
+          prev.map((d) => {
+            const currentId = d.returnRequestId || d.id;
+            return currentId === returnId
+              ? {
+                  ...d,
+                  adminDecision: "APPROVED",
+                  adminNotes: payload.adminNotes,
+                  refundStatus: "COMPLETED",
+                }
+              : d;
+          }),
+        );
+      } else {
+        await adminApi.rejectDispute(returnId, payload);
+        setDisputes((prev) =>
+          prev.map((d) => {
+            const currentId = d.returnRequestId || d.id;
+            return currentId === returnId
+              ? {
+                  ...d,
+                  adminDecision: "REJECTED",
+                  adminNotes: payload.adminNotes,
+                  refundStatus: "REJECTED",
+                }
+              : d;
+          }),
+        );
+      }
+      closeModal();
     } catch (err) {
       console.error(err);
-      setError(`Failed to update dispute status to ${newStatus}.`);
+      setError(
+        err.response?.data?.message ||
+          `Failed to process ${actionType.toLowerCase()} dispute for Return Request #${returnId}.`,
+      );
     } finally {
       setActionLoading(false);
     }
   };
 
-  // Helper to format Status Badge style
   const getStatusBadge = (status = "") => {
-    const st = status.toUpperCase();
+    const st = status.toString().toUpperCase();
     if (
       st.includes("RESOLVED") ||
       st.includes("CLOSED") ||
-      st.includes("APPROVED")
+      st.includes("ACCEPTED") ||
+      st.includes("APPROVED") ||
+      st.includes("COMPLETED")
     ) {
       return (
         <span className="badge bg-success-subtle text-success border border-success-subtle">
@@ -99,16 +166,13 @@ const DisputeMgmt = () => {
         </span>
       );
     }
-    if (st.includes("PENDING") || st.includes("OPEN")) {
+    if (
+      st.includes("PENDING") ||
+      st.includes("OPEN") ||
+      st.includes("DISPUTED")
+    ) {
       return (
         <span className="badge bg-warning-subtle text-warning border border-warning-subtle">
-          {status}
-        </span>
-      );
-    }
-    if (st.includes("REVIEW") || st.includes("IN_PROGRESS")) {
-      return (
-        <span className="badge bg-primary-subtle text-primary border border-primary-subtle">
           {status}
         </span>
       );
@@ -122,13 +186,13 @@ const DisputeMgmt = () => {
     }
     return (
       <span className="badge bg-secondary-subtle text-secondary border border-secondary-subtle">
-        {status}
+        {status || "UNKNOWN"}
       </span>
     );
   };
 
-  // Filter Logic
   const filteredDisputes = disputes.filter((dispute) => {
+    const returnId = dispute.returnRequestId || dispute.id || "";
     const matchesSearch =
       (dispute.raisedBy || dispute.userEmail || dispute.userName || "")
         .toLowerCase()
@@ -136,27 +200,30 @@ const DisputeMgmt = () => {
       (dispute.reason || dispute.subject || dispute.title || "")
         .toLowerCase()
         .includes(searchTerm.toLowerCase()) ||
-      (dispute.description || dispute.details || "")
+      (dispute.description || dispute.details || dispute.sellerNotes || "")
         .toLowerCase()
         .includes(searchTerm.toLowerCase()) ||
-      (dispute.id || "")
-        .toString()
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
+      returnId.toString().toLowerCase().includes(searchTerm.toLowerCase());
 
+    const statusToCheck =
+      dispute.adminDecision || dispute.sellerDecision || "DISPUTED";
     const matchesStatus =
       selectedStatus === "ALL" ||
-      dispute.status?.toUpperCase() === selectedStatus;
+      statusToCheck.toUpperCase() === selectedStatus;
 
     return matchesSearch && matchesStatus;
   });
 
-  // Unique statuses for dropdown filter
   const uniqueStatuses = Array.from(
-    new Set(disputes.map((d) => d.status?.toUpperCase()).filter(Boolean)),
+    new Set(
+      disputes
+        .map((d) =>
+          (d.adminDecision || d.sellerDecision || d.status)?.toUpperCase(),
+        )
+        .filter(Boolean),
+    ),
   );
 
-  // Pagination Math
   const totalPages = Math.ceil(filteredDisputes.length / itemsPerPage) || 1;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -167,12 +234,23 @@ const DisputeMgmt = () => {
 
   return (
     <div className="container-fluid p-0">
+      <style>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        .spin-animation {
+          animation: spin 1s linear infinite;
+        }
+      `}</style>
+
       {/* Header Banner */}
       <div className="d-flex justify-content-between align-items-center mb-4">
         <div>
           <h3 className="fw-bold mb-1">Dispute Management</h3>
           <p className="text-muted mb-0">
-            Review user claims, track resolutions, and manage platform disputes
+            Review user claims, track seller responses, and resolve platform
+            disputes
           </p>
         </div>
         <button
@@ -180,7 +258,7 @@ const DisputeMgmt = () => {
           onClick={fetchDisputes}
           disabled={loading || actionLoading}
         >
-          <RefreshCw size={16} className={loading ? "spin" : ""} />
+          <RefreshCw size={16} className={loading ? "spin-animation" : ""} />
           <span>Refresh Disputes</span>
         </button>
       </div>
@@ -197,6 +275,7 @@ const DisputeMgmt = () => {
             type="button"
             className="btn-close"
             onClick={() => setError(null)}
+            aria-label="Close"
           ></button>
         </div>
       )}
@@ -205,7 +284,6 @@ const DisputeMgmt = () => {
       <div className="card shadow-sm border-0 mb-4">
         <div className="card-body p-3">
           <div className="row g-3 align-items-center">
-            {/* Search Input */}
             <div className="col-md-8 col-lg-9">
               <div className="input-group">
                 <span className="input-group-text bg-white border-end-0 text-muted">
@@ -214,7 +292,7 @@ const DisputeMgmt = () => {
                 <input
                   type="text"
                   className="form-control border-start-0 ps-0"
-                  placeholder="Search by ID, user, reason, or details..."
+                  placeholder="Search by Return ID, user email, reason, or notes..."
                   value={searchTerm}
                   onChange={(e) => {
                     setSearchTerm(e.target.value);
@@ -223,8 +301,6 @@ const DisputeMgmt = () => {
                 />
               </div>
             </div>
-
-            {/* Status Filter */}
             <div className="col-md-4 col-lg-3">
               <div className="input-group">
                 <span className="input-group-text bg-white border-end-0 text-muted">
@@ -256,10 +332,9 @@ const DisputeMgmt = () => {
         <div className="card-header bg-white py-3">
           <h5 className="card-title mb-0 d-flex align-items-center gap-2">
             <AlertTriangle size={18} className="text-warning" />
-            <span>Dispute Cases ({filteredDisputes.length})</span>
+            <span>Disputed Return Requests ({filteredDisputes.length})</span>
           </h5>
         </div>
-
         <div className="card-body p-0">
           {loading ? (
             <div className="text-center py-5">
@@ -273,7 +348,9 @@ const DisputeMgmt = () => {
                 size={36}
                 className="mb-2 text-secondary opacity-50"
               />
-              <p className="mb-0">No disputes matching your search criteria.</p>
+              <p className="mb-0">
+                No disputed returns matching your search criteria.
+              </p>
             </div>
           ) : (
             <div className="table-responsive">
@@ -281,33 +358,38 @@ const DisputeMgmt = () => {
                 <thead className="table-light">
                   <tr>
                     <th style={{ width: "5%" }}></th>
-                    <th style={{ width: "15%" }}>Created At</th>
+                    <th style={{ width: "15%" }}>Return ID / Order</th>
                     <th style={{ width: "20%" }}>Raised By</th>
-                    <th style={{ width: "20%" }}>Reason / Subject</th>
-                    <th style={{ width: "15%" }}>Status</th>
-                    <th style={{ width: "25%" }} className="text-end pe-4">
-                      Actions
+                    <th style={{ width: "25%" }}>Reason / Claim</th>
+                    <th style={{ width: "15%" }}>Admin Decision</th>
+                    <th style={{ width: "20%" }} className="text-end pe-4">
+                      Admin Actions
                     </th>
                   </tr>
                 </thead>
                 <tbody>
                   {currentDisputes.map((dispute, index) => {
-                    const disputeId = dispute.id || index;
-                    const isExpanded = expandedRow === disputeId;
-                    const createdAt =
-                      dispute.createdAt ||
-                      dispute.timestamp ||
-                      new Date().toISOString();
+                    const returnId =
+                      dispute.returnRequestId || dispute.id || index;
+                    const isExpanded = expandedRow === returnId;
+                    const isResolved =
+                      dispute.adminDecision &&
+                      dispute.adminDecision !== "PENDING";
+
+                    const images = Array.isArray(dispute.imageUrls)
+                      ? dispute.imageUrls
+                      : dispute.customerPhoto
+                        ? [dispute.customerPhoto]
+                        : [];
 
                     return (
-                      <React.Fragment key={disputeId}>
+                      <React.Fragment key={returnId}>
                         <tr>
-                          {/* Toggle Expand Icon */}
                           <td className="text-center">
                             <button
                               type="button"
                               className="btn btn-link btn-sm p-0 text-dark text-decoration-none"
-                              onClick={() => toggleRow(disputeId)}
+                              onClick={() => toggleRow(returnId)}
                               aria-label="Toggle Dispute Details"
                             >
                               {isExpanded ? (
@@ -317,18 +399,17 @@ const DisputeMgmt = () => {
                               )}
                             </button>
                           </td>
-
-                          {/* Created At */}
                           <td className="small text-secondary">
-                            <div className="d-flex align-items-center gap-1">
-                              <Calendar size={14} className="text-muted" />
-                              <span>
-                                {new Date(createdAt).toLocaleDateString()}
-                              </span>
+                            <div className="fw-bold text-dark">
+                              REQ #{dispute.returnRequestId || dispute.id}
+                            </div>
+                            <div
+                              className="text-muted"
+                              style={{ fontSize: "0.75rem" }}
+                            >
+                              Order #{dispute.orderId || "N/A"}
                             </div>
                           </td>
-
-                          {/* Raised By */}
                           <td>
                             <div className="d-flex align-items-center gap-2">
                               <div
@@ -343,36 +424,33 @@ const DisputeMgmt = () => {
                               </div>
                               <div>
                                 <div className="fw-semibold text-dark small">
-                                  {dispute.raisedBy ||
-                                    dispute.userEmail ||
-                                    dispute.userName ||
-                                    "Anonymous User"}
+                                  {dispute.userEmail ||
+                                    dispute.raisedBy ||
+                                    "Customer"}
                                 </div>
-                                {dispute.userRole && (
-                                  <div
-                                    className="text-muted"
-                                    style={{ fontSize: "0.75rem" }}
-                                  >
-                                    {dispute.userRole}
-                                  </div>
-                                )}
+                                <div
+                                  className="text-muted"
+                                  style={{ fontSize: "0.75rem" }}
+                                >
+                                  User ID: {dispute.userId || "N/A"}
+                                </div>
                               </div>
                             </div>
                           </td>
-
-                          {/* Reason / Subject */}
                           <td>
                             <div className="fw-semibold small text-dark">
-                              {dispute.reason ||
-                                dispute.subject ||
-                                "Dispute Claim"}
+                              {dispute.reason || "Dispute Claim"}
+                            </div>
+                            <div
+                              className="text-muted"
+                              style={{ fontSize: "0.75rem" }}
+                            >
+                              Type: {dispute.requestType || "RETURN"}
                             </div>
                           </td>
-
-                          {/* Status Badge */}
-                          <td>{getStatusBadge(dispute.status || "PENDING")}</td>
-
-                          {/* Quick Actions */}
+                          <td>
+                            {getStatusBadge(dispute.adminDecision || "PENDING")}
+                          </td>
                           <td className="text-end pe-4">
                             <div
                               className="btn-group btn-group-sm"
@@ -381,26 +459,20 @@ const DisputeMgmt = () => {
                               <button
                                 type="button"
                                 className="btn btn-outline-success d-flex align-items-center gap-1"
-                                disabled={
-                                  actionLoading ||
-                                  dispute.status?.toUpperCase() === "RESOLVED"
-                                }
+                                disabled={actionLoading || isResolved}
                                 onClick={() =>
-                                  handleUpdateStatus(disputeId, "RESOLVED")
+                                  openActionModal(returnId, "ACCEPT")
                                 }
                               >
                                 <CheckCircle size={14} />
-                                <span>Resolve</span>
+                                <span>Accept</span>
                               </button>
                               <button
                                 type="button"
                                 className="btn btn-outline-danger d-flex align-items-center gap-1"
-                                disabled={
-                                  actionLoading ||
-                                  dispute.status?.toUpperCase() === "REJECTED"
-                                }
+                                disabled={actionLoading || isResolved}
                                 onClick={() =>
-                                  handleUpdateStatus(disputeId, "REJECTED")
+                                  openActionModal(returnId, "REJECT")
                                 }
                               >
                                 <XCircle size={14} />
@@ -410,42 +482,146 @@ const DisputeMgmt = () => {
                           </td>
                         </tr>
 
-                        {/* Collapsible Detail Drawer */}
+                        {/* Collapsible Details Drawer */}
                         {isExpanded && (
                           <tr className="bg-light">
                             <td colSpan="6" className="p-3">
                               <div className="card border shadow-sm">
-                                <div className="card-header bg-white py-2 fw-semibold text-muted small d-flex align-items-center gap-2">
-                                  <FileText size={16} />
-                                  <span>Dispute Case Context & Payload</span>
+                                <div className="card-header bg-white py-2 fw-semibold text-muted small d-flex align-items-center justify-content-between">
+                                  <div className="d-flex align-items-center gap-2">
+                                    <FileText size={16} />
+                                    <span>Return Dispute Overview</span>
+                                  </div>
+                                  <span className="font-monospace text-secondary">
+                                    Order Item ID:{" "}
+                                    {dispute.orderItemId || "N/A"}
+                                  </span>
                                 </div>
                                 <div className="card-body">
-                                  <div className="mb-3">
-                                    <h6 className="fw-bold small text-secondary mb-1">
-                                      Description / Details:
-                                    </h6>
-                                    <p className="small text-dark mb-0 bg-light p-2 rounded border">
-                                      {dispute.description ||
-                                        dispute.details ||
-                                        dispute.message ||
-                                        "No detailed statement provided."}
-                                    </p>
+                                  <div className="row g-4">
+                                    {/* Left Side: Customer Claim */}
+                                    <div className="col-md-6 border-end">
+                                      <div className="d-flex align-items-center gap-2 mb-3 text-primary">
+                                        <User size={18} />
+                                        <h6 className="fw-bold mb-0">
+                                          Customer Claim
+                                        </h6>
+                                      </div>
+                                      <div className="mb-3">
+                                        <span className="text-muted small d-block mb-1">
+                                          Customer Email:
+                                        </span>
+                                        <div className="fw-semibold small text-dark mb-2">
+                                          {dispute.userEmail || "N/A"}
+                                        </div>
+                                        <span className="text-muted small d-block mb-1">
+                                          Return Reason:
+                                        </span>
+                                        <div className="p-2 bg-light rounded border small text-dark mb-3">
+                                          {dispute.reason ||
+                                            "No reason provided."}
+                                        </div>
+                                      </div>
+
+                                      {/* Attached Images */}
+                                      <div>
+                                        <span className="text-muted small d-block mb-1">
+                                          Attached Photos ({images.length}):
+                                        </span>
+                                        {images.length > 0 ? (
+                                          <div className="d-flex flex-wrap gap-2">
+                                            {images.map((imgUrl, idx) => (
+                                              <button
+                                                key={idx}
+                                                type="button"
+                                                className="btn p-1 border rounded bg-white shadow-sm cursor-pointer"
+                                                onClick={() =>
+                                                  setPreviewImage(imgUrl)
+                                                }
+                                              >
+                                                <img
+                                                  src={imgUrl}
+                                                  alt={`Proof ${idx + 1}`}
+                                                  className="rounded"
+                                                  style={{
+                                                    width: "100px",
+                                                    height: "100px",
+                                                    objectFit: "cover",
+                                                  }}
+                                                />
+                                              </button>
+                                            ))}
+                                          </div>
+                                        ) : (
+                                          <div className="p-3 bg-light border rounded text-center text-muted small">
+                                            <ImageIcon
+                                              size={20}
+                                              className="mb-1 opacity-50"
+                                            />
+                                            <div>
+                                              No proof photos attached by
+                                              customer
+                                            </div>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+
+                                    {/* Right Side: Seller Response */}
+                                    <div className="col-md-6">
+                                      <div className="d-flex align-items-center gap-2 mb-3 text-dark">
+                                        <Store size={18} />
+                                        <h6 className="fw-bold mb-0">
+                                          Seller & Admin Status
+                                        </h6>
+                                      </div>
+                                      <div className="mb-3">
+                                        <span className="text-muted small d-block mb-1">
+                                          Seller Decision:
+                                        </span>
+                                        <div className="mb-2">
+                                          {getStatusBadge(
+                                            dispute.sellerDecision ||
+                                              "REJECTED",
+                                          )}
+                                        </div>
+                                        <span className="text-muted small d-block mb-1">
+                                          Seller Notes:
+                                        </span>
+                                        <div className="p-2 bg-light rounded border small text-dark mb-3">
+                                          {dispute.sellerNotes ||
+                                            "No seller notes provided."}
+                                        </div>
+                                        {dispute.adminNotes && (
+                                          <>
+                                            <span className="text-muted small d-block mb-1">
+                                              Admin Resolution Notes:
+                                            </span>
+                                            <div className="p-2 bg-info-subtle border border-info-subtle rounded small text-dark">
+                                              {dispute.adminNotes}
+                                            </div>
+                                          </>
+                                        )}
+                                      </div>
+                                    </div>
                                   </div>
 
-                                  <h6 className="fw-bold small text-secondary mb-1">
-                                    Full Payload JSON:
-                                  </h6>
-                                  <div className="bg-dark p-2 rounded">
-                                    <pre
-                                      className="text-success mb-0 small"
-                                      style={{
-                                        maxHeight: "200px",
-                                        overflowY: "auto",
-                                      }}
-                                    >
-                                      {JSON.stringify(dispute, null, 2)}
-                                    </pre>
-                                  </div>
+                                  <details className="mt-4 pt-3 border-top">
+                                    <summary className="text-muted small fw-semibold cursor-pointer">
+                                      View Raw Payload JSON
+                                    </summary>
+                                    <div className="bg-dark p-2 rounded mt-2">
+                                      <pre
+                                        className="text-success mb-0 small font-monospace"
+                                        style={{
+                                          maxHeight: "160px",
+                                          overflowY: "auto",
+                                        }}
+                                      >
+                                        {JSON.stringify(dispute, null, 2)}
+                                      </pre>
+                                    </div>
+                                  </details>
                                 </div>
                               </div>
                             </td>
@@ -460,7 +636,7 @@ const DisputeMgmt = () => {
           )}
         </div>
 
-        {/* Pagination Footer */}
+        {/* Pagination */}
         {!loading && filteredDisputes.length > 0 && (
           <div className="card-footer bg-white py-3 d-flex align-items-center justify-content-between">
             <span className="small text-muted">
@@ -472,7 +648,6 @@ const DisputeMgmt = () => {
               of <span className="fw-semibold">{filteredDisputes.length}</span>{" "}
               disputes
             </span>
-
             <ul className="pagination pagination-sm mb-0">
               <li
                 className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
@@ -519,6 +694,121 @@ const DisputeMgmt = () => {
           </div>
         )}
       </div>
+
+      {/* Image Preview Modal */}
+      {previewImage && (
+        <div
+          className="modal fade show d-block"
+          tabIndex="-1"
+          style={{ backgroundColor: "rgba(0,0,0,0.7)" }}
+          onClick={() => setPreviewImage(null)}
+        >
+          <div className="modal-dialog modal-dialog-centered modal-lg">
+            <div
+              className="modal-content bg-transparent border-0 text-end"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="mb-2">
+                <button
+                  type="button"
+                  className="btn btn-light btn-sm rounded-circle"
+                  onClick={() => setPreviewImage(null)}
+                >
+                  <X size={18} />
+                </button>
+              </div>
+              <div className="text-center">
+                <img
+                  src={previewImage}
+                  alt="Proof Preview"
+                  className="img-fluid rounded shadow"
+                  style={{ maxHeight: "80vh", objectFit: "contain" }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Admin Action Modal */}
+      {activeModal.show && (
+        <div
+          className="modal fade show d-block"
+          tabIndex="-1"
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content shadow">
+              <div className="modal-header">
+                <h5 className="modal-header-title mb-0 d-flex align-items-center gap-2 fw-bold fs-6">
+                  <MessageSquare size={18} className="text-primary" />
+                  <span>
+                    {activeModal.actionType === "ACCEPT"
+                      ? "Accept Dispute (Rule for Customer)"
+                      : "Reject Dispute (Uphold Seller)"}
+                  </span>
+                </h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={closeModal}
+                  disabled={actionLoading}
+                ></button>
+              </div>
+              <div className="modal-body">
+                <p className="text-muted small mb-3">
+                  Please enter optional notes or a justification for Return
+                  Request <strong>#{activeModal.returnId}</strong>.
+                </p>
+                <div className="mb-3">
+                  <label className="form-label small fw-semibold">
+                    Admin Notes / Remarks
+                  </label>
+                  <textarea
+                    className="form-control"
+                    rows="4"
+                    placeholder="Enter resolution notes here..."
+                    value={adminNotes}
+                    onChange={(e) => setAdminNotes(e.target.value)}
+                    disabled={actionLoading}
+                  ></textarea>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-light border btn-sm"
+                  onClick={closeModal}
+                  disabled={actionLoading}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className={`btn btn-sm ${
+                    activeModal.actionType === "ACCEPT"
+                      ? "btn-success"
+                      : "btn-danger"
+                  }`}
+                  onClick={handleConfirmAction}
+                  disabled={actionLoading}
+                >
+                  {actionLoading ? (
+                    <span
+                      className="spinner-border spinner-border-sm me-1"
+                      role="status"
+                    ></span>
+                  ) : activeModal.actionType === "ACCEPT" ? (
+                    "Confirm Accept"
+                  ) : (
+                    "Confirm Reject"
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

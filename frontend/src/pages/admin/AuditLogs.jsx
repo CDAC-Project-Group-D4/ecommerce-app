@@ -35,14 +35,14 @@ const AuditLogs = () => {
       setLoading(true);
       setError(null);
       const response = await adminApi.getAuditLogs();
-      
+
       // If Spring Boot returns Page<AuditLog> (paginated), response.data.content is the array
       const rawData = response.data;
       const logArray = Array.isArray(rawData)
         ? rawData
         : Array.isArray(rawData?.content)
-        ? rawData.content
-        : [];
+          ? rawData.content
+          : [];
 
       setLogs(logArray);
     } catch (err) {
@@ -111,11 +111,15 @@ const AuditLogs = () => {
   };
 
   const safeLogs = Array.isArray(logs) ? logs : [];
+  console.log(safeLogs);
 
   // Filter Logic
   const filteredLogs = safeLogs.filter((log) => {
     const matchesSearch =
-      (log.userEmail || log.performedBy || log.username || "")
+      (log.adminEmail || log.userEmail || log.performedBy || log.username || "")
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+        (log.adminId?.toString() || "")
         .toLowerCase()
         .includes(searchTerm.toLowerCase()) ||
       (log.action || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -317,7 +321,7 @@ const AuditLogs = () => {
                               </div>
                               <div>
                                 <div className="fw-semibold text-dark small">
-                                  {log.performedBy ||
+                                  {log.adminEmail ||
                                     log.userEmail ||
                                     log.username ||
                                     "System Event"}

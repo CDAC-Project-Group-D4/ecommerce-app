@@ -35,6 +35,7 @@ export default function SellerMgmt() {
       const commissionRes = await adminApi
         .getCommissionSetting()
         .catch(() => null);
+      console.log(commissionRes);
       if (commissionRes?.data) {
         setCommission(commissionRes.data);
         setNewDefaultRate(commissionRes.data.defaultRate || "10");
@@ -42,7 +43,7 @@ export default function SellerMgmt() {
 
       // Fetch sellers directly from AdminSellerController
       const sellersRes = await adminApi.getSellers();
-      console.log(sellersRes)
+      console.log(sellersRes);
       const sellersData = Array.isArray(sellersRes.data)
         ? sellersRes.data
         : sellersRes.data?.content || [];
@@ -101,9 +102,14 @@ export default function SellerMgmt() {
   const handleUpdateCommission = async (e) => {
     e.preventDefault();
     setSavingCommission(true);
+    console.log(commission);
     try {
-      const payload = { ...commission, defaultRate: Number(newDefaultRate) };
-      const response = await adminApi.updateCommissionSetting(payload);
+      const payload = {
+        ...commission,
+        commissionPercentage: Number(newDefaultRate),
+      };
+      const response = await adminApi.updateCommissionSetting(newDefaultRate);
+      console.log(response)
       setCommission(payload);
       alert(
         response.data?.message || "Commission setting updated successfully!",
@@ -166,7 +172,7 @@ export default function SellerMgmt() {
             className="btn btn-outline-dark btn-sm"
           >
             <i className="bi bi-gear-fill me-1"></i> Commission Settings (
-            {commission.defaultRate || 0}%)
+            {commission.commissionPercentage || 0}%)
           </button>
           <button onClick={loadData} className="btn btn-primary btn-sm">
             <i className="bi bi-arrow-clockwise me-1"></i> Refresh
@@ -199,7 +205,7 @@ export default function SellerMgmt() {
                 Default Commission Rate
               </span>
               <h3 className="fw-bold mb-0 text-primary">
-                {commission.defaultRate || 0}%
+                {commission.commissionPercentage || 0}%
               </h3>
             </div>
           </div>

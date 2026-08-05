@@ -41,6 +41,7 @@ export default function AdminComplaints() {
 
       if (response && response.data) {
         const data = response.data;
+        console.log(data)
 
         // Defensive handling for Spring Boot Page<T> vs raw Array
         const complaintList = Array.isArray(data)
@@ -298,7 +299,7 @@ export default function AdminComplaints() {
                           : "N/A"}
                       </td>
                       <td>
-                        {item.resolved ? (
+                        {!item.isActive ? (
                           <span className="badge bg-success-subtle text-success border border-success-subtle">
                             Resolved
                           </span>
@@ -353,6 +354,7 @@ export default function AdminComplaints() {
       {/* Resolution Modal */}
       {selectedComplaint && (
         <>
+        {console.log(selectedComplaint)}
           <div className="modal-backdrop fade show"></div>
           <div className="modal d-block fade show" tabIndex="-1">
             <div className="modal-dialog modal-lg modal-dialog-centered">
@@ -411,7 +413,7 @@ export default function AdminComplaints() {
                         className="mb-0 text-secondary small"
                         style={{ whiteSpace: "pre-wrap" }}
                       >
-                        {selectedComplaint.description ||
+                        {selectedComplaint.body ||
                           selectedComplaint.message ||
                           "No details provided."}
                       </p>
