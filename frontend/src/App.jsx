@@ -17,12 +17,20 @@ import CreateReturn from "./pages/CreateReturn.jsx";
 import MyReturns from "./pages/MyReturns.jsx";
 import SellerReturns from "./pages/SellerReturns.jsx";
 import ProtectedRoute from "./routes/ProtectedRoute.jsx";
+import 'bootstrap/dist/css/bootstrap.min.css';
+// import './Home.css';
+import Home from './pages/Home';
+import './css/Home.css';    
+import ProductDetail from './pages/ProductDetail.jsx';
 
 
 function App(){
     return (
         <div>
             <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/products/:id" element={<ProductDetail />} />
+                {/* <Route path="/login" element={<Login />} /> */}
                 <Route path='/signin' element={<SignIn />} />
                 <Route path='/signup' element={<SignUp />} />
                 <Route path="/cart" element={<Cart />} />
