@@ -10,12 +10,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/products")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class CustomerProductController {
    private final CustomerProductService customerProductService;
 
@@ -66,7 +67,7 @@ public class CustomerProductController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<CustomerProductResponseDTO> getProductById(Long id){
+    public ResponseEntity<CustomerProductResponseDTO> getProductById(@PathVariable Long id){
         return new ResponseEntity<>(customerProductService.getProductById(id),HttpStatus.OK);
     }
 }

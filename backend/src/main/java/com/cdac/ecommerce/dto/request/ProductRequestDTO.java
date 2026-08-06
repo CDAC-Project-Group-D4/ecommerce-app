@@ -22,6 +22,7 @@ public class ProductRequestDTO {
     @NotNull(message = "price is required")
     @Positive(message = "price must be greater than 0")
     private BigDecimal price;
+    private String description;
 
     @Min(value = 0, message = "stock cannot be negative")
     private int stock;

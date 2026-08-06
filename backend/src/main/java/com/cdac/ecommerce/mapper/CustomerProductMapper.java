@@ -12,6 +12,7 @@ public interface CustomerProductMapper {
     @Mapping(target ="productId", source="id")
     @Mapping(target="storeId",source="store.id")
     @Mapping(target="categoryId",source="category.id")
+
     CustomerProductResponseDTO toDto(Product product);
 
     // Product Listing API

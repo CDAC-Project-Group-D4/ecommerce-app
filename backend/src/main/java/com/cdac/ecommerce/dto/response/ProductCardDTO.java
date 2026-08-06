@@ -6,10 +6,10 @@ public record ProductCardDTO(
         Long id,
 
         String name,
-
+        String description,
         BigDecimal price,
 
-//        String thumbnailUrl,
+        String imageUrl,
 
 //        Double avgRating,
 

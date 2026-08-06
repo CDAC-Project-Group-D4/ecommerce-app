@@ -51,11 +51,14 @@ INSERT IGNORE INTO categories (category_id, name, is_active, parent_id, created_
 -- =================================================================
 -- 5. INSERT PRODUCTS
 -- =================================================================
-INSERT IGNORE INTO products (id, product_name, price, stock, low_stock_threshold, is_active, image_url, store_id, category_id, created_at, updated_at) VALUES
-(101, 'Wireless Noise-Canceling Headphones', 2999.00, 50, 5, 1, 'https://example.com/images/headphones.jpg', 1, 4, NOW(), NOW()),
-(102, 'Smart Fitness Tracker Watch', 4999.00, 30, 5, 1, 'https://example.com/images/smartwatch.jpg', 1, 5, NOW(), NOW()),
-(103, 'Classic Cotton Denim Jacket', 3500.00, 20, 2, 1, 'https://example.com/images/jacket.jpg', 2, 6, NOW(), NOW()),
-(104, 'Ergonomic Mechanical Keyboard', 4200.00, 15, 3, 1, 'https://example.com/images/keyboard.jpg', 1, 4, NOW(), NOW());
+INSERT IGNORE INTO products (id, product_name, description,price, stock, low_stock_threshold, is_active, image_url, store_id, category_id, created_at, updated_at) VALUES
+(101, 'Wireless Iphone','This is latest Iphone in the world Iphone', 2999.00, 50, 5, 1, '/uploads/images/iphone.jpg', 1, 4, NOW(), NOW()),
+(102, 'Smart Fitness Tracker Watch','This is latest Iphone in the world Fitness Tracker', 4999.00, 30, 5, 1, '/uploads/images/watch.png', 1, 5, NOW(), NOW()),
+(103, 'Classic Cotton Denim Jacket','This is latest Iphone in the word Denim Jacket', 3500.00, 20, 2, 1, '/uploads/images/menShirt.png', 2, 6, NOW(), NOW()),
+(104, 'Fashionables item 1 ','This is latest Iphone in the world Fashionable Item 1 ', 4200.00, 15, 3, 1, '/uploads/images/fashion1.png', 1, 2, NOW(), NOW()),
+(105, ' Classy Sofa','This is latest Iphone in the world best classy sofa', 2999.00, 50, 5, 1, '/uploads/images/sofa.png', 1, 3, NOW(), NOW()),
+(106, 'Wearables Items','This is latest Iphone in the world wearables Items', 2999.00, 50, 5, 1, '/uploads/images/wearables.png', 1, 5, NOW(), NOW()),
+(107, 'Fashionables item 1','This is latest Iphone in the world Iphone', 2999.00, 50, 5, 1, '/uploads/images/fashion2.jpg', 1, 2, NOW(), NOW());
 
 -- =================================================================
 -- 6. INSERT CUSTOMER ADDRESSES
