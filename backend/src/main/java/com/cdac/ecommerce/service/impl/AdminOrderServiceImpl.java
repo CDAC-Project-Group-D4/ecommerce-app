@@ -1,7 +1,10 @@
 package com.cdac.ecommerce.service.impl;
 
+import com.cdac.ecommerce.annotation.LogAdminAction;
 import com.cdac.ecommerce.dto.response.OrderResponseDTO;
 import com.cdac.ecommerce.entity.Order;
+import com.cdac.ecommerce.entity.enums.Action;
+import com.cdac.ecommerce.entity.enums.EntityEnum;
 import com.cdac.ecommerce.entity.enums.OrderStatus;
 import com.cdac.ecommerce.entity.enums.PaymentMethod;
 import com.cdac.ecommerce.exception.OrderNotFoundException;
@@ -41,6 +44,12 @@ public class AdminOrderServiceImpl implements AdminOrderService {
     @Override
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
+    @LogAdminAction(
+            action = Action.UPDATE,
+            entity = EntityEnum.ORDER,
+            entityId = "#id",
+            description = "Order marked out for delivery"
+    )
     public boolean simulateOutForDelivery(Long id) {
 
         Order order = orderRepository
@@ -58,6 +67,12 @@ public class AdminOrderServiceImpl implements AdminOrderService {
     @Override
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
+    @LogAdminAction(
+            action = Action.UPDATE,
+            entity = EntityEnum.ORDER,
+            entityId = "#id",
+            description = "Order marked delivered."
+    )
     public boolean simulateDelivered(Long id) {
 
         Order order = orderRepository
