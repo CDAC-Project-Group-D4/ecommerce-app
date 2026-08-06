@@ -39,5 +39,5 @@ public class CustomerComplaint extends BaseClass{
     private LocalDateTime resolvedAt;
 
     @Column(name = "is_active")
-    private boolean isActive = true;
+    private Boolean isActive = true;
 }

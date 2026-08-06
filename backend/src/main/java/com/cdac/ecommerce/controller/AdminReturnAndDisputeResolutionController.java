@@ -5,7 +5,6 @@ import com.cdac.ecommerce.dto.response.ReturnDisputeResponseDTO;
 import com.cdac.ecommerce.service.AdminReturnDisputeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,45 +17,42 @@ public class AdminReturnAndDisputeResolutionController {
 
     private final AdminReturnDisputeService adminReturnDisputeService;
 
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<List<ReturnDisputeResponseDTO>> getAllCustomerEscalatedDisputes(
-            @RequestParam(name = "status", required = false) String status){
+            @RequestParam(name = "status", required = false) String status) {
 
-        if("DISPUTED".equalsIgnoreCase(status)){
-            List<ReturnDisputeResponseDTO> disputeResponseDTOS = adminReturnDisputeService.getDisputeRequests();
-            return ResponseEntity.ok(disputeResponseDTOS);
+        // Default behavior: fetch disputes if status is DISPUTED, ALL, or null/blank
+        if (status == null || status.isBlank() || "DISPUTED".equalsIgnoreCase(status) || "ALL".equalsIgnoreCase(status)) {
+            List<ReturnDisputeResponseDTO> disputeResponseDTOs = adminReturnDisputeService.getDisputeRequests();
+            return ResponseEntity.ok(disputeResponseDTOs);
         }
 
         return ResponseEntity.badRequest().build();
-
     }
 
     @PatchMapping("/{id}/accept-dispute")
     public ResponseEntity<Boolean> acceptDispute(
             @PathVariable("id") Long returnRequestId,
-            @RequestBody @Valid AdminDisputeActionRequestDto dto){
+            @RequestBody @Valid AdminDisputeActionRequestDto dto) {
 
-        if(dto != null && dto.adminId() != null){
+        if (dto != null && dto.adminId() != null) {
             boolean accepted = adminReturnDisputeService.acceptDispute(returnRequestId, dto.adminId(), dto);
-
-            return accepted ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
+            return ResponseEntity.ok(accepted);
         }
+
         return ResponseEntity.badRequest().build();
     }
 
     @PatchMapping("/{id}/reject-dispute")
     public ResponseEntity<Boolean> rejectDispute(
             @PathVariable("id") Long returnRequestId,
-            @RequestBody @Valid AdminDisputeActionRequestDto dto
-    ){
+            @RequestBody @Valid AdminDisputeActionRequestDto dto) {
 
-        if(dto != null && dto.adminId() != null){
-
-            boolean accepted = adminReturnDisputeService.rejectDispute(returnRequestId, dto.adminId(), dto);
-
-            return accepted ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
+        if (dto != null && dto.adminId() != null) {
+            boolean rejected = adminReturnDisputeService.rejectDispute(returnRequestId, dto.adminId(), dto);
+            return ResponseEntity.ok(rejected);
         }
-        return ResponseEntity.badRequest().build();
 
+        return ResponseEntity.badRequest().build();
     }
 }

@@ -13,6 +13,7 @@ public interface CustomerComplaintMapper {
     @Mapping(source = "customer.id", target = "customerId")
     @Mapping(source = "resolvedBy.id", target = "resolvedBy")
     @Mapping(source = "id", target = "complaintId")
+    @Mapping(source = "customer.fullName", target = "customerName")
     CustomerComplaintResponseDTO toDto(CustomerComplaint customerComplaint);
 
     @Mapping(target = "id", ignore = true)
