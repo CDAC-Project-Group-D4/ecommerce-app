@@ -7,6 +7,7 @@ public record CustomerComplaintResponseDTO(
         Long orderId,
         Long customerId,
         Long resolvedBy,
+        String customerName,
         String body,
         String subject,
         LocalDateTime createdAt,

@@ -2,8 +2,10 @@ package com.cdac.ecommerce.aspect;
 
 import com.cdac.ecommerce.annotation.LogAdminAction;
 import com.cdac.ecommerce.entity.User;
+import com.cdac.ecommerce.security.UserDetailsImpl;
 import com.cdac.ecommerce.service.AdminAuditLogService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 
+@Slf4j
 @Aspect
 @Component
 @RequiredArgsConstructor
@@ -30,7 +33,21 @@ public class AdminAuditAspect {
     public void logAdminActivity(JoinPoint joinPoint, LogAdminAction logAdminAction, Object result){
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(authentication == null || !(authentication.getPrincipal() instanceof User authenticatedAdmin)){
+        if(authentication == null || !(authentication.isAuthenticated())){
+            return;
+        }
+
+        User authenticatedAdmin = null;
+        Object principal = authentication.getPrincipal();
+
+        if(principal instanceof UserDetailsImpl userDetails){
+            authenticatedAdmin = userDetails.getUser();
+        } else if (principal instanceof User user) {
+            authenticatedAdmin = user;
+        }
+
+        if(authenticatedAdmin == null){
+            log.warn("AdminAuditAspect: Could not resolve User entity from principal.");
             return;
         }
 

@@ -37,14 +37,10 @@ public class AdminReturnDisputeServiceImpl implements AdminReturnDisputeService 
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('ADMIN')")
     public List<ReturnDisputeResponseDTO> getDisputeRequests() {
-
-        List<ReturnRequest> returnRequests = returnRequestRepo.findDisputedReturnRequests(Decision.REJECTED);
-
-        return returnRequests
+        return returnRequestRepo.findDisputedReturnRequests(Decision.REJECTED)
                 .stream()
-                .map(request -> returnDisputeMapper.toDto(request))
+                .map(returnDisputeMapper::toDto)
                 .toList();
-
     }
 
     @Override
@@ -53,55 +49,72 @@ public class AdminReturnDisputeServiceImpl implements AdminReturnDisputeService 
             action = Action.APPROVE_RETURN,
             entity = EntityEnum.RETURN_REQUEST,
             entityId = "#returnRequestId",
-            description = "Return approved by admin"
+            description = "Return dispute accepted by admin"
     )
     @PreAuthorize("hasRole('ADMIN')")
     public Boolean acceptDispute(Long returnRequestId, Long adminId, AdminDisputeActionRequestDto dto) {
-        ReturnRequest request = returnRequestRepo.findById(returnRequestId)
-                .orElseThrow(() -> new ReturnRequestNotFoundException("Return request not found!"));
+        DisputeContext context = resolveDisputeContext(returnRequestId, adminId);
+        ReturnRequest request = context.request();
 
-        User admin = userRepo.findById(adminId)
-                .orElseThrow(() -> new UserNotFoundException("Admin with Id " + adminId + " not found!"));
+        String notes = (dto != null && dto.adminNotes() != null && !dto.adminNotes().isBlank())
+                ? dto.adminNotes()
+                : "Dispute accepted. Refund approved";
 
-        request.setAdminUserId(admin);
+        request.setAdminUserId(context.admin());
         request.setAdminDecidedAt(LocalDateTime.now());
-        request.setAdminNotes(dto.adminNotes() != null ? dto.adminNotes() : "Dispute accepted. Refund approved");
+        request.setAdminNotes(notes);
         request.setAdminDecision(Decision.APPROVED);
+
         if (request.getRequestType() == RequestType.RETURN) {
             request.setRefundStatus(RefundStatus.COMPLETED);
-            request.setRefundReference(
-                    "REF-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
+            request.setRefundReference("REF-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
         }
 
-        ReturnRequest savedRequest = returnRequestRepo.save(request);
         return true;
     }
 
     @Override
     @Transactional
     @LogAdminAction(
-            action = Action.APPROVE_REJECT,
+            action = Action.REJECT_RETURN, // Updated enum value for clarity
             entity = EntityEnum.RETURN_REQUEST,
             entityId = "#returnRequestId",
-            description = "admin rejected the dispute"
+            description = "Return dispute rejected by admin"
     )
     @PreAuthorize("hasRole('ADMIN')")
     public boolean rejectDispute(Long returnRequestId, Long adminId, AdminDisputeActionRequestDto dto) {
-        ReturnRequest request = returnRequestRepo.findById(returnRequestId)
-                .orElseThrow(() -> new ReturnRequestNotFoundException("Return request not found!"));
+        DisputeContext context = resolveDisputeContext(returnRequestId, adminId);
+        ReturnRequest request = context.request();
 
-        User admin = userRepo.findById(adminId)
-                .orElseThrow(() -> new UserNotFoundException("Admin with Id " + adminId + " not found!"));
+        String notes = (dto != null && dto.adminNotes() != null && !dto.adminNotes().isBlank())
+                ? dto.adminNotes()
+                : "Dispute rejected!";
 
-        request.setAdminUserId(admin);
+        request.setAdminUserId(context.admin());
         request.setAdminDecidedAt(LocalDateTime.now());
-        request.setAdminNotes(dto.adminNotes() != null ? dto.adminNotes() : "Dispute rejected!");
+        request.setAdminNotes(notes);
         request.setAdminDecision(Decision.REJECTED);
+
         if (request.getRequestType() == RequestType.RETURN) {
             request.setRefundStatus(RefundStatus.REJECTED);
         }
 
-        ReturnRequest savedRequest = returnRequestRepo.save(request);
         return true;
     }
+
+    private DisputeContext resolveDisputeContext(Long returnRequestId, Long adminId) {
+        ReturnRequest request = returnRequestRepo.findById(returnRequestId)
+                .orElseThrow(() -> new ReturnRequestNotFoundException("Return request not found with ID: " + returnRequestId));
+
+        if (request.getAdminDecision() != null && request.getAdminDecision() != Decision.PENDING) {
+            throw new IllegalStateException("Dispute request #" + returnRequestId + " has already been processed.");
+        }
+
+        User admin = userRepo.findById(adminId)
+                .orElseThrow(() -> new UserNotFoundException("Admin not found with ID: " + adminId));
+
+        return new DisputeContext(request, admin);
+    }
+
+    private record DisputeContext(ReturnRequest request, User admin) {}
 }

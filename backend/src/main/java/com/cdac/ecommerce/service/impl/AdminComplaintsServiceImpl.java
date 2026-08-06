@@ -62,7 +62,6 @@ public class AdminComplaintsServiceImpl implements AdminComplaintsService {
 
         complaint.setResolvedBy(adminUser);
         complaint.setResolvedAt(LocalDateTime.now());
-
         complaint.setBody(complaint.getBody() + "\n\n[Resolution Note]: " + resolveComplaintRequestDTO.resolutionNote());
 
         CustomerComplaint customerComplaint = complaintRepo.save(complaint);
