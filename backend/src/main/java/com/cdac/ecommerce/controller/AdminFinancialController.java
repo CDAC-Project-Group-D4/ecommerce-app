@@ -32,7 +32,7 @@ public class AdminFinancialController {
         return ResponseEntity.ok(financialService.getLatestCommission());
     }
 
-    @PutMapping("/settings/commission")
+    @PostMapping("/settings/commission")
     public ResponseEntity<PlatformSettingResponseDTO> updateGlobalCommission(
             @Valid @RequestBody AdminCommissionRequestDTO commissionRequestDTO,
             @AuthenticationPrincipal User adminUser
