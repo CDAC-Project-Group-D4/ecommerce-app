@@ -3,7 +3,7 @@ import Sidebar from "../components/sellerComponents/Sidebar";
 import SellerNavbar from "../components/sellerComponents/SellerNavbar";
 import Icon from "../components/sellerComponents/Icon";
 import { getMyStore, uploadStoreMedia } from "../api/storeApi";
-import { getStoreProducts, createProduct, updateProduct, deleteProduct } from "../api/productApi";
+import { getStoreProducts, createProduct, updateProduct, deleteProduct, toggleProductStatus } from "../api/productApi";
 import { useSeller } from "../context/SellerContext.jsx";
 import "../css/SellerDashboard.css";
 import "../css/Product.css";
@@ -253,6 +253,21 @@ function Product() {
         }
     };
 
+    // Handle Toggle Status (Active <-> Inactive)
+    const handleToggleStatus = async (productId) => {
+        setError(null);
+        setSuccess(null);
+        try {
+            const updatedProd = await toggleProductStatus(productId);
+            setProducts((prev) =>
+                prev.map((p) => (p.id === productId ? { ...p, ...updatedProd } : p))
+            );
+            setSuccess(updatedProd.message || "Product status updated successfully!");
+        } catch (err) {
+            setError(typeof err === "string" ? err : err.message || "Failed to update product status");
+        }
+    };
+
     // Helper to check if product is deleted
     const isProductDeleted = (product) => {
         if (
@@ -402,9 +417,14 @@ function Product() {
                                                 {/* Column 7: Low Stock Limit */}
                                                 <td style={{ textAlign: "center" }}>{prod.low_stock_threshold || prod.lowStockThreshold || 5}</td>
 
-                                                {/* Column 8: Status */}
+                                                {/* Column 8: Status (Clickable to Toggle Status) */}
                                                 <td>
-                                                    <span className={`prd-badge ${deleted ? "prd-badge-deleted" : "prd-badge-active"}`}>
+                                                    <span
+                                                        className={`prd-badge ${deleted ? "prd-badge-deleted" : "prd-badge-active"}`}
+                                                        style={{ cursor: "pointer" }}
+                                                        onClick={() => handleToggleStatus(prod.id)}
+                                                        title="Click to toggle Active / Inactive status"
+                                                    >
                                                         {deleted ? "Inactive" : "Active"}
                                                     </span>
                                                 </td>
@@ -419,14 +439,14 @@ function Product() {
                                                     </button>
                                                 </td>
 
-                                                {/* Column 10: Delete Product */}
+                                                {/* Column 10: Delete / Reactivate Product */}
                                                 <td style={{ textAlign: "center" }}>
                                                     <button
-                                                        className="prd-btn-delete"
-                                                        onClick={() => handleDeleteProduct(prod.id)}
-                                                        disabled={deleted}
+                                                        className={deleted ? "prd-btn-update" : "prd-btn-delete"}
+                                                        onClick={() => handleToggleStatus(prod.id)}
+                                                        title="Click to toggle status Active / Inactive"
                                                     >
-                                                        <Icon name="trash" size={14} /> {deleted ? "Deleted" : "Delete"}
+                                                        <Icon name={deleted ? "box" : "trash"} size={14} /> {deleted ? "Reactivate" : "Delete"}
                                                     </button>
                                                 </td>
                                             </tr>

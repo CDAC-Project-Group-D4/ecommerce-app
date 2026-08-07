@@ -31,6 +31,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final UserRepo userRepository;
+    private final com.cdac.ecommerce.service.NotificationService notificationService;
     private final ModelMapper modelMapper;
 
     @Override
@@ -54,6 +55,10 @@ public class ProductServiceImpl implements ProductService {
         }
 
         Product newProduct= productRepository.save(product);
+
+        // Trigger notification check
+        notificationService.checkAndTriggerLowStockNotification(newProduct);
+
         ProductResponseDTO productResponseDTO= modelMapper.map(newProduct, ProductResponseDTO.class);
         productResponseDTO.setMessage("product created successfully");
         return productResponseDTO;
@@ -92,7 +97,14 @@ public class ProductServiceImpl implements ProductService {
         }
 
         if (updateProductRequestDTO.getStock() != null) {
-            product.setStock(updateProductRequestDTO.getStock());
+            int newStock = updateProductRequestDTO.getStock();
+            product.setStock(newStock);
+            // Rule 1 & 2: If stock is 0 -> Inactive. If stock > 0 -> Active automatically.
+            if (newStock == 0) {
+                product.set_active(false);
+            } else {
+                product.set_active(true);
+            }
         }
 
         if (updateProductRequestDTO.getImageUrl() != null && !updateProductRequestDTO.getImageUrl().isBlank()) {
@@ -100,6 +112,10 @@ public class ProductServiceImpl implements ProductService {
         }
 
         Product updateProduct=productRepository.save(product);
+
+        // Trigger notification check
+        notificationService.checkAndTriggerLowStockNotification(updateProduct);
+
         ProductResponseDTO productResponseDTO= modelMapper.map(updateProduct, ProductResponseDTO.class);
         productResponseDTO.setMessage("product updated successfully");
         return  productResponseDTO;
@@ -128,7 +144,7 @@ public class ProductServiceImpl implements ProductService {
             throw new RuntimeException("unauthorized!! cannot delete product");
         }
 
-        //soft deleting the product
+        //soft deleting the product (Rule 3: Set Inactive)
         product.set_active(false);
         Product deleteProduct= productRepository.save(product);
         ProductResponseDTO productResponseDTO= modelMapper.map(deleteProduct, ProductResponseDTO.class);
@@ -170,5 +186,33 @@ public class ProductServiceImpl implements ProductService {
 
         List<Product> lowStockProducts = productRepository.findLowStockProductsByStoreId(store.getId());
         return lowStockProducts.stream().map(product -> modelMapper.map(product, ProductResponseDTO.class)).collect(Collectors.toList());
+    }
+
+    @Override
+    public ProductResponseDTO toggleProductStatus(Long productId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        String email = userDetails.getUsername();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        Store store = user.getStore();
+        if (store == null) {
+            throw new ResourceNotFoundException("Store not found for this user");
+        }
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+
+        if (!product.getStore().getId().equals(store.getId())) {
+            throw new RuntimeException("Unauthorized to modify this product");
+        }
+
+        // Rule 3: Allow seller to toggle status Active <-> Inactive anytime
+        product.set_active(!product.is_active());
+        Product saved = productRepository.save(product);
+
+        ProductResponseDTO dto = modelMapper.map(saved, ProductResponseDTO.class);
+        dto.setMessage("Product status updated to " + (saved.is_active() ? "Active" : "Inactive"));
+        return dto;
     }
 }

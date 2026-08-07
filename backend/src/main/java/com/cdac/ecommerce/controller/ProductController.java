@@ -50,6 +50,12 @@ public class  ProductController {
         return ResponseEntity.ok(productResponseDTO);
     }
 
+    @PutMapping("/toggle-status/{productId}")
+    public ResponseEntity<ProductResponseDTO> toggleProductStatus(@PathVariable Long productId){
+        ProductResponseDTO productResponseDTO = productService.toggleProductStatus(productId);
+        return ResponseEntity.ok(productResponseDTO);
+    }
+
 
     @GetMapping("/{productId}/reviews")
     public ResponseEntity<List<ReviewResponseDTO>> getProductReviews(
