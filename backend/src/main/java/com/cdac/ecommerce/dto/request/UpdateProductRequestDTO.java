@@ -11,6 +11,8 @@ public class UpdateProductRequestDTO {
 
     private String name;
 
+    private String description;
+
     @Positive(message = "price must be greater than 0")
     private BigDecimal price;
 

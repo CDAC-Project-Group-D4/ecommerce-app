@@ -4,6 +4,7 @@ import SellerNavbar from "../components/sellerComponents/SellerNavbar";
 import Icon from "../components/sellerComponents/Icon";
 import { getMyStore, uploadStoreMedia } from "../api/storeApi";
 import { getStoreProducts, createProduct, updateProduct, deleteProduct, toggleProductStatus } from "../api/productApi";
+import { getAllCategories } from "../api/categoryApi";
 import { useSeller } from "../context/SellerContext.jsx";
 import "../css/SellerDashboard.css";
 import "../css/Product.css";
@@ -27,6 +28,7 @@ function Product() {
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
+    const [categories, setCategories] = useState([]);
 
     useEffect(() => {
         if (contextStore) {
@@ -41,6 +43,7 @@ function Product() {
     const [addLoading, setAddLoading] = useState(false);
     const [newProductData, setNewProductData] = useState({
         name: "",
+        description: "",
         price: "",
         stock: "",
         low_stock_threshold: "5",
@@ -56,9 +59,10 @@ function Product() {
     const [updateLoading, setUpdateLoading] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [updateProductData, setUpdateProductData] = useState({
+        name: "",
+        description: "",
         price: "",
-        stock: "",
-        name: ""
+        stock: ""
     });
     const [updateCoverFile, setUpdateCoverFile] = useState(null);
     const [updateCoverPreview, setUpdateCoverPreview] = useState(null);
@@ -89,6 +93,24 @@ function Product() {
             })
             .finally(() => {
                 setLoading(false);
+            });
+    }, []);
+
+    // Fetch Categories on Mount
+    useEffect(() => {
+        getAllCategories()
+            .then((res) => {
+                const list = res.data || res || [];
+                setCategories(list);
+                if (list.length > 0) {
+                    setNewProductData((prev) => ({
+                        ...prev,
+                        category_id: prev.category_id || String(list[0].id)
+                    }));
+                }
+            })
+            .catch((err) => {
+                console.error("Failed to load categories:", err);
             });
     }, []);
 
@@ -135,6 +157,7 @@ function Product() {
 
             const payload = {
                 name: newProductData.name,
+                description: newProductData.description,
                 price: parseFloat(newProductData.price),
                 stock: parseInt(newProductData.stock, 10),
                 low_stock_threshold: parseInt(newProductData.low_stock_threshold || "5", 10),
@@ -158,6 +181,7 @@ function Product() {
             // Reset form & file states
             setNewProductData({
                 name: "",
+                description: "",
                 price: "",
                 stock: "",
                 low_stock_threshold: "5",
@@ -177,6 +201,7 @@ function Product() {
         setSelectedProduct(product);
         setUpdateProductData({
             name: product.name || "",
+            description: product.description || "",
             price: product.price !== undefined ? String(product.price) : "",
             stock: product.stock !== undefined ? String(product.stock) : ""
         });
@@ -201,6 +226,7 @@ function Product() {
 
             const payload = {
                 name: updateProductData.name,
+                description: updateProductData.description,
                 price: parseFloat(updateProductData.price),
                 stock: parseInt(updateProductData.stock, 10),
                 imageUrl: updatedCoverUrl
@@ -215,6 +241,7 @@ function Product() {
                               ...p,
                               ...updatedProd,
                               name: updateProductData.name || p.name,
+                              description: updateProductData.description || p.description,
                               imageUrl: updatedCoverUrl || p.imageUrl
                           }
                         : p
@@ -290,6 +317,7 @@ function Product() {
         const query = searchTerm.toLowerCase();
         return (
             (p.name && p.name.toLowerCase().includes(query)) ||
+            (p.description && p.description.toLowerCase().includes(query)) ||
             (p.id && String(p.id).toLowerCase().includes(query)) ||
             (p.categoryId && String(p.categoryId).includes(query))
         );
@@ -356,7 +384,7 @@ function Product() {
                                     <th>Product ID</th>
                                     <th>Product Name</th>
                                     <th>Cover Photo</th>
-                                    <th>Category ID</th>
+                                    <th>Category</th>
                                     <th>Price</th>
                                     <th>Stock</th>
                                     <th>Low Stock Limit</th>
@@ -410,7 +438,9 @@ function Product() {
                                                 </td>
 
                                                 {/* Column 4: Category */}
-                                                <td className="sd-cell-subcode">CAT-{prod.categoryId || prod.category_id || 1}</td>
+                                                <td className="sd-cell-subcode">
+                                                    {categories.find((c) => String(c.id) === String(prod.categoryId || prod.category_id))?.name || `CAT-${prod.categoryId || prod.category_id || 1}`}
+                                                </td>
 
                                                 {/* Column 5: Price */}
                                                 <td style={{ fontWeight: 600 }}>₹{Number(prod.price).toFixed(2)}</td>
@@ -493,6 +523,18 @@ function Product() {
                                     />
                                 </div>
 
+                                <div className="prd-form-group full-width">
+                                    <label>Description *</label>
+                                    <textarea
+                                        name="description"
+                                        placeholder="Detailed description of the product..."
+                                        value={newProductData.description}
+                                        onChange={(e) => setNewProductData({ ...newProductData, description: e.target.value })}
+                                        rows="3"
+                                        required
+                                    />
+                                </div>
+
                                 <div className="prd-form-group">
                                     <label>Price (₹) *</label>
                                     <input
@@ -530,15 +572,23 @@ function Product() {
                                 </div>
 
                                 <div className="prd-form-group">
-                                    <label>Category ID *</label>
-                                    <input
-                                        type="number"
+                                    <label>Category *</label>
+                                    <select
                                         name="category_id"
-                                        placeholder="1"
                                         value={newProductData.category_id}
                                         onChange={(e) => setNewProductData({ ...newProductData, category_id: e.target.value })}
                                         required
-                                    />
+                                    >
+                                        {categories.length === 0 ? (
+                                            <option value="">Loading categories...</option>
+                                        ) : (
+                                            categories.map((cat) => (
+                                                <option key={cat.id} value={cat.id}>
+                                                    {cat.name}
+                                                </option>
+                                            ))
+                                        )}
+                                    </select>
                                 </div>
 
                                 {/* Cover Photo Upload */}
@@ -615,6 +665,17 @@ function Product() {
                                         value={updateProductData.name}
                                         onChange={(e) => setUpdateProductData({ ...updateProductData, name: e.target.value })}
                                         required
+                                    />
+                                </div>
+
+                                <div className="prd-form-group full-width">
+                                    <label>Description</label>
+                                    <textarea
+                                        name="description"
+                                        placeholder="Detailed description of the product..."
+                                        value={updateProductData.description}
+                                        onChange={(e) => setUpdateProductData({ ...updateProductData, description: e.target.value })}
+                                        rows="3"
                                     />
                                 </div>
 

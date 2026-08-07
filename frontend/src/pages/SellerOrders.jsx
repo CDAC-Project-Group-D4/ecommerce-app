@@ -59,7 +59,9 @@ function SellerOrders() {
     let totalRevenue = 0;
 
     rawOrders.forEach((order) => {
-        const customerName = order.address?.fullName || "Customer";
+        const customerName = order.userFullName || order.address?.fullName || "Customer";
+        const shippingName = order.address?.fullName;
+        const customerPhone = order.userPhone || order.address?.mobileNumber;
         const orderStatus = (order.orderStatus || "PENDING").toUpperCase();
 
         if (["CONFIRMED", "PLACED", "SHIPPED", "OUT_FOR_DELIVERY", "DELIVERED", "COMPLETED"].includes(orderStatus)) {
@@ -88,6 +90,8 @@ function SellerOrders() {
                     rawProductId: pId,
                     productName: item.productName || matchedProduct?.name || "Product",
                     customerName: customerName,
+                    shippingName: shippingName,
+                    customerPhone: customerPhone,
                     orderedQty: orderedQty,
                     currentStock: availableStock,
                     totalAmt: itemAmount,
@@ -242,7 +246,12 @@ function SellerOrders() {
                                             <td className="sd-cell-code">{item.id}</td>
                                             <td className="sd-cell-subcode">{item.productId}</td>
                                             <td className="sd-cell-name">{item.productName}</td>
-                                            <td>{item.customerName}</td>
+                                            <td>
+                                                <div style={{ fontWeight: "600", color: "#111827" }}>{item.customerName}</div>
+                                                {item.customerPhone && (
+                                                    <div style={{ fontSize: "11.5px", color: "#6b7280" }}>📞 {item.customerPhone}</div>
+                                                )}
+                                            </td>
                                             <td className="sd-cell-qty" style={{ fontWeight: "700" }}>{item.orderedQty}</td>
                                             <td className="sd-cell-qty" style={{ fontWeight: "700", color: item.currentStock > 5 ? "#16a34a" : "#dc2626" }}>
                                                 {item.currentStock}

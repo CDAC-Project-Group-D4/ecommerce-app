@@ -307,7 +307,7 @@ public class StoreServiceImpl implements StoreService {
 
         // Fix order status in DB if order items have sufficient stock
         for (Order order : orders) {
-            if (order.getOrderStatus() == OrderStatus.CANCELLED || order.getOrderStatus() == OrderStatus.PLACED || order.getOrderStatus() == OrderStatus.PENDING) {
+            if (order.getOrderStatus() == OrderStatus.PLACED || order.getOrderStatus() == OrderStatus.PENDING) {
                 boolean allInStock = true;
                 if (order.getOrderItems() != null && !order.getOrderItems().isEmpty()) {
                     for (OrderItem item : order.getOrderItems()) {

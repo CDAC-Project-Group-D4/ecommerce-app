@@ -10,6 +10,7 @@ import com.cdac.ecommerce.mapper.OrderMapper;
 import com.cdac.ecommerce.repository.*;
 import com.cdac.ecommerce.service.OrderService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -149,21 +150,41 @@ OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public void cancelOrder(Long userId, Long orderId) {
-        Order order=orderRepository.findByIdAndUser_Id(orderId,userId)
-                .orElseThrow(()-> new ResourceNotFoundException( "Order not found"));
+        Order order = orderRepository.findByIdAndUser_Id(orderId, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
-        if(order.getOrderStatus() == OrderStatus.SHIPPED ||
-                order.getOrderStatus() == OrderStatus.OUT_FOR_DELIVERY ||
-                order.getOrderStatus() == OrderStatus.DELIVERED){
-
-            throw new IllegalStateException( "Order cannot be cancelled" );
-
+        if (order.getOrderStatus() == OrderStatus.CANCELLED) {
+            throw new IllegalStateException("Order is already cancelled");
         }
+
+        if (order.getOrderStatus() == OrderStatus.SHIPPED ||
+                order.getOrderStatus() == OrderStatus.OUT_FOR_DELIVERY ||
+                order.getOrderStatus() == OrderStatus.DELIVERED ||
+                order.getOrderStatus() == OrderStatus.COMPLETED) {
+
+            throw new IllegalStateException("Order cannot be cancelled at this stage");
+        }
+
         order.setOrderStatus(OrderStatus.CANCELLED);
 
-        orderRepository.save(order);
+        // Restore product stock and reactivate product if stock becomes > 0
+        if (order.getOrderItems() != null) {
+            for (OrderItem item : order.getOrderItems()) {
+                Product product = item.getProduct();
+                if (product != null) {
+                    int restoredStock = product.getStock() + item.getQuantity();
+                    product.setStock(restoredStock);
+                    if (restoredStock > 0 && product.getStore() != null && product.getStore().isActive()) {
+                        product.setActive(true);
+                    }
+                    productRepository.save(product);
+                }
+            }
+        }
 
+        orderRepository.save(order);
     }
 
 
