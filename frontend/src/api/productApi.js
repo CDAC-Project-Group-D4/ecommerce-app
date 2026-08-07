@@ -39,3 +39,9 @@ export const deleteProduct = async (productId) => {
     const response = await axios.delete(`${BASE_URL}/delete-product/${productId}`, getAuthHeader());
     return response.data;
 };
+
+// Toggle product status (Active <-> Inactive)
+export const toggleProductStatus = async (productId) => {
+    const response = await axios.put(`${BASE_URL}/toggle-status/${productId}`, {}, getAuthHeader());
+    return response.data;
+};

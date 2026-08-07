@@ -17,4 +17,6 @@ public interface ProductService {
     List<ProductResponseDTO> getProduct();
 
     List<ProductResponseDTO> getLowStockProducts();
+
+    ProductResponseDTO toggleProductStatus(Long productId);
 }

@@ -40,4 +40,8 @@ public class Product extends BaseClass{
     @ManyToOne
     @JoinColumn(name="category_id" ,nullable = false)
     private Category category;
+
+    public int getLowStockThreshold() {
+        return low_stock_threshold;
+    }
 }

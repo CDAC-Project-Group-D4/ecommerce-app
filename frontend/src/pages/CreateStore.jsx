@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createStore } from "../api/storeApi";
+import { useSeller } from "../context/SellerContext";
 import "../css/CreateStore.css";
 
 //this is similar to the signup page
 function CreateStore() {
     
     const navigate = useNavigate();
+    const sellerContext = useSeller();
     const [formData, setFormData] = useState({
         storeName: "",
         description: ""
@@ -32,6 +34,10 @@ function CreateStore() {
         try{
             const data = await createStore(formData);
             setSuccess("Store created successfully");
+
+            if (sellerContext?.refreshStore) {
+                await sellerContext.refreshStore();
+            }
 
             setFormData({
                 storeName: "",

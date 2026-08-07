@@ -18,13 +18,16 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class OrderServiceImpl implements OrderService {
+public class
+OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final CartRepository cartRepository;
     private final OrderItemRepository orderItemRepository;
     private final CustomerAddressRepository addressRepository;
     private final UserRepo userRepo;
+    private final ProductRepository productRepository;
+    private final com.cdac.ecommerce.service.NotificationService notificationService;
     private final OrderMapper orderMapper;
 
     public OrderServiceImpl(OrderRepository orderRepository,
@@ -32,6 +35,8 @@ public class OrderServiceImpl implements OrderService {
                             OrderItemRepository orderItemRepository,
                             CustomerAddressRepository addressRepository,
                             UserRepo userRepo,
+                            ProductRepository productRepository,
+                            com.cdac.ecommerce.service.NotificationService notificationService,
                             OrderMapper orderMapper) {
 
         this.orderRepository = orderRepository;
@@ -39,6 +44,8 @@ public class OrderServiceImpl implements OrderService {
         this.orderItemRepository = orderItemRepository;
         this.addressRepository = addressRepository;
         this.userRepo = userRepo;
+        this.productRepository = productRepository;
+        this.notificationService = notificationService;
         this.orderMapper = orderMapper;
     }
 
@@ -56,47 +63,56 @@ public class OrderServiceImpl implements OrderService {
        CustomerAddress address= addressRepository.findByIdAndUser_Id(request.getAddressId(),userId)
                .orElseThrow(()-> new ResourceNotFoundException("Address not found"));
 
+       // 1. Verify stock availability for all items in cart first
+       for (Cart cart : cartItems) {
+           Product product = cart.getProduct();
+           if (product.getStock() < cart.getQuantity()) {
+               throw new IllegalStateException("Insufficient stock for product: " + product.getName() + 
+                       ". Available: " + product.getStock() + ", Required: " + cart.getQuantity());
+           }
+       }
+
        //create a order
-        Order order =new Order();
+        Order order = new Order();
         order.setUser(user);
         order.setAddress(address);
-
         order.setPaymentMethod(request.getPaymentMethod());
+        order.setOrderStatus(OrderStatus.CONFIRMED);
 
-        if(request.getPaymentMethod()== PaymentMethod.CASH_ON_DELIVERY){
-            order.setOrderStatus(OrderStatus.CONFIRMED);
-        }
-        else{
-            order.setOrderStatus(OrderStatus.PENDING);
-
-            order.setPaymentRef(
-                    "PAY-" + System.currentTimeMillis()
-            );
+        if (request.getPaymentMethod() != PaymentMethod.CASH_ON_DELIVERY) {
+            order.setPaymentRef("PAY-" + System.currentTimeMillis());
         }
 
         order.setPlacedAt(LocalDateTime.now());
 
-        BigDecimal totalAmount= BigDecimal.ZERO;
+        BigDecimal totalAmount = BigDecimal.ZERO;
 
-        // Create OrderItems
-        for(Cart cart:cartItems){
-            BigDecimal price=cart.getProduct().getPrice();
-
-            BigDecimal lineTotal=price.multiply
-                    (BigDecimal.valueOf(cart.getQuantity()));
-
-            totalAmount=totalAmount.add(lineTotal);
+        // Create OrderItems & deduct stock
+        for (Cart cart : cartItems) {
+            BigDecimal price = cart.getProduct().getPrice();
+            BigDecimal lineTotal = price.multiply(BigDecimal.valueOf(cart.getQuantity()));
+            totalAmount = totalAmount.add(lineTotal);
 
             OrderItem orderItem = new OrderItem();
-
             orderItem.setOrder(order);
-            orderItem.setProduct(cart.getProduct());
+
+            Product product = cart.getProduct();
+            orderItem.setProduct(product);
             orderItem.setQuantity(cart.getQuantity());
             orderItem.setPrice(price);
             orderItem.setLineTotal(lineTotal);
             order.getOrderItems().add(orderItem);
 
+            // Deduct stock, set inactive if stock reaches 0, and save
+            int updatedStock = Math.max(0, product.getStock() - cart.getQuantity());
+            product.setStock(updatedStock);
+            if (updatedStock == 0) {
+                product.set_active(false);
+            }
+            productRepository.save(product);
 
+            // Trigger notification check for seller
+            notificationService.checkAndTriggerLowStockNotification(product);
         }
 
         order.setTotalAmt(totalAmount);

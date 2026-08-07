@@ -3,28 +3,28 @@
 -- =================================================================
 
 -- CUSTOMERS (10 users)
-INSERT IGNORE INTO users (id, full_name, email, phone, image_url, password, is_active, is_blocked, created_at, updated_at) VALUES
-(1, 'Alice Johnson', 'alice.j@example.com', '+12025550143', 'https://example.com/images/alice.jpg', '$2a$10$eXpAnDlEpAsSwOrD000001', 1, 0, NOW(), NOW()),
-(2, 'Michael Brown', 'mbrown@example.com', '+12025550172', NULL, '$2a$10$eXpAnDlEpAsSwOrD000002', 1, 0, NOW(), NOW()),
-(3, 'Emily Davis', 'emily.davis@example.com', '+12025550198', 'https://example.com/images/emily.jpg', '$2a$10$eXpAnDlEpAsSwOrD000003', 1, 0, NOW(), NOW()),
-(4, 'David Wilson', 'dwilson@example.com', '+12025550111', NULL, '$2a$10$eXpAnDlEpAsSwOrD000004', 1, 0, NOW(), NOW()),
-(5, 'Sarah Martinez', 'sarah.m@example.com', '+12025550155', 'https://example.com/images/sarah.jpg', '$2a$10$eXpAnDlEpAsSwOrD000005', 1, 0, NOW(), NOW()),
-(6, 'James Taylor', 'jtaylor@example.com', '+12025550166', NULL, '$2a$10$eXpAnDlEpAsSwOrD000006', 1, 0, NOW(), NOW()),
-(7, 'Linda Anderson', 'linda.a@example.com', '+12025550122', 'https://example.com/images/linda.jpg', '$2a$10$eXpAnDlEpAsSwOrD000007', 0, 0, NOW(), NOW()), -- Inactive user
-(8, 'Robert Thomas', 'rthomas@example.com', '+12025550188', NULL, '$2a$10$eXpAnDlEpAsSwOrD000008', 1, 0, NOW(), NOW()),
-(9, 'Barbara White', 'bwhite@example.com', '+12025550133', 'https://example.com/images/barbara.jpg', '$2a$10$eXpAnDlEpAsSwOrD000009', 1, 0, NOW(), NOW()),
-(10, 'William Harris', 'wharris@example.com', '+12025550144', NULL, '$2a$10$eXpAnDlEpAsSwOrD000010', 1, 1, NOW(), NOW()); -- Blocked user
+INSERT IGNORE INTO users (id, full_name, email, phone, image_url, password, roles, is_active, is_blocked, created_at, updated_at) VALUES
+(1, 'Alice Johnson', 'alice.j@example.com', '+12025550143', 'https://example.com/images/alice.jpg', '$2a$10$eXpAnDlEpAsSwOrD000001', 'CUSTOMER', 1, 0, NOW(), NOW()),
+(2, 'Michael Brown', 'mbrown@example.com', '+12025550172', NULL, '$2a$10$eXpAnDlEpAsSwOrD000002', 'CUSTOMER', 1, 0, NOW(), NOW()),
+(3, 'Emily Davis', 'emily.davis@example.com', '+12025550198', 'https://example.com/images/emily.jpg', '$2a$10$eXpAnDlEpAsSwOrD000003', 'CUSTOMER', 1, 0, NOW(), NOW()),
+(4, 'David Wilson', 'dwilson@example.com', '+12025550111', NULL, '$2a$10$eXpAnDlEpAsSwOrD000004', 'CUSTOMER', 1, 0, NOW(), NOW()),
+(5, 'Sarah Martinez', 'sarah.m@example.com', '+12025550155', 'https://example.com/images/sarah.jpg', '$2a$10$eXpAnDlEpAsSwOrD000005', 'CUSTOMER', 1, 0, NOW(), NOW()),
+(6, 'James Taylor', 'jtaylor@example.com', '+12025550166', NULL, '$2a$10$eXpAnDlEpAsSwOrD000006', 'CUSTOMER', 1, 0, NOW(), NOW()),
+(7, 'Linda Anderson', 'linda.a@example.com', '+12025550122', 'https://example.com/images/linda.jpg', '$2a$10$eXpAnDlEpAsSwOrD000007', 'CUSTOMER', 0, 0, NOW(), NOW()), -- Inactive user
+(8, 'Robert Thomas', 'rthomas@example.com', '+12025550188', NULL, '$2a$10$eXpAnDlEpAsSwOrD000008', 'CUSTOMER', 1, 0, NOW(), NOW()),
+(9, 'Barbara White', 'bwhite@example.com', '+12025550133', 'https://example.com/images/barbara.jpg', '$2a$10$eXpAnDlEpAsSwOrD000009', 'CUSTOMER', 1, 0, NOW(), NOW()),
+(10, 'William Harris', 'wharris@example.com', '+12025550144', NULL, '$2a$10$eXpAnDlEpAsSwOrD000010', 'CUSTOMER', 1, 1, NOW(), NOW()); -- Blocked user
 
 -- SELLERS (4 users)
-INSERT IGNORE INTO users (id, full_name, email, phone, image_url, password, is_active, is_blocked, created_at, updated_at) VALUES
-(11, 'Global Tech Corp', 'vendor.tech@example.com', '+18005550199', 'https://example.com/images/tech_logo.jpg', '$2a$10$eXpAnDlEpAsSwOrD000011', 1, 0, NOW(), NOW()),
-(12, 'Fashion Hub', 'vendor.fashion@example.com', '+18005550188', 'https://example.com/images/fashion_logo.jpg', '$2a$10$eXpAnDlEpAsSwOrD000012', 1, 0, NOW(), NOW()),
-(13, 'Organic Grocer', 'vendor.grocer@example.com', '+18005550177', NULL, '$2a$10$eXpAnDlEpAsSwOrD000013', 1, 0, NOW(), NOW()),
-(14, 'Book Worm LLC', 'vendor.books@example.com', '+18005550166', 'https://example.com/images/books_logo.jpg', '$2a$10$eXpAnDlEpAsSwOrD000014', 0, 0, NOW(), NOW()); -- Pending approval/Inactive seller
+INSERT IGNORE INTO users (id, full_name, email, phone, image_url, password, roles, is_active, is_blocked, created_at, updated_at) VALUES
+(11, 'Global Tech Corp', 'vendor.tech@example.com', '+18005550199', 'https://example.com/images/tech_logo.jpg', '$2a$10$eXpAnDlEpAsSwOrD000011', 'SELLER', 1, 0, NOW(), NOW()),
+(12, 'Fashion Hub', 'vendor.fashion@example.com', '+18005550188', 'https://example.com/images/fashion_logo.jpg', '$2a$10$eXpAnDlEpAsSwOrD000012', 'SELLER', 1, 0, NOW(), NOW()),
+(13, 'Organic Grocer', 'vendor.grocer@example.com', '+18005550177', NULL, '$2a$10$eXpAnDlEpAsSwOrD000013', 'SELLER', 1, 0, NOW(), NOW()),
+(14, 'Book Worm LLC', 'vendor.books@example.com', '+18005550166', 'https://example.com/images/books_logo.jpg', '$2a$10$eXpAnDlEpAsSwOrD000014', 'SELLER', 0, 0, NOW(), NOW()); -- Pending approval/Inactive seller
 
 -- ADMIN (1 user)
-INSERT IGNORE INTO users (id, full_name, email, phone, image_url, password, is_active, is_blocked, created_at, updated_at) VALUES
-(15, 'System Admin 2', 'admin2@ecommerce.com', '+19995551122', NULL, '$2a$10$eXpAnDlEpAsSwOrD000015', 1, 0, NOW(), NOW());
+INSERT IGNORE INTO users (id, full_name, email, phone, image_url, password, roles, is_active, is_blocked, created_at, updated_at) VALUES
+(15, 'System Admin 2', 'admin2@ecommerce.com', '+19995551122', NULL, '$2a$10$eXpAnDlEpAsSwOrD000015', 'ADMIN', 1, 0, NOW(), NOW());
 
 -- =================================================================
 -- 3. INSERT STORES (Belong to Sellers 11, 12, 13, 14)
@@ -77,7 +77,6 @@ INSERT IGNORE INTO customer_addresses (
 (4, 4, 'David Wilson', '9876543213', 'OTHER',
  'Plot No. 56', 'Sector 18', '201301', 'Noida', 'Uttar Pradesh', 'India',
  1, NOW(), NOW());
->>>>>>> c0d488d2adabf20059534eb4300ac78b5ddbe051
 
 -- Order 1: DELIVERED RECENTLY
 INSERT IGNORE INTO orders (
@@ -220,9 +219,6 @@ INSERT IGNORE INTO return_requests (
 (10, 5, NULL, 2, 'Accidental return request submission.', 'RETURN',
  NULL, NULL, NULL,
  NULL, NULL, NULL, NULL,
-<<<<<<< HEAD
- 0, NOW() - INTERVAL 7 DAY, NOW());
-=======
  0, NOW() - INTERVAL 7 DAY, NOW());
 
 -- =================================================================
@@ -260,4 +256,3 @@ INSERT IGNORE INTO customer_complaints (
 (3, 5, 2, NULL, 'Product support required',
  'I need help setting up the keyboard.',
  NULL, 1, NOW() - INTERVAL 1 DAY, NOW());
->>>>>>> c0d488d2adabf20059534eb4300ac78b5ddbe051
