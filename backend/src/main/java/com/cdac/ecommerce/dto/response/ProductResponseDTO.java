@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 public class ProductResponseDTO {
     private Long id;
     private String name;
+    private String description;
     private BigDecimal price;
     private int stock;
     private int low_stock_threshold;

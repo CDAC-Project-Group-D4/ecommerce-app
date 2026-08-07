@@ -204,7 +204,7 @@ public class StoreServiceImpl implements StoreService {
         //deactivate products
         if(store.getProductList()!=null){
             for(Product product : store.getProductList()){
-                product.set_active(false);
+                product.setActive(false);
             }
         }
 
@@ -235,7 +235,7 @@ public class StoreServiceImpl implements StoreService {
         if(store.getProductList()!=null){
             for(Product product : store.getProductList()){
                 if(product.getStock()>0){
-                    product.set_active(true);
+                    product.setActive(true);
                 }
             }
         }

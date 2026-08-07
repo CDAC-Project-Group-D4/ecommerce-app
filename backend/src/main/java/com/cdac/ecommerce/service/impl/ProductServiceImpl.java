@@ -101,9 +101,9 @@ public class ProductServiceImpl implements ProductService {
             product.setStock(newStock);
             // Rule 1 & 2: If stock is 0 -> Inactive. If stock > 0 -> Active automatically.
             if (newStock == 0) {
-                product.set_active(false);
+                product.setActive(false);
             } else {
-                product.set_active(true);
+                product.setActive(true);
             }
         }
 
@@ -145,7 +145,7 @@ public class ProductServiceImpl implements ProductService {
         }
 
         //soft deleting the product (Rule 3: Set Inactive)
-        product.set_active(false);
+        product.setActive(false);
         Product deleteProduct= productRepository.save(product);
         ProductResponseDTO productResponseDTO= modelMapper.map(deleteProduct, ProductResponseDTO.class);
         productResponseDTO.setMessage("product deleted successfully");
@@ -208,11 +208,11 @@ public class ProductServiceImpl implements ProductService {
         }
 
         // Rule 3: Allow seller to toggle status Active <-> Inactive anytime
-        product.set_active(!product.is_active());
+        product.setActive(!product.isActive());
         Product saved = productRepository.save(product);
 
         ProductResponseDTO dto = modelMapper.map(saved, ProductResponseDTO.class);
-        dto.setMessage("Product status updated to " + (saved.is_active() ? "Active" : "Inactive"));
+        dto.setMessage("Product status updated to " + (saved.isActive() ? "Active" : "Inactive"));
         return dto;
     }
 }

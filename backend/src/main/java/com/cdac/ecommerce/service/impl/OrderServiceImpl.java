@@ -107,7 +107,7 @@ OrderServiceImpl implements OrderService {
             int updatedStock = Math.max(0, product.getStock() - cart.getQuantity());
             product.setStock(updatedStock);
             if (updatedStock == 0) {
-                product.set_active(false);
+                product.setActive(false);
             }
             productRepository.save(product);
 

@@ -3,28 +3,28 @@
 -- =================================================================
 
 -- CUSTOMERS (10 users)
-INSERT IGNORE INTO users (id, full_name, email, phone, image_url, password, roles, is_active, is_blocked, created_at, updated_at) VALUES
-(1, 'Alice Johnson', 'alice.j@example.com', '+12025550143', 'https://example.com/images/alice.jpg', '$2a$10$eXpAnDlEpAsSwOrD000001', 'CUSTOMER', 1, 0, NOW(), NOW()),
-(2, 'Michael Brown', 'mbrown@example.com', '+12025550172', NULL, '$2a$10$eXpAnDlEpAsSwOrD000002', 'CUSTOMER', 1, 0, NOW(), NOW()),
-(3, 'Emily Davis', 'emily.davis@example.com', '+12025550198', 'https://example.com/images/emily.jpg', '$2a$10$eXpAnDlEpAsSwOrD000003', 'CUSTOMER', 1, 0, NOW(), NOW()),
-(4, 'David Wilson', 'dwilson@example.com', '+12025550111', NULL, '$2a$10$eXpAnDlEpAsSwOrD000004', 'CUSTOMER', 1, 0, NOW(), NOW()),
-(5, 'Sarah Martinez', 'sarah.m@example.com', '+12025550155', 'https://example.com/images/sarah.jpg', '$2a$10$eXpAnDlEpAsSwOrD000005', 'CUSTOMER', 1, 0, NOW(), NOW()),
-(6, 'James Taylor', 'jtaylor@example.com', '+12025550166', NULL, '$2a$10$eXpAnDlEpAsSwOrD000006', 'CUSTOMER', 1, 0, NOW(), NOW()),
-(7, 'Linda Anderson', 'linda.a@example.com', '+12025550122', 'https://example.com/images/linda.jpg', '$2a$10$eXpAnDlEpAsSwOrD000007', 'CUSTOMER', 0, 0, NOW(), NOW()), -- Inactive user
-(8, 'Robert Thomas', 'rthomas@example.com', '+12025550188', NULL, '$2a$10$eXpAnDlEpAsSwOrD000008', 'CUSTOMER', 1, 0, NOW(), NOW()),
-(9, 'Barbara White', 'bwhite@example.com', '+12025550133', 'https://example.com/images/barbara.jpg', '$2a$10$eXpAnDlEpAsSwOrD000009', 'CUSTOMER', 1, 0, NOW(), NOW()),
-(10, 'William Harris', 'wharris@example.com', '+12025550144', NULL, '$2a$10$eXpAnDlEpAsSwOrD000010', 'CUSTOMER', 1, 1, NOW(), NOW()); -- Blocked user
+INSERT IGNORE INTO users (id, full_name, email, phone, image_url, password, is_active, is_blocked, created_at, updated_at) VALUES
+(1, 'Alice Johnson', 'alice.j@example.com', '+12025550143', 'https://example.com/images/alice.jpg', '$2a$10$eXpAnDlEpAsSwOrD000001', 1, 0, NOW(), NOW()),
+(2, 'Michael Brown', 'mbrown@example.com', '+12025550172', NULL, '$2a$10$eXpAnDlEpAsSwOrD000002', 1, 0, NOW(), NOW()),
+(3, 'Emily Davis', 'emily.davis@example.com', '+12025550198', 'https://example.com/images/emily.jpg', '$2a$10$eXpAnDlEpAsSwOrD000003', 1, 0, NOW(), NOW()),
+(4, 'David Wilson', 'dwilson@example.com', '+12025550111', NULL, '$2a$10$eXpAnDlEpAsSwOrD000004', 1, 0, NOW(), NOW()),
+(5, 'Sarah Martinez', 'sarah.m@example.com', '+12025550155', 'https://example.com/images/sarah.jpg', '$2a$10$eXpAnDlEpAsSwOrD000005', 1, 0, NOW(), NOW()),
+(6, 'James Taylor', 'jtaylor@example.com', '+12025550166', NULL, '$2a$10$eXpAnDlEpAsSwOrD000006', 1, 0, NOW(), NOW()),
+(7, 'Linda Anderson', 'linda.a@example.com', '+12025550122', 'https://example.com/images/linda.jpg', '$2a$10$eXpAnDlEpAsSwOrD000007', 0, 0, NOW(), NOW()), -- Inactive user
+(8, 'Robert Thomas', 'rthomas@example.com', '+12025550188', NULL, '$2a$10$eXpAnDlEpAsSwOrD000008', 1, 0, NOW(), NOW()),
+(9, 'Barbara White', 'bwhite@example.com', '+12025550133', 'https://example.com/images/barbara.jpg', '$2a$10$eXpAnDlEpAsSwOrD000009', 1, 0, NOW(), NOW()),
+(10, 'William Harris', 'wharris@example.com', '+12025550144', NULL, '$2a$10$eXpAnDlEpAsSwOrD000010', 1, 1, NOW(), NOW()); -- Blocked user
 
 -- SELLERS (4 users)
-INSERT IGNORE INTO users (id, full_name, email, phone, image_url, password, roles, is_active, is_blocked, created_at, updated_at) VALUES
-(11, 'Global Tech Corp', 'vendor.tech@example.com', '+18005550199', 'https://example.com/images/tech_logo.jpg', '$2a$10$eXpAnDlEpAsSwOrD000011', 'SELLER', 1, 0, NOW(), NOW()),
-(12, 'Fashion Hub', 'vendor.fashion@example.com', '+18005550188', 'https://example.com/images/fashion_logo.jpg', '$2a$10$eXpAnDlEpAsSwOrD000012', 'SELLER', 1, 0, NOW(), NOW()),
-(13, 'Organic Grocer', 'vendor.grocer@example.com', '+18005550177', NULL, '$2a$10$eXpAnDlEpAsSwOrD000013', 'SELLER', 1, 0, NOW(), NOW()),
-(14, 'Book Worm LLC', 'vendor.books@example.com', '+18005550166', 'https://example.com/images/books_logo.jpg', '$2a$10$eXpAnDlEpAsSwOrD000014', 'SELLER', 0, 0, NOW(), NOW()); -- Pending approval/Inactive seller
+INSERT IGNORE INTO users (id, full_name, email, phone, image_url, password, is_active, is_blocked, created_at, updated_at) VALUES
+(11, 'Global Tech Corp', 'vendor.tech@example.com', '+18005550199', 'https://example.com/images/tech_logo.jpg', '$2a$10$eXpAnDlEpAsSwOrD000011', 1, 0, NOW(), NOW()),
+(12, 'Fashion Hub', 'vendor.fashion@example.com', '+18005550188', 'https://example.com/images/fashion_logo.jpg', '$2a$10$eXpAnDlEpAsSwOrD000012', 1, 0, NOW(), NOW()),
+(13, 'Organic Grocer', 'vendor.grocer@example.com', '+18005550177', NULL, '$2a$10$eXpAnDlEpAsSwOrD000013', 1, 0, NOW(), NOW()),
+(14, 'Book Worm LLC', 'vendor.books@example.com', '+18005550166', 'https://example.com/images/books_logo.jpg', '$2a$10$eXpAnDlEpAsSwOrD000014', 0, 0, NOW(), NOW()); -- Pending approval/Inactive seller
 
 -- ADMIN (1 user)
-INSERT IGNORE INTO users (id, full_name, email, phone, image_url, password, roles, is_active, is_blocked, created_at, updated_at) VALUES
-(15, 'System Admin 2', 'admin2@ecommerce.com', '+19995551122', NULL, '$2a$10$eXpAnDlEpAsSwOrD000015', 'ADMIN', 1, 0, NOW(), NOW());
+INSERT IGNORE INTO users (id, full_name, email, phone, image_url, password, is_active, is_blocked, created_at, updated_at) VALUES
+(15, 'System Admin 2', 'admin2@ecommerce.com', '+19995551122', NULL, '$2a$10$eXpAnDlEpAsSwOrD000015', 1, 0, NOW(), NOW());
 
 -- =================================================================
 -- 3. INSERT STORES (Belong to Sellers 11, 12, 13, 14)
@@ -51,11 +51,44 @@ INSERT IGNORE INTO categories (category_id, name, is_active, parent_id, created_
 -- =================================================================
 -- 5. INSERT PRODUCTS
 -- =================================================================
-INSERT IGNORE INTO products (id, product_name, price, stock, low_stock_threshold, is_active, image_url, store_id, category_id, created_at, updated_at) VALUES
-(101, 'Wireless Noise-Canceling Headphones', 2999.00, 50, 5, 1, 'https://example.com/images/headphones.jpg', 1, 4, NOW(), NOW()),
-(102, 'Smart Fitness Tracker Watch', 4999.00, 30, 5, 1, 'https://example.com/images/smartwatch.jpg', 1, 5, NOW(), NOW()),
-(103, 'Classic Cotton Denim Jacket', 3500.00, 20, 2, 1, 'https://example.com/images/jacket.jpg', 2, 6, NOW(), NOW()),
-(104, 'Ergonomic Mechanical Keyboard', 4200.00, 15, 3, 1, 'https://example.com/images/keyboard.jpg', 1, 4, NOW(), NOW());
+INSERT IGNORE INTO products (id, product_name, description, price, stock, low_stock_threshold, is_active, image_url, store_id, category_id, created_at, updated_at) VALUES
+(101, 'Wireless Iphone','This is latest Iphone in the world Iphone', 2999.00, 50, 5, 1, '/uploads/images/iphone.jpg', 1, 4, NOW(), NOW()),
+(102, 'Smart Fitness Tracker Watch','This is latest Iphone in the world Fitness Tracker', 4999.00, 30, 5, 1, '/uploads/images/watch.png', 1, 5, NOW(), NOW()),
+(103, 'Classic Cotton Denim Jacket','This is latest Iphone in the word Denim Jacket', 3500.00, 20, 2, 1, '/uploads/images/menShirt.png', 2, 6, NOW(), NOW()),
+(104, 'Fashionables item 1 ','This is latest Iphone in the world Fashionable Item 1 ', 4200.00, 15, 3, 1, '/uploads/images/fashion1.png', 1, 2, NOW(), NOW()),
+(105, ' Classy Sofa','This is latest Iphone in the world best classy sofa', 2999.00, 50, 5, 1, '/uploads/images/sofa.png', 1, 3, NOW(), NOW()),
+(106, 'Wearables Items','This is latest Iphone in the world wearables Items', 2999.00, 50, 5, 1, '/uploads/images/wearables.png', 1, 5, NOW(), NOW()),
+(107, 'Fashionables item 1','This is latest Iphone in the world Iphone', 2999.00, 50, 5, 1, '/uploads/images/fashion2.jpg', 1, 2, NOW(), NOW());
+
+-- =================================================================
+-- 5b. ADDED: INSERT PRODUCT ATTRIBUTES (Global EAV Keys)
+-- =================================================================
+INSERT IGNORE INTO product_attributes (id, attribute_name) VALUES
+(1, 'RAM'),
+(2, 'Color'),
+(3, 'Storage'),
+(4, 'Size'),
+(5, 'Material');
+
+-- =================================================================
+-- 5c. ADDED: INSERT PRODUCT ATTRIBUTE VALUES (EAV Mapping Data)
+-- =================================================================
+INSERT IGNORE INTO product_attribute_values (product_id, attribute_id, attribute_value) VALUES
+-- Attributes for Product 101 (Wireless Iphone)
+(101, 1, '8GB'),
+(101, 2, 'Deep Purple'),
+(101, 3, '256GB'),
+
+-- Attributes for Product 102 (Smart Fitness Tracker Watch)
+(102, 2, 'Midnight Black'),
+
+-- Attributes for Product 103 (Classic Cotton Denim Jacket)
+(103, 4, 'Large'),
+(103, 2, 'Indigo Blue'),
+(103, 5, '100% Cotton'),
+
+-- Attributes for Product 106 (Wearables Items alternative variant)
+(106, 2, 'Rose Gold');
 
 -- =================================================================
 -- 6. INSERT CUSTOMER ADDRESSES
@@ -78,6 +111,10 @@ INSERT IGNORE INTO customer_addresses (
  'Plot No. 56', 'Sector 18', '201301', 'Noida', 'Uttar Pradesh', 'India',
  1, NOW(), NOW());
 
+-- =================================================================
+-- 7. INSERT ORDERS
+-- =================================================================
+
 -- Order 1: DELIVERED RECENTLY
 INSERT IGNORE INTO orders (
     order_id, user_id, address_id, order_status, payment_method, total_amt,
@@ -87,7 +124,7 @@ INSERT IGNORE INTO orders (
     'PAY_RAZOR_98765', 'TRK_NY_1001', NOW() - INTERVAL 5 DAY, NOW() - INTERVAL 3 DAY, NOW() - INTERVAL 2 DAY, NULL, NOW(), NOW()
 );
 
--- Order 2: DELIVERED EXPIRED (Updated 'COD' -> 'CASH_ON_DELIVERY')
+-- Order 2: DELIVERED EXPIRED
 INSERT IGNORE INTO orders (
     order_id, user_id, address_id, order_status, payment_method, total_amt,
     payment_ref, tracking_id, placed_at, shipped_at, delivered_at, completed_at, created_at, updated_at
@@ -105,7 +142,7 @@ INSERT IGNORE INTO orders (
     'PAY_RAZOR_99999', 'TRK_SF_3001', NOW() - INTERVAL 2 DAY, NOW() - INTERVAL 1 DAY, NULL, NULL, NOW(), NOW()
 );
 
--- Order 4: OUT_FOR_DELIVERY (Updated 'COD' -> 'CASH_ON_DELIVERY')
+-- Order 4: OUT_FOR_DELIVERY
 INSERT IGNORE INTO orders (
     order_id, user_id, address_id, order_status, payment_method, total_amt,
     payment_ref, tracking_id, placed_at, shipped_at, delivered_at, completed_at, created_at, updated_at
@@ -142,13 +179,8 @@ INSERT IGNORE INTO order_items (
 INSERT IGNORE INTO reviews (
     review_id, product_id, user_id, order_id, rating, comment, is_active, created_at, updated_at
 ) VALUES
--- Review 1: Great review for Product 101 by User 1 (Order 1)
 (1, 101, 1, 1, 5, 'Absolutely loved this product! Excellent build quality and fast shipping.', 1, NOW(), NOW()),
-
--- Review 2: Average review for Product 102 by User 1 (Order 2)
 (2, 102, 1, 2, 3, 'Decent quality for the price, but packaging was slightly damaged.', 1, NOW(), NOW()),
-
--- Review 3: High rating for Product 104 by User 2 (Order 5)
 (3, 104, 2, 5, 4, 'Works as advertised. Very happy with the purchase!', 1, NOW(), NOW());
 
 -- =================================================================
@@ -160,66 +192,26 @@ INSERT IGNORE INTO return_requests (
     admin_user_id, admin_decision, admin_notes, admin_decided_at,
     is_active, created_at, updated_at
 ) VALUES
-
--- [1] DISPUTED: Item Return - Seller Rejected, Admin Pending (Shows in status=DISPUTED)
-(1, 1, 1, 1, 'Product arrived shattered in transit.', 'RETURN',
- 'REJECTED', 'Courier proof shows package was delivered intact.', NOW() - INTERVAL 2 DAY,
- NULL, NULL, NULL, NULL,
- 1, NOW() - INTERVAL 3 DAY, NOW()),
-
--- [2] DISPUTED: Full Order Replace - Seller Rejected, Admin Pending (Shows in status=DISPUTED)
-(2, 2, NULL, 1, 'Wrong items sent across the whole shipment.', 'REPLACE',
- 'REJECTED', 'Seller claims weight check matched invoice.', NOW() - INTERVAL 1 DAY,
- NULL, NULL, NULL, NULL,
- 1, NOW() - INTERVAL 2 DAY, NOW()),
-
+-- [1] DISPUTED: Item Return - Seller Rejected, Admin Pending
+(1, 1, 1, 1, 'Product arrived shattered in transit.', 'RETURN', 'REJECTED', 'Courier proof shows package was delivered intact.', NOW() - INTERVAL 2 DAY, NULL, NULL, NULL, NULL, 1, NOW() - INTERVAL 3 DAY, NOW()),
+-- [2] DISPUTED: Full Order Replace - Seller Rejected, Admin Pending
+(2, 2, NULL, 1, 'Wrong items sent across the whole shipment.', 'REPLACE', 'REJECTED', 'Seller claims weight check matched invoice.', NOW() - INTERVAL 1 DAY, NULL, NULL, NULL, NULL, 1, NOW() - INTERVAL 2 DAY, NOW()),
 -- [3] SELLER APPROVED: Item Replacement accepted by seller
-(3, 5, 6, 2, 'Keyboard was defective, replacement requested.', 'REPLACE',
- 'APPROVED', 'Replacement approved, reverse pickup scheduled.', NOW() - INTERVAL 1 DAY,
- NULL, NULL, NULL, NULL,
- 1, NOW() - INTERVAL 2 DAY, NOW()),
-
+(3, 5, 6, 2, 'Keyboard was defective, replacement requested.', 'REPLACE', 'APPROVED', 'Replacement approved, reverse pickup scheduled.', NOW() - INTERVAL 1 DAY, NULL, NULL, NULL, NULL, 1, NOW() - INTERVAL 2 DAY, NOW()),
 -- [4] SELLER APPROVED: Full Order Return accepted by seller
-(4, 1, NULL, 1, 'Entire order is no longer needed.', 'RETURN',
- 'APPROVED', 'Accepted late delivery return request.', NOW() - INTERVAL 2 DAY,
- NULL, NULL, NULL, NULL,
- 1, NOW() - INTERVAL 4 DAY, NOW()),
-
+(4, 1, NULL, 1, 'Entire order is no longer needed.', 'RETURN', 'APPROVED', 'Accepted late delivery return request.', NOW() - INTERVAL 2 DAY, NULL, NULL, NULL, NULL, 1, NOW() - INTERVAL 4 DAY, NOW()),
 -- [5] PENDING SELLER: Fresh Item Return request awaiting seller action
-(5, 2, 2, 1, 'Missing original box accessories.', 'RETURN',
- NULL, NULL, NULL,
- NULL, NULL, NULL, NULL,
- 1, NOW() - INTERVAL 1 DAY, NOW()),
-
+(5, 2, 2, 1, 'Missing original box accessories.', 'RETURN', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, NOW() - INTERVAL 1 DAY, NOW()),
 -- [6] PENDING SELLER: Fresh Full Order Replace request awaiting seller action
-(6, 5, NULL, 2, 'Received a defective product.', 'REPLACE',
- NULL, NULL, NULL,
- NULL, NULL, NULL, NULL,
- 1, NOW() - INTERVAL 6 HOUR, NOW()),
-
+(6, 5, NULL, 2, 'Received a defective product.', 'REPLACE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, NOW() - INTERVAL 6 HOUR, NOW()),
 -- [7] ADMIN RESOLVED (OVERRIDDEN): Admin approved after Seller rejected
-(7, 1, 1, 1, 'Headphones stopped working after delivery.', 'RETURN',
- 'REJECTED', 'Seller claims physical damage after delivery.', NOW() - INTERVAL 5 DAY,
- 15, 'APPROVED', 'Admin reviewed evidence provided by the customer. Refund granted.', NOW() - INTERVAL 1 DAY,
- 1, NOW() - INTERVAL 6 DAY, NOW()),
-
+(7, 1, 1, 1, 'Headphones stopped working after delivery.', 'RETURN', 'REJECTED', 'Seller claims physical damage after delivery.', NOW() - INTERVAL 5 DAY, 15, 'APPROVED', 'Admin reviewed evidence provided by the customer. Refund granted.', NOW() - INTERVAL 1 DAY, 1, NOW() - INTERVAL 6 DAY, NOW()),
 -- [8] ADMIN RESOLVED (UPHELD): Admin rejected after Seller rejected
-(8, 2, 2, 1, 'Did not like product aesthetics after opening.', 'RETURN',
- 'REJECTED', 'Non-defective items non-returnable per category policy.', NOW() - INTERVAL 4 DAY,
- 15, 'REJECTED', 'Admin upheld seller decision based on category terms.', NOW() - INTERVAL 1 DAY,
- 1, NOW() - INTERVAL 5 DAY, NOW()),
-
--- [9] DISPUTED: Item Replacement - Seller Rejected, Admin Pending (Shows in status=DISPUTED)
-(9, 5, 6, 2, 'Electrical component non-functional out of box.', 'REPLACE',
- 'REJECTED', 'Seller requested service center certificate first.', NOW() - INTERVAL 12 HOUR,
- NULL, NULL, NULL, NULL,
- 1, NOW() - INTERVAL 1 DAY, NOW()),
-
+(8, 2, 2, 1, 'Did not like product aesthetics after opening.', 'RETURN', 'REJECTED', 'Non-defective items non-returnable per category policy.', NOW() - INTERVAL 4 DAY, 15, 'REJECTED', 'Admin upheld seller decision based on category terms.', NOW() - INTERVAL 1 DAY, 1, NOW() - INTERVAL 5 DAY, NOW()),
+-- [9] DISPUTED: Item Replacement - Seller Rejected, Admin Pending
+(9, 5, 6, 2, 'Electrical component non-functional out of box.', 'REPLACE', 'REJECTED', 'Seller requested service center certificate first.', NOW() - INTERVAL 12 HOUR, NULL, NULL, NULL, NULL, 1, NOW() - INTERVAL 1 DAY, NOW()),
 -- [10] INACTIVE / CANCELLED: User cancelled return request
-(10, 5, NULL, 2, 'Accidental return request submission.', 'RETURN',
- NULL, NULL, NULL,
- NULL, NULL, NULL, NULL,
- 0, NOW() - INTERVAL 7 DAY, NOW());
+(10, 5, NULL, 2, 'Accidental return request submission.', 'RETURN', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NOW() - INTERVAL 7 DAY, NOW());
 
 -- =================================================================
 -- 11. INSERT CART ITEMS
@@ -247,12 +239,6 @@ INSERT IGNORE INTO customer_complaints (
     id, order_id, customer_id, resolved_by, subject, body,
     resolved_at, is_active, created_at, updated_at
 ) VALUES
-(1, 1, 1, NULL, 'Delivery packaging issue',
- 'The outer package was damaged when the order arrived.',
- NULL, 1, NOW() - INTERVAL 2 DAY, NOW()),
-(2, 2, 1, 15, 'Payment receipt required',
- 'Please provide a payment receipt for this order.',
- NOW() - INTERVAL 1 DAY, 0, NOW() - INTERVAL 3 DAY, NOW()),
-(3, 5, 2, NULL, 'Product support required',
- 'I need help setting up the keyboard.',
- NULL, 1, NOW() - INTERVAL 1 DAY, NOW());
+(1, 1, 1, NULL, 'Delivery packaging issue', 'The outer package was damaged when the order arrived.', NULL, 1, NOW() - INTERVAL 2 DAY, NOW()),
+(2, 2, 1, 15, 'Payment receipt required', 'Please provide a payment receipt for this order.', NOW() - INTERVAL 1 DAY, 0, NOW() - INTERVAL 3 DAY, NOW()),
+(3, 5, 2, NULL, 'Product support required', 'I need help setting up the keyboard.', NULL, 1, NOW() - INTERVAL 1 DAY, NOW());
