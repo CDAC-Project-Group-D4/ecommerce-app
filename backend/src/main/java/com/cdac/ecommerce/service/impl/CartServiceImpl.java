@@ -42,7 +42,7 @@ public class CartServiceImpl implements CartService {
         Product product = productRepository.findById(requestDTO.getProductId())
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + requestDTO.getProductId()));
 
-        if (!product.is_active() || product.getStock() <= 0) {
+        if (!product.isActive() || product.getStock() <= 0) {
             throw new IllegalStateException("Product is unavailable or out of stock");
         }
 

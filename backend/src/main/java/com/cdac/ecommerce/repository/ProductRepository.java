@@ -1,6 +1,11 @@
 package com.cdac.ecommerce.repository;
 
 import com.cdac.ecommerce.entity.Product;
+import io.micrometer.common.lang.Nullable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -12,14 +17,14 @@ import java.util.Optional;
 public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
 
 
-    @Query("SELECT p FROM Product p WHERE p.store.id = :storeId AND p.stock <= p.low_stock_threshold AND p.is_active = true")
+    @Query("SELECT p FROM Product p WHERE p.store.id = :storeId AND p.stock <= p.low_stock_threshold AND p.isActive = true")
     List<Product> findLowStockProductsByStoreId(@Param("storeId") Long storeId);
 
     // Used by CartService to validate a product is still sellable before adding to cart
     // NOTE: using an explicit @Query here instead of a derived method name (findByIs_active)
     // because Spring Data's name parser splits on underscores and gets confused by the
     // underscore inside the field name "is_active" itself. Explicit JPQL sidesteps that.
-    @Query("SELECT p FROM Product p WHERE p.is_active = :isActive")
+    @Query("SELECT p FROM Product p WHERE p.isActive = :isActive")
     List<Product> findByActiveStatus(@Param("isActive") boolean isActive);
 
     // Optional but likely useful later for store/seller module and category browsing
@@ -27,9 +32,13 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
 
     List<Product> findByCategory_Id(Long categoryId);
 
-    @Query("Select p FROM Product p WHERE p.is_active = true")
-    List<Product> findByIs_activeTrue();
+    @Query("Select p FROM Product p WHERE p.isActive = true")
+    List<Product> findByIsActiveTrue();
 
     @Override
     Optional<Product> findById(Long id);
+
+    @Override
+    @EntityGraph(attributePaths = {"attributeValues", "attributeValues.attribute", "store"})
+    Page<Product> findAll(@Nullable Specification<Product> spec, Pageable pageable);
 }

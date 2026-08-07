@@ -1,6 +1,8 @@
 package com.cdac.ecommerce.entity;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -18,6 +20,9 @@ public class Product extends BaseClass{
     @Column(name="product_name" ,nullable=false)
     private String name;
 
+    @Column(name = "description",nullable =false)
+    private String description;
+
     @Column(name="price" ,nullable=false)
     private BigDecimal  price;
 
@@ -28,7 +33,7 @@ public class Product extends BaseClass{
     private int low_stock_threshold;
 
     @Column(name="is_active" ,nullable=false)
-    private boolean is_active=true;
+    private boolean isActive=true;
 
     @Column(name = "image_url", length = 1000)
     private String imageUrl = null;
@@ -40,6 +45,9 @@ public class Product extends BaseClass{
     @ManyToOne
     @JoinColumn(name="category_id" ,nullable = false)
     private Category category;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductAttributeValue> attributeValues = new ArrayList<>();
 
     public int getLowStockThreshold() {
         return low_stock_threshold;

@@ -29,20 +29,23 @@ export const SellerProvider = ({ children }) => {
     }, []);
 
     useEffect(() => {
-        const token = localStorage.getItem("jwtToken");
-        let user = null;
-        try {
-            const userStr = localStorage.getItem("user");
-            if (userStr) {
-                user = typeof userStr === "string" ? JSON.parse(userStr) : userStr;
-            }
-        } catch (e) {
-            console.error("Error parsing user from localStorage:", e);
-        }
+        const userStr = localStorage.getItem("user");
+        const token = localStorage.getItem("token");
 
-        // Fetch store if JWT token exists
-        if (token) {
-            refreshStore();
+        if (token && userStr) {
+            try {
+                const user = JSON.parse(userStr);
+                
+                // 🔑 CRITICAL FIX: Only fetch store if logged-in user is a SELLER
+                if (user?.role === "SELLER" || user?.role === "ROLE_SELLER") {
+                    refreshStore();
+                } else {
+                    setLoadingStore(false); // Customer logged in, stop loading store
+                }
+            } catch (e) {
+                console.error("Error parsing user from localStorage", e);
+                setLoadingStore(false);
+            }
         } else {
             setLoadingStore(false);
         }
