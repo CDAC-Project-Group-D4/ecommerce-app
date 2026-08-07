@@ -171,6 +171,11 @@
     align-items: flex-end;
 }
 
+.return-item-actions .btn {
+    min-width: 110px;
+    white-space: nowrap;
+}
+
 .return-request-btn {
     padding: 8px 14px;
     color: #7c3aed;

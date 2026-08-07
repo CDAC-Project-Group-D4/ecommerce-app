@@ -39,6 +39,8 @@ export const orderApi = {
   placeOrder: (orderData) => api.post('/orders', orderData),
   getOrders: () => api.get('/orders'),
   cancelOrder: (id) => api.patch(`/orders/${id}/cancel`),
+  cancelOrderItem: (orderId, orderItemId) =>
+    api.patch(`/orders/${orderId}/items/${orderItemId}/cancel`),
 };
 
 export const customerAccountApi = {

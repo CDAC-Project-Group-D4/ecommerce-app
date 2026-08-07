@@ -3,6 +3,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import { useOrders } from "../context/OrderContext";
 import WriteReviewButton from "../components/customerComponents/reviews/WriteReviewButton";
+import OrderStatusBadge from "../components/customerComponents/Orders/OrderStatusBadge";
 import { getMyReviews } from "../api/reviewApi";
 import { getMyReturns } from "../api/returnApi";
 
@@ -17,12 +18,13 @@ function OrderDetails() {
     const location = useLocation();
     const [myReviews, setMyReviews] = useState([]);
     const [myReturns, setMyReturns] = useState([]);
+    const [cancellingItemId, setCancellingItemId] = useState(null);
 
     const {
         selectedOrder,
         loading,
         loadOrder,
-        handleCancelOrder
+        handleCancelOrderItem
     } = useOrders();
 
     useEffect(() => {
@@ -64,13 +66,33 @@ function OrderDetails() {
     }
 
     const order = selectedOrder;
-    const returnDeadline = order.deliveredAt
-        ? new Date(new Date(order.deliveredAt).getTime() + 7 * 24 * 60 * 60 * 1000)
-        : null;
-    const returnEligibleStatus =
-        order.orderStatus === "DELIVERED" || order.orderStatus === "COMPLETED";
-    const returnWindowOpen =
-        returnEligibleStatus && returnDeadline && new Date() <= returnDeadline;
+    const isItemDelivered = (item) =>
+        ["DELIVERED", "COMPLETED"].includes(item.itemStatus?.toUpperCase());
+    const isItemReturnWindowOpen = (item) => {
+        if (!isItemDelivered(item) || !item.deliveredAt) {
+            return false;
+        }
+
+        const deadline = new Date(
+            new Date(item.deliveredAt).getTime() + 7 * 24 * 60 * 60 * 1000
+        );
+        return new Date() <= deadline;
+    };
+
+    const cancelItem = async (orderItemId) => {
+        if (!window.confirm("Are you sure you want to cancel this item?")) {
+            return;
+        }
+
+        setCancellingItemId(orderItemId);
+        try {
+            await handleCancelOrderItem(order.orderId, orderItemId);
+        } catch (err) {
+            alert(err?.response?.data?.message || "Could not cancel the item. Please try again.");
+        } finally {
+            setCancellingItemId(null);
+        }
+    };
 
     return (
 
@@ -157,15 +179,35 @@ function OrderDetails() {
 
                                             </div>
 
-                                            <h5>
+                                            <div className="order-item-controls">
+                                                <div className="d-flex flex-column align-items-end gap-2">
+                                                    <OrderStatusBadge
+                                                        status={item.itemStatus || order.orderStatus}
+                                                    />
+                                                    <h5>
 
-                                                ₹{item.lineTotal}
+                                                        ₹{item.lineTotal}
 
-                                            </h5>
+                                                    </h5>
+                                                </div>
 
-                                            <div className="return-item-actions">
+                                                <div className="return-item-actions">
+                                                {["PENDING", "PLACED", "CONFIRMED"].includes(
+                                                    (item.itemStatus || order.orderStatus)?.toUpperCase()
+                                                ) && (
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-outline-danger btn-sm"
+                                                        onClick={() => cancelItem(item.orderItemId)}
+                                                        disabled={cancellingItemId === item.orderItemId}
+                                                    >
+                                                        {cancellingItemId === item.orderItemId
+                                                            ? "Cancelling..."
+                                                            : "Cancel Item"}
+                                                    </button>
+                                                )}
                                                 {
-                                                    returnEligibleStatus &&
+                                                    isItemDelivered(item) &&
                                                     (
                                                         myReviews.some(
                                                             (review) =>
@@ -185,7 +227,7 @@ function OrderDetails() {
                                                 }
 
                                                 {
-                                                    returnEligibleStatus &&
+                                                    isItemDelivered(item) &&
                                                     (
                                                         myReturns.some(
                                                             (request) =>
@@ -197,7 +239,7 @@ function OrderDetails() {
                                                                 Return requested
                                                             </span>
                                                             :
-                                                            returnWindowOpen
+                                                            isItemReturnWindowOpen(item)
                                                                 ?
                                                                 <button
                                                                     type="button"
@@ -214,6 +256,7 @@ function OrderDetails() {
                                                                 </span>
                                                     )
                                                 }
+                                                </div>
                                             </div>
 
                                         </div>
@@ -300,7 +343,7 @@ function OrderDetails() {
 
                                     <strong>
 
-                                        {order.orderStatus}
+                                        {order.orderStatus.replaceAll("_", " ")}
 
                                     </strong>
 
@@ -312,7 +355,7 @@ function OrderDetails() {
 
                                     <strong>
 
-                                        {order.paymentMethod}
+                                        {order.paymentMethod.replaceAll("_", " ")}
 
                                     </strong>
 
@@ -341,41 +384,6 @@ function OrderDetails() {
                                     </strong>
 
                                 </div>
-
-                                {
-
-                                    order.orderStatus !== "SHIPPED"
-
-                                    &&
-
-                                    order.orderStatus !== "DELIVERED"
-
-                                    &&
-
-                                    order.orderStatus !== "COMPLETED"
-
-                                    &&
-
-                                    order.orderStatus !== "CANCELLED"
-
-                                    &&
-
-                                    <button
-                                        className="btn btn-danger w-100"
-                                        onClick={async () => {
-
-                                            await handleCancelOrder(order.orderId);
-
-                                            navigate("/orders");
-
-                                        }}
-                                    >
-
-                                        Cancel Order
-
-                                    </button>
-
-                                }
 
                             </div>
 

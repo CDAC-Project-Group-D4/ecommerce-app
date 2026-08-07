@@ -8,7 +8,7 @@ function OrderStatusBadge({ status }) {
 
         >
 
-            {status}
+            {status.replaceAll("_", " ")}
 
         </span>
 

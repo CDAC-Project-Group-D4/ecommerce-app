@@ -30,6 +30,9 @@ public class OrderMapper {
         dto.setQuantity(orderItem.getQuantity());
         dto.setPrice(orderItem.getPrice());
         dto.setLineTotal(orderItem.getLineTotal());
+        dto.setItemStatus(orderItem.getItemStatus());
+        dto.setShippedAt(orderItem.getShippedAt());
+        dto.setDeliveredAt(orderItem.getDeliveredAt());
 
         return dto;
     }
