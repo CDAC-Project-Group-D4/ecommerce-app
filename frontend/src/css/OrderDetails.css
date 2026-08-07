@@ -108,6 +108,13 @@
 
 }
 
+.order-item-controls {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+    gap: 18px;
+}
+
 
 /*   Address*/
 .order-details-page .card-body h4{
@@ -271,6 +278,11 @@
         flex-direction:column;
         text-align:center;
 
+    }
+
+    .order-item-controls {
+        align-items: center;
+        flex-direction: column;
     }
 
     .product-image{

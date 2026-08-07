@@ -46,18 +46,17 @@ public class ReviewServiceImpl implements ReviewService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Order not found"));
 
-        boolean productExists = order.getOrderItems()
+        OrderItem orderItem = order.getOrderItems()
                 .stream()
-                .anyMatch(item ->
-                        item.getProduct().getId().equals(requestDTO.getProductId()));
+                .filter(item ->
+                        item.getProduct().getId().equals(requestDTO.getProductId()))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "This product does not belong to the selected order."));
 
-        if (!productExists) {
-            throw new ResourceNotFoundException("This product does not belong to the selected order.");
-        }
-
-        // Check Order Status
-        if (order.getOrderStatus() != OrderStatus.DELIVERED &&
-                order.getOrderStatus() != OrderStatus.COMPLETED) {
+        // Check this item's delivery status
+        if (orderItem.getItemStatus() != OrderStatus.DELIVERED &&
+                orderItem.getItemStatus() != OrderStatus.COMPLETED) {
 
             throw new IllegalStateException(
                     "Review can only be added after delivery.");

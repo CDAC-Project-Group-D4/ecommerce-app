@@ -9,6 +9,7 @@ import com.cdac.ecommerce.exception.ResourceNotFoundException;
 import com.cdac.ecommerce.mapper.OrderMapper;
 import com.cdac.ecommerce.repository.*;
 import com.cdac.ecommerce.service.OrderService;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -101,6 +102,7 @@ OrderServiceImpl implements OrderService {
             orderItem.setQuantity(cart.getQuantity());
             orderItem.setPrice(price);
             orderItem.setLineTotal(lineTotal);
+            orderItem.setItemStatus(OrderStatus.CONFIRMED);
             order.getOrderItems().add(orderItem);
 
             // Deduct stock, set inactive if stock reaches 0, and save to DB
@@ -164,6 +166,41 @@ OrderServiceImpl implements OrderService {
 
         orderRepository.save(order);
 
+    }
+
+    @Override
+    @Transactional
+    public OrderResponseDTO cancelOrderItem(Long userId, Long orderId, Long orderItemId) {
+        Order order = orderRepository.findByIdAndUser_Id(orderId, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+
+        OrderItem orderItem = order.getOrderItems().stream()
+                .filter(item -> item.getId().equals(orderItemId))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Order item not found in this order"));
+
+        if (orderItem.getItemStatus() != OrderStatus.PENDING
+                && orderItem.getItemStatus() != OrderStatus.PLACED
+                && orderItem.getItemStatus() != OrderStatus.CONFIRMED) {
+            throw new IllegalStateException("Order item cannot be cancelled at its current status");
+        }
+
+        orderItem.setItemStatus(OrderStatus.CANCELLED);
+
+        Product product = orderItem.getProduct();
+        product.setStock(product.getStock() + orderItem.getQuantity());
+
+        boolean allItemsCancelled = order.getOrderItems().stream()
+                .allMatch(item -> item.getItemStatus() == OrderStatus.CANCELLED);
+        if (allItemsCancelled) {
+            order.setOrderStatus(OrderStatus.CANCELLED);
+        }
+
+        productRepository.save(product);
+        orderItemRepository.save(orderItem);
+        orderRepository.save(order);
+
+        return orderMapper.toOrderResponseDTO(order);
     }
 
 

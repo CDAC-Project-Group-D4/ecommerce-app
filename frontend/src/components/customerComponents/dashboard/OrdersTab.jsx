@@ -1,6 +1,25 @@
 import { useState, useEffect } from "react";
 import { orderApi } from "../../../api/customerApi";
 
+const formatStatus = (status) => status?.replaceAll("_", " ");
+
+const getStatusStyle = (status) => {
+  switch (status?.toUpperCase()) {
+    case "CANCELLED":
+      return { color: "#b42318", backgroundColor: "#fdecec" };
+    case "DELIVERED":
+    case "COMPLETED":
+      return { color: "#166534", backgroundColor: "#dcfce7" };
+    case "SHIPPED":
+    case "OUT_FOR_DELIVERY":
+      return { color: "#075985", backgroundColor: "#e0f2fe" };
+    case "CONFIRMED":
+      return { color: "#1e7b3b", backgroundColor: "#e6f7ec" };
+    default:
+      return { color: "#9a6700", backgroundColor: "#fff3cd" };
+  }
+};
+
 export function OrdersTab() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,16 +42,16 @@ export function OrdersTab() {
     loadOrders();
   }, []);
 
-  const handleCancel = async (orderId) => {
-    if (window.confirm("Are you sure you want to cancel this order?")) {
-      setCancellingId(orderId);
+  const handleCancelItem = async (orderId, orderItemId) => {
+    if (window.confirm("Are you sure you want to cancel this item?")) {
+      setCancellingId(orderItemId);
       try {
-        await orderApi.cancelOrder(orderId);
-        alert("Order cancelled successfully.");
+        await orderApi.cancelOrderItem(orderId, orderItemId);
+        alert("Order item cancelled successfully.");
         loadOrders();
       } catch (err) {
-        console.error("Failed to cancel order:", err);
-        alert("Could not cancel the order. Please try again.");
+        console.error("Failed to cancel order item:", err);
+        alert(err?.response?.data?.message || "Could not cancel the item. Please try again.");
       } finally {
         setCancellingId(null);
       }
@@ -110,7 +129,7 @@ export function OrdersTab() {
                           : "#664d03",
                   }}
                 >
-                  {ord.orderStatus}
+                  {formatStatus(ord.orderStatus)}
                 </span>
               </div>
 
@@ -120,6 +139,7 @@ export function OrdersTab() {
                   <ul className="list-group list-group-flush mb-3">
                     {itemsList.map((item, idx) => {
                       const itemId = item.orderItemId || item.id || idx;
+                      const itemStatus = item.itemStatus || ord.orderStatus;
                       return (
                         <li
                           key={itemId}
@@ -141,14 +161,34 @@ export function OrdersTab() {
                               <small className="text-muted">
                                 Qty: {item.quantity} × ₹{item.price}
                               </small>
+                              {["PENDING", "PLACED", "CONFIRMED"].includes(
+                                itemStatus?.toUpperCase(),
+                              ) && (
+                                <button
+                                  type="button"
+                                  className="btn btn-outline-danger btn-sm mt-2 d-block"
+                                  onClick={() => handleCancelItem(currentOrderId, itemId)}
+                                  disabled={cancellingId === itemId}
+                                >
+                                  {cancellingId === itemId ? "Cancelling..." : "Cancel Item"}
+                                </button>
+                              )}
                             </div>
                           </div>
-                          <span className="fw-bold text-dark">
-                            ₹
-                            {(
-                              item.lineTotal || item.quantity * item.price
-                            ).toLocaleString("en-IN")}
-                          </span>
+                          <div className="d-flex flex-column align-items-end gap-2">
+                            <span
+                              className="badge"
+                              style={getStatusStyle(itemStatus)}
+                            >
+                              {formatStatus(itemStatus)}
+                            </span>
+                            <span className="fw-bold text-dark">
+                              ₹
+                              {(
+                                item.lineTotal || item.quantity * item.price
+                              ).toLocaleString("en-IN")}
+                            </span>
+                          </div>
                         </li>
                       );
                     })}
@@ -168,29 +208,6 @@ export function OrdersTab() {
                     </strong>
                   </p>
 
-                  {/* Operational verification matching valid status arrays */}
-                  {["PLACED", "CONFIRMED", "PENDING"].includes(
-                    ord.orderStatus?.toUpperCase(),
-                  ) && (
-                    <button
-                      onClick={() => handleCancel(currentOrderId)}
-                      disabled={cancellingId === currentOrderId}
-                      className="btn btn-outline-danger btn-sm px-3 py-2 rounded-3 fw-semibold"
-                    >
-                      {cancellingId === currentOrderId ? (
-                        <>
-                          <span
-                            className="spinner-border spinner-border-sm me-2"
-                            role="status"
-                            aria-hidden="true"
-                          ></span>
-                          Cancelling...
-                        </>
-                      ) : (
-                        "Cancel Order"
-                      )}
-                    </button>
-                  )}
                 </div>
               </div>
             </div>

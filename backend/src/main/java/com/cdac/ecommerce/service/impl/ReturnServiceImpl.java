@@ -66,21 +66,21 @@ public class ReturnServiceImpl implements ReturnService {
         Order order = orderRepository.findByIdAndUser_Id(dto.getOrderId(), userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found."));
 
-        if ((order.getOrderStatus() != OrderStatus.DELIVERED
-                && order.getOrderStatus() != OrderStatus.COMPLETED)
-                || order.getDeliveredAt() == null) {
-            throw new IllegalStateException("Return is available only after delivery.");
-        }
-
-        LocalDateTime deadline = order.getDeliveredAt().plusDays(7);
-        if (LocalDateTime.now().isAfter(deadline)) {
-            throw new IllegalStateException("The 7-day return window has closed.");
-        }
-
         OrderItem item = orderItemRepository.findById(dto.getOrderItemId())
                 .filter(found -> found.getOrder().getId().equals(order.getId()))
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "This item does not belong to the selected order."));
+
+        if ((item.getItemStatus() != OrderStatus.DELIVERED
+                && item.getItemStatus() != OrderStatus.COMPLETED)
+                || item.getDeliveredAt() == null) {
+            throw new IllegalStateException("Return is available only after this item is delivered.");
+        }
+
+        LocalDateTime deadline = item.getDeliveredAt().plusDays(7);
+        if (LocalDateTime.now().isAfter(deadline)) {
+            throw new IllegalStateException("The 7-day return window has closed for this item.");
+        }
 
         if (returnRequestRepo.existsByOrder_IdAndOrderItem_Id(order.getId(), item.getId())) {
             throw new ResourceAlreadyExistsException(

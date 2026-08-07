@@ -42,9 +42,14 @@ function OrderCard({ order, onView }) {
                                 </p>
                             </div>
 
-                            <strong className="order-line-total">
-                                ₹{item.lineTotal}
-                            </strong>
+                            <div className="d-flex flex-column align-items-end gap-2">
+                                <OrderStatusBadge
+                                    status={item.itemStatus || order.orderStatus}
+                                />
+                                <strong className="order-line-total">
+                                    ₹{item.lineTotal}
+                                </strong>
+                            </div>
                         </div>
                     ))}
                 </div>

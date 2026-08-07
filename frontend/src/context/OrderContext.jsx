@@ -2,7 +2,8 @@ import { createContext, useContext, useState, useCallback } from "react";
 import {
     getOrders,
     getOrder,
-    cancelOrder
+    cancelOrder,
+    cancelOrderItem
 } from "../api/orderApi";
 
 const OrderContext = createContext();
@@ -76,6 +77,30 @@ export const OrderProvider = ({ children }) => {
 
     };
 
+    const handleCancelOrderItem = async (orderId, orderItemId) => {
+
+        try {
+
+            const updatedOrder = await cancelOrderItem(orderId, orderItemId);
+
+            setSelectedOrder(updatedOrder);
+            setOrders((currentOrders) =>
+                currentOrders.map((order) =>
+                    order.orderId === updatedOrder.orderId ? updatedOrder : order
+                )
+            );
+
+            return updatedOrder;
+
+        } catch (err) {
+
+            setError("Unable to cancel order item.");
+            throw err;
+
+        }
+
+    };
+
     return (
 
         <OrderContext.Provider
@@ -86,7 +111,8 @@ export const OrderProvider = ({ children }) => {
                 error,
                 loadOrders,
                 loadOrder,
-                handleCancelOrder
+                handleCancelOrder,
+                handleCancelOrderItem
             }}
         >
 

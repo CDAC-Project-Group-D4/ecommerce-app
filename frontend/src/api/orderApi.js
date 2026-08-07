@@ -42,3 +42,12 @@ export const cancelOrder = async (orderId) => {
     return response.data;
 
 };
+
+// Cancel one item from an order
+export const cancelOrderItem = async (orderId, orderItemId) => {
+
+    const response = await api.patch(`/${orderId}/items/${orderItemId}/cancel`);
+
+    return response.data;
+
+};
