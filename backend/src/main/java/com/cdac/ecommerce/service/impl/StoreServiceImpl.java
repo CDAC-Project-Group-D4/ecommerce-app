@@ -24,6 +24,8 @@ import com.cdac.ecommerce.repository.ReviewRepository;
 import com.cdac.ecommerce.repository.StoreRepository;
 import com.cdac.ecommerce.repository.UserRepo;
 import com.cdac.ecommerce.repository.WishlistRepository;
+import com.cdac.ecommerce.entity.OrderItem;
+import com.cdac.ecommerce.service.NotificationService;
 import com.cdac.ecommerce.security.UserDetailsImpl;
 import com.cdac.ecommerce.service.StoreService;
 import jakarta.transaction.Transactional;
@@ -59,6 +61,7 @@ public class StoreServiceImpl implements StoreService {
     private final ReviewRepository reviewRepository;
     private final OrderItemRepository orderItemRepository;
     private final ReturnRequestRepo returnRequestRepo;
+    private final NotificationService notificationService;
     private final ModelMapper modelMapper;
     private final OrderMapper orderMapper;
 
@@ -301,6 +304,28 @@ public class StoreServiceImpl implements StoreService {
 
         Long storeId = store.getId();
         List<Order> orders = orderRepository.findOrdersByStoreId(storeId);
+
+        // Fix order status in DB if order items have sufficient stock
+        for (Order order : orders) {
+            if (order.getOrderStatus() == OrderStatus.CANCELLED || order.getOrderStatus() == OrderStatus.PLACED || order.getOrderStatus() == OrderStatus.PENDING) {
+                boolean allInStock = true;
+                if (order.getOrderItems() != null && !order.getOrderItems().isEmpty()) {
+                    for (OrderItem item : order.getOrderItems()) {
+                        if (item.getProduct() != null && item.getProduct().getStock() < item.getQuantity()) {
+                            allInStock = false;
+                            break;
+                        }
+                    }
+                } else {
+                    allInStock = false;
+                }
+
+                if (allInStock) {
+                    order.setOrderStatus(OrderStatus.CONFIRMED);
+                    orderRepository.save(order);
+                }
+            }
+        }
         
         return orders.stream().map(order -> {
             OrderResponseDTO dto = orderMapper.toOrderResponseDTO(order);

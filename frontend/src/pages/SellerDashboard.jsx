@@ -167,7 +167,7 @@ function getStatusCategory(status) {
 }
 
 function SellerDashboard() {
-    const { store: contextStore, storeName } = useSeller();
+    const { store: contextStore, storeName, refreshStore, loadingStore } = useSeller();
     const [store, setStore] = useState(contextStore);
     const [rawOrders, setRawOrders] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -175,8 +175,12 @@ function SellerDashboard() {
     const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
-        if (contextStore) setStore(contextStore);
-    }, [contextStore]);
+        if (contextStore) {
+            setStore(contextStore);
+        } else if (!loadingStore && refreshStore) {
+            refreshStore();
+        }
+    }, [contextStore, loadingStore, refreshStore]);
 
     useEffect(() => {
         setLoading(true);
@@ -196,8 +200,8 @@ function SellerDashboard() {
     // Flatten orders & orderItems for table rendering & statistics
     const itemList = [];
     let totalRevenue = 0;
+    let totalProductsSold = 0;
     const uniqueCustomers = new Set();
-    const uniqueProducts = new Set();
 
     let successfulCount = 0;
     let pendingCount = 0;
@@ -218,7 +222,7 @@ function SellerDashboard() {
 
         if (order.orderItems && order.orderItems.length > 0) {
             order.orderItems.forEach((item) => {
-                if (item.productId) uniqueProducts.add(item.productId);
+                totalProductsSold += Number(item.quantity) || 0;
                 itemList.push({
                     id: `ORD-${order.orderId}`,
                     orderItemId: item.orderItemId,
@@ -281,7 +285,7 @@ function SellerDashboard() {
                         </div>
                         <div className="sd-stat-card">
                             <span className="sd-stat-label">Total Products Sold</span>
-                            <span className="sd-stat-value">{loading ? "..." : uniqueProducts.size.toLocaleString()}</span>
+                            <span className="sd-stat-value">{loading ? "..." : totalProductsSold.toLocaleString()}</span>
                         </div>
                         <div className="sd-stat-card">
                             <span className="sd-stat-label">Total Customers</span>

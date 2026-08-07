@@ -9,6 +9,12 @@ export const SellerProvider = ({ children }) => {
     const [errorStore, setErrorStore] = useState(null);
 
     const refreshStore = useCallback(async () => {
+        const token = localStorage.getItem("jwtToken");
+        if (!token) {
+            setStore(null);
+            setLoadingStore(false);
+            return null;
+        }
         try {
             setLoadingStore(true);
             setErrorStore(null);
@@ -23,6 +29,7 @@ export const SellerProvider = ({ children }) => {
                 return null;
             }
             setErrorStore(err.message || "Could not load store");
+            return null;
         } finally {
             setLoadingStore(false);
         }
