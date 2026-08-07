@@ -213,7 +213,7 @@ function SellerDashboard() {
         else if (category === "Pending") pendingCount++;
         else rejectedCount++;
 
-        const customerName = order.address?.fullName || "Customer";
+        const customerName = order.userFullName || order.address?.fullName || "Customer";
         if (customerName) uniqueCustomers.add(customerName);
 
         if (order.totalAmt) {

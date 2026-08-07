@@ -320,7 +320,8 @@
 }
 
 .prd-form-group input,
-.prd-form-group select {
+.prd-form-group select,
+.prd-form-group textarea {
     padding: 10px 14px;
     border: 1px solid #d1d5db;
     border-radius: 8px;
@@ -331,7 +332,8 @@
 }
 
 .prd-form-group input:focus,
-.prd-form-group select:focus {
+.prd-form-group select:focus,
+.prd-form-group textarea:focus {
     border-color: #f5821f;
     box-shadow: 0 0 0 3px rgba(245, 130, 31, 0.15);
 }

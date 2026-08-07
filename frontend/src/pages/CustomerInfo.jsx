@@ -23,9 +23,14 @@ function CustomerInfo() {
 
                 (ordersData || []).forEach((order) => {
                     const address = order.address;
-                    const name = address?.fullName || "Guest Customer";
-                    const phone = address?.mobileNumber || "—";
-                    const key = `${name.toLowerCase()}_${phone}`;
+                    // Primary customer info from registered User entity
+                    const custId = order.userId ? `CUST-${order.userId}` : null;
+                    const name = order.userFullName || address?.fullName || "Guest Customer";
+                    const phone = order.userPhone || address?.mobileNumber || "—";
+                    const email = order.userEmail || "";
+
+                    // Grouping key: by userId if available, else name + phone
+                    const key = order.userId ? `user_${order.userId}` : `${name.toLowerCase()}_${phone}`;
 
                     const addressParts = [
                         address?.addressLine1,
@@ -42,8 +47,9 @@ function CustomerInfo() {
 
                     if (!customerMap.has(key)) {
                         customerMap.set(key, {
-                            id: `CUST-${customerMap.size + 1}`,
+                            id: custId || `CUST-${customerMap.size + 1}`,
                             fullName: name,
+                            email: email,
                             mobileNumber: phone,
                             address: fullAddress,
                             city: address?.city || "—",
@@ -81,6 +87,7 @@ function CustomerInfo() {
         return (
             cust.fullName.toLowerCase().includes(query) ||
             cust.mobileNumber.toLowerCase().includes(query) ||
+            (cust.email && cust.email.toLowerCase().includes(query)) ||
             cust.address.toLowerCase().includes(query) ||
             cust.city.toLowerCase().includes(query)
         );

@@ -26,7 +26,6 @@ const NAV_ITEMS = [
     { to: "/seller/customer-info", label: "Customers", icon: "users" },
     { to: "/seller/orders", label: "Orders & Confirmation", icon: "truck" },
     { to: "/seller/returns", label: "Returns", icon: "return" },
-    { to: "/seller/cancel-order", label: "Cancelled Order", icon: "cancel" },
 ];
 
 function Sidebar({ storeName: propStoreName }) {
