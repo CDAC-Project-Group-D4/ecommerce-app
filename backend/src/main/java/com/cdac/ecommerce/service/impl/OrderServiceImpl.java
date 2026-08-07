@@ -72,7 +72,7 @@ OrderServiceImpl implements OrderService {
            }
        }
 
-       //create a order
+       // Create order
         Order order = new Order();
         order.setUser(user);
         order.setAddress(address);
@@ -87,7 +87,7 @@ OrderServiceImpl implements OrderService {
 
         BigDecimal totalAmount = BigDecimal.ZERO;
 
-        // Create OrderItems & deduct stock
+        // Create OrderItems & deduct stock in database ONCE
         for (Cart cart : cartItems) {
             BigDecimal price = cart.getProduct().getPrice();
             BigDecimal lineTotal = price.multiply(BigDecimal.valueOf(cart.getQuantity()));
@@ -103,7 +103,7 @@ OrderServiceImpl implements OrderService {
             orderItem.setLineTotal(lineTotal);
             order.getOrderItems().add(orderItem);
 
-            // Deduct stock, set inactive if stock reaches 0, and save
+            // Deduct stock, set inactive if stock reaches 0, and save to DB
             int updatedStock = Math.max(0, product.getStock() - cart.getQuantity());
             product.setStock(updatedStock);
             if (updatedStock == 0) {
@@ -117,13 +117,11 @@ OrderServiceImpl implements OrderService {
 
         order.setTotalAmt(totalAmount);
 
-        //save order
+        // Save order & orderItems
         Order savedOrder = orderRepository.save(order);
-
-        //save orderItems
         orderItemRepository.saveAll(savedOrder.getOrderItems());
 
-        //clear cart
+        // Clear cart
         cartRepository.deleteAll(cartItems);
 
         return orderMapper.toOrderResponseDTO(savedOrder);

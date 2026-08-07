@@ -20,7 +20,7 @@ const getImageUrl = (url) => {
 };
 
 function Product() {
-    const { store: contextStore, storeName } = useSeller();
+    const { store: contextStore, storeName, refreshStore, loadingStore } = useSeller();
     const [store, setStore] = useState(contextStore);
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -29,8 +29,12 @@ function Product() {
     const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
-        if (contextStore) setStore(contextStore);
-    }, [contextStore]);
+        if (contextStore) {
+            setStore(contextStore);
+        } else if (!loadingStore && refreshStore) {
+            refreshStore();
+        }
+    }, [contextStore, loadingStore, refreshStore]);
 
     // Modal state for Add Product
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);

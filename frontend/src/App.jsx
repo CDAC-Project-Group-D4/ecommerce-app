@@ -17,6 +17,7 @@ import AddReview from "./pages/AddReview.jsx";
 import CreateReturn from "./pages/CreateReturn.jsx";
 import MyReturns from "./pages/MyReturns.jsx";
 import SellerReturns from "./pages/SellerReturns.jsx";
+import SellerOrders from "./pages/SellerOrders.jsx";
 import ProtectedRoute from "./routes/ProtectedRoute.jsx";
 import 'bootstrap/dist/css/bootstrap.min.css';
 // import './Home.css';
@@ -54,7 +55,8 @@ function App() {
         <Route path="/create-store" element={<CreateStore />} />
         <Route path="/seller/store-info" element={<Store />} />
         <Route path="/seller/products" element={<Product />} />
-                <Route path='/seller/customer-info' element={<CustomerInfo/>}/>
+        <Route path='/seller/customer-info' element={<CustomerInfo/>}/>
+        <Route path="/seller/orders" element={<SellerOrders />} />
         <Route path="/orders/:orderId" element={<OrderDetails />} />
 
         <Route element={<ProtectedAdminRoute />}>

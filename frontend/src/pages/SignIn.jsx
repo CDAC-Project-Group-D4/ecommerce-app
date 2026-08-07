@@ -3,9 +3,11 @@ import { signinUser } from "../api/authApi";
 import "../css/SignUp.css";
 import { useNavigate } from "react-router-dom";
 import { getMyStore } from "../api/storeApi";
+import { useSeller } from "../context/SellerContext";
 
 function SignIn() {
   const navigate = useNavigate();
+  const sellerContext = useSeller();
 
   //the initial value of the form is set to the following
   const [formData, setFormData] = useState({
@@ -55,8 +57,14 @@ function SignIn() {
         // 2. Check for SELLER role
         else if (data.role === "SELLER") {
           try {
-            await getMyStore();
-            navigate("/seller/dashboard");
+            const storeData = sellerContext?.refreshStore
+              ? await sellerContext.refreshStore()
+              : await getMyStore();
+            if (storeData) {
+              navigate("/seller/dashboard");
+            } else {
+              navigate("/create-store");
+            }
           } catch (err) {
             navigate("/create-store");
           }
