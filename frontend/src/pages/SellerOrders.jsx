@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Sidebar from "../components/sellerComponents/Sidebar";
 import SellerNavbar from "../components/sellerComponents/SellerNavbar";
 import Icon from "../components/sellerComponents/Icon";
-import { getStoreOrders } from "../api/storeApi";
+import { getStoreOrders, shipOrderItem, cancelOrderItemBySeller } from "../api/storeApi";
 import { getStoreProducts } from "../api/productApi";
 import { useSeller } from "../context/SellerContext";
 import "../css/SellerDashboard.css";
@@ -15,6 +15,8 @@ function SellerOrders() {
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [statusFilter, setStatusFilter] = useState("ALL"); // ALL, CONFIRMED, SHIPPED, DELIVERED, CANCELLED
+    const [shippingItemId, setShippingItemId] = useState(null);
+    const [cancellingItemId, setCancellingItemId] = useState(null);
 
     useEffect(() => {
         if (!contextStore && !loadingStore && refreshStore) {
@@ -43,6 +45,37 @@ function SellerOrders() {
     useEffect(() => {
         fetchOrdersAndProducts();
     }, []);
+
+    const handleShipItem = async (orderItemId) => {
+        if (!orderItemId) return;
+        setShippingItemId(orderItemId);
+        setError(null);
+        try {
+            await shipOrderItem(orderItemId);
+            fetchOrdersAndProducts();
+        } catch (err) {
+            console.error("Error shipping item:", err);
+            setError(err?.response?.data?.message || err?.message || "Failed to mark item as shipped");
+        } finally {
+            setShippingItemId(null);
+        }
+    };
+
+    const handleCancelItem = async (orderItemId) => {
+        if (!orderItemId) return;
+        if (!window.confirm("Are you sure you want to cancel this ordered product item? Stock will be restored.")) return;
+        setCancellingItemId(orderItemId);
+        setError(null);
+        try {
+            await cancelOrderItemBySeller(orderItemId);
+            fetchOrdersAndProducts();
+        } catch (err) {
+            console.error("Error cancelling item:", err);
+            setError(err?.response?.data?.message || err?.message || "Failed to cancel item");
+        } finally {
+            setCancellingItemId(null);
+        }
+    };
 
     // Product Map: productId -> product object
     const stockMap = {};
@@ -77,7 +110,11 @@ function SellerOrders() {
                 const availableStock = matchedProduct?.stock !== undefined ? matchedProduct.stock : 0;
                 const orderedQty = Number(item.quantity) || 0;
                 const itemAmount = item.lineTotal || (item.price * orderedQty) || 0;
-                totalRevenue += Number(itemAmount);
+                const itemStatus = (item.itemStatus || orderStatus || "CONFIRMED").toUpperCase();
+
+                if (["DELIVERED", "COMPLETED"].includes(itemStatus)) {
+                    totalRevenue += Number(itemAmount);
+                }
 
                 const itemKey = `ORD-${order.orderId}_ITEM-${item.orderItemId || pId}`;
 
@@ -95,7 +132,8 @@ function SellerOrders() {
                     orderedQty: orderedQty,
                     currentStock: availableStock,
                     totalAmt: itemAmount,
-                    status: orderStatus,
+                    status: itemStatus,
+                    itemStatus: itemStatus,
                     placedAt: order.placedAt ? new Date(order.placedAt).toLocaleDateString() : "—"
                 });
             });
@@ -130,12 +168,16 @@ function SellerOrders() {
             case "COMPLETED":
             case "CONFIRMED":
             case "PLACED":
+            case "RETURN_ACCEPTED":
                 return "badge-delivered";
             case "SHIPPED":
             case "OUT_FOR_DELIVERY":
                 return "badge-shipped";
+            case "RETURN_REQUESTED":
+                return "badge-pending";
             case "CANCELLED":
             case "REJECTED":
+            case "RETURN_REJECTED":
                 return "badge-cancelled";
             default:
                 return "badge-pending";
@@ -228,9 +270,9 @@ function SellerOrders() {
                                     <th>Product Name</th>
                                     <th>Customer Name</th>
                                     <th>Ordered Qty</th>
-                                    <th>Current Stock in DB</th>
                                     <th>Total Amount</th>
-                                    <th>Order Status</th>
+                                    <th>Item Status</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -253,14 +295,39 @@ function SellerOrders() {
                                                 )}
                                             </td>
                                             <td className="sd-cell-qty" style={{ fontWeight: "700" }}>{item.orderedQty}</td>
-                                            <td className="sd-cell-qty" style={{ fontWeight: "700", color: item.currentStock > 5 ? "#16a34a" : "#dc2626" }}>
-                                                {item.currentStock}
-                                            </td>
                                             <td style={{ fontWeight: "600" }}>₹{Number(item.totalAmt).toFixed(2)}</td>
                                             <td>
                                                 <span className={`sd-status-badge ${getStatusBadgeClass(item.status)}`} style={{ textTransform: "uppercase" }}>
                                                     {item.status}
                                                 </span>
+                                            </td>
+                                            <td>
+                                                {item.itemStatus === "CONFIRMED" || item.itemStatus === "PLACED" || item.itemStatus === "PENDING" ? (
+                                                    <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+                                                        <button
+                                                            className="btn btn-sm btn-success"
+                                                            onClick={() => handleShipItem(item.orderItemId)}
+                                                            disabled={shippingItemId === item.orderItemId || cancellingItemId === item.orderItemId}
+                                                            style={{ borderRadius: "6px", fontSize: "12px", padding: "4px 10px", fontWeight: "600", whiteSpace: "nowrap" }}
+                                                        >
+                                                            {shippingItemId === item.orderItemId ? "Shipping..." : "Shipped"}
+                                                        </button>
+                                                        <button
+                                                            className="btn btn-sm btn-outline-danger"
+                                                            onClick={() => handleCancelItem(item.orderItemId)}
+                                                            disabled={shippingItemId === item.orderItemId || cancellingItemId === item.orderItemId}
+                                                            style={{ borderRadius: "6px", fontSize: "12px", padding: "4px 10px", fontWeight: "600", whiteSpace: "nowrap" }}
+                                                        >
+                                                            {cancellingItemId === item.orderItemId ? "Cancelling..." : "Cancel"}
+                                                        </button>
+                                                    </div>
+                                                ) : item.itemStatus === "SHIPPED" ? (
+                                                    <span style={{ fontSize: "12px", color: "#2563eb", fontWeight: "600" }}>✓ Shipped</span>
+                                                ) : item.itemStatus === "CANCELLED" ? (
+                                                    <span style={{ fontSize: "12px", color: "#dc2626", fontWeight: "600" }}>Cancelled</span>
+                                                ) : (
+                                                    <span style={{ fontSize: "12px", color: "#4b5563", fontWeight: "600" }}>{item.itemStatus}</span>
+                                                )}
                                             </td>
                                         </tr>
                                     ))

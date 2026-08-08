@@ -78,3 +78,15 @@ export const reactivateStore = async () => {
     const response = await axios.put(`${BASE_URL}/reactivate-store`, {}, getAuthHeader());
     return response.data;
 }
+
+// ship order item api
+export const shipOrderItem = async (orderItemId) => {
+    const response = await axios.put(`${BASE_URL}/orders/items/${orderItemId}/ship`, {}, getAuthHeader());
+    return response.data;
+};
+
+// cancel order item by seller api
+export const cancelOrderItemBySeller = async (orderItemId) => {
+    const response = await axios.put(`${BASE_URL}/orders/items/${orderItemId}/cancel`, {}, getAuthHeader());
+    return response.data;
+};

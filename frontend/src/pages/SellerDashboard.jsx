@@ -216,13 +216,17 @@ function SellerDashboard() {
         const customerName = order.userFullName || order.address?.fullName || "Customer";
         if (customerName) uniqueCustomers.add(customerName);
 
-        if (order.totalAmt) {
-            totalRevenue += Number(order.totalAmt);
-        }
-
         if (order.orderItems && order.orderItems.length > 0) {
             order.orderItems.forEach((item) => {
-                totalProductsSold += Number(item.quantity) || 0;
+                const itemStatus = (item.itemStatus || order.orderStatus || "PENDING").toUpperCase();
+                const itemAmount = Number(item.lineTotal || (item.price * item.quantity)) || 0;
+
+                // Total Revenue and Total Products Sold are calculated ONLY for items whose status is DELIVERED or COMPLETED
+                if (["DELIVERED", "COMPLETED"].includes(itemStatus)) {
+                    totalRevenue += itemAmount;
+                    totalProductsSold += Number(item.quantity) || 0;
+                }
+
                 itemList.push({
                     id: `ORD-${order.orderId}`,
                     orderItemId: item.orderItemId,
@@ -230,9 +234,9 @@ function SellerDashboard() {
                     productName: item.productName || "Product",
                     customerName: customerName,
                     quantity: item.quantity,
-                    totalAmt: item.lineTotal || (item.price * item.quantity) || 0,
+                    totalAmt: itemAmount,
                     statusCategory: category,
-                    rawStatus: order.orderStatus || "PENDING"
+                    rawStatus: itemStatus
                 });
             });
         }
@@ -332,7 +336,7 @@ function SellerDashboard() {
                                     <th>Customer Name</th>
                                     <th>Quantity</th>
                                     <th>Amount</th>
-                                    <th>Order Status</th>
+                                    <th>Item Status</th>
                                 </tr>
                             </thead>
                             <tbody>

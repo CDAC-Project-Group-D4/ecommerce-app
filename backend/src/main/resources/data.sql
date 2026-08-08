@@ -164,14 +164,14 @@ INSERT IGNORE INTO orders (
 -- 8. INSERT ORDER ITEMS
 -- =================================================================
 INSERT IGNORE INTO order_items (
-    order_item_id, order_id, product_id, quantity, price, line_total, created_at, updated_at
+    order_item_id, order_id, product_id, quantity, price, line_total, item_status, created_at, updated_at
 ) VALUES
-(1, 1, 101, 1, 2999.00, 2999.00, NOW(), NOW()), -- Order #1
-(2, 2, 102, 1, 4999.00, 4999.00, NOW(), NOW()), -- Order #2
-(3, 3, 103, 1, 3500.00, 3500.00, NOW(), NOW()), -- Order #3
-(4, 4, 101, 1, 2999.00, 2999.00, NOW(), NOW()), -- Order #4 (Item 1)
-(5, 4, 104, 1, 4200.00, 4200.00, NOW(), NOW()), -- Order #4 (Item 2)
-(6, 5, 104, 1, 4200.00, 4200.00, NOW(), NOW()); -- Order #5
+(1, 1, 101, 1, 2999.00, 2999.00, 'DELIVERED', NOW(), NOW()), -- Order #1
+(2, 2, 102, 1, 4999.00, 4999.00, 'DELIVERED', NOW(), NOW()), -- Order #2
+(3, 3, 103, 1, 3500.00, 3500.00, 'SHIPPED', NOW(), NOW()), -- Order #3
+(4, 4, 101, 1, 2999.00, 2999.00, 'OUT_FOR_DELIVERY', NOW(), NOW()), -- Order #4 (Item 1)
+(5, 4, 104, 1, 4200.00, 4200.00, 'OUT_FOR_DELIVERY', NOW(), NOW()), -- Order #4 (Item 2)
+(6, 5, 104, 1, 4200.00, 4200.00, 'COMPLETED', NOW(), NOW()); -- Order #5
 
 -- =================================================================
 -- 9. INSERT REVIEWS
