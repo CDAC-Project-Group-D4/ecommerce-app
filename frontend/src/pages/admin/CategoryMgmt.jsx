@@ -52,7 +52,7 @@ const CategoryMgmt = () => {
     try {
       setLoading(true);
       const response = await adminApi.getCategories();
-      setCategories(response.data || []);
+      setCategories(response || []);
       setError(null);
     } catch (err) {
       console.error(err);

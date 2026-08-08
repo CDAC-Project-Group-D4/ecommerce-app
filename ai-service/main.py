@@ -49,7 +49,7 @@ async def chat_endpoint(request: ChatRequest):
     client = get_groq_client()
     if not client:
         return {
-            "reply": "Welcome to ApkaCart AI! (Groq API Key is not configured yet in .env file. Please add your free GROQ_API_KEY from https://console.groq.com to enable real-time LLM answers).",
+            "reply": "Welcome to ApnaCart AI! (Groq API Key is not configured yet in .env file. Please add your free GROQ_API_KEY from https://console.groq.com to enable real-time LLM answers).",
             "products": catalog[:3]
         }
 

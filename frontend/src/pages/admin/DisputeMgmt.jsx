@@ -52,7 +52,7 @@ const DisputeMgmt = () => {
       setLoading(true);
       setError(null);
       const response = await adminApi.getDisputedReturns();
-      setDisputes(response.data || []);
+      setDisputes(Array.isArray(response) ? response : []);
     } catch (err) {
       console.error("Error fetching disputes:", err);
       setError("Failed to fetch disputed returns. Please try again.");

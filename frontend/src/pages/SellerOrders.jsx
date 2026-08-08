@@ -94,7 +94,7 @@ function SellerOrders() {
     rawOrders.forEach((order) => {
         const customerName = order.userFullName || order.address?.fullName || "Customer";
         const shippingName = order.address?.fullName;
-        const customerPhone = order.userPhone || order.address?.mobileNumber;
+        const customerPhone = order.address?.mobileNumber || order.userPhone;
         const orderStatus = (order.orderStatus || "PENDING").toUpperCase();
 
         if (["CONFIRMED", "PLACED", "SHIPPED", "OUT_FOR_DELIVERY", "DELIVERED", "COMPLETED"].includes(orderStatus)) {
