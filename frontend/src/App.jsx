@@ -9,7 +9,7 @@ import CreateStore from "./pages/CreateStore.jsx";
 import Checkout from "./pages/Checkout.jsx";
 import Store from "./pages/Store.jsx";
 import Product from "./pages/Product.jsx";
-import CustomerInfo from './pages/CustomerInfo.jsx';
+import CustomerInfo from "./pages/CustomerInfo.jsx";
 import Orders from "./pages/Orders.jsx";
 import OrderDetails from "./pages/OrderDetails.jsx";
 import OrderSuccess from "./pages/OrderSuccess.jsx";
@@ -19,11 +19,10 @@ import MyReturns from "./pages/MyReturns.jsx";
 import SellerReturns from "./pages/SellerReturns.jsx";
 import SellerOrders from "./pages/SellerOrders.jsx";
 import ProtectedRoute from "./routes/ProtectedRoute.jsx";
-import 'bootstrap/dist/css/bootstrap.min.css';
-// import './Home.css';
-import Home from './pages/Home';
-import './css/Home.css';    
-import ProductDetail from './pages/ProductDetail.jsx';
+import "bootstrap/dist/css/bootstrap.min.css";
+import Home from "./pages/Home";
+import "./css/Home.css";
+import ProductDetail from "./pages/ProductDetail.jsx";
 
 import CategoryMgmt from "./pages/admin/CategoryMgmt.jsx";
 import SellerMgmt from "./pages/admin/SellerMgmt";
@@ -36,16 +35,16 @@ import { ProtectedAdminRoute } from "./routes/ProtectedAdminRoute.jsx";
 import AdminLayout from "./layout/AdminLayout.jsx";
 import AdminComplaints from "./pages/admin/AdminComplaints.jsx";
 import CustomerDashboard from "./pages/CustomerDashboard.jsx";
-import AIChatbot from "./components/customerComponents/AIChatbot.jsx";
+import SearchResults from "./pages/SearchResult.jsx";
 
 function App() {
   return (
     <div>
       <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/products/:id" element={<ProductDetail />} />
-                <Route path="/dashboard" element={<CustomerDashboard />} />
-                {/* <Route path="/login" element={<Login />} /> */}
+        <Route path="/" element={<Home />} />
+        <Route path="/products/:id" element={<ProductDetail />} />
+        <Route path="/dashboard" element={<CustomerDashboard />} />
+        <Route path="/search" element={<SearchResults />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/cart" element={<Cart />} />
@@ -56,7 +55,7 @@ function App() {
         <Route path="/create-store" element={<CreateStore />} />
         <Route path="/seller/store-info" element={<Store />} />
         <Route path="/seller/products" element={<Product />} />
-        <Route path='/seller/customer-info' element={<CustomerInfo/>}/>
+        <Route path="/seller/customer-info" element={<CustomerInfo />} />
         <Route path="/seller/orders" element={<SellerOrders />} />
         <Route path="/orders/:orderId" element={<OrderDetails />} />
 
@@ -84,7 +83,6 @@ function App() {
           <Route path="/seller/returns" element={<SellerReturns />} />
         </Route>
       </Routes>
-      <AIChatbot />
     </div>
   );
 }

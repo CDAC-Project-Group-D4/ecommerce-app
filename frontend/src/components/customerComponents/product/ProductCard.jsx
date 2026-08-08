@@ -1,18 +1,27 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { cartApi } from "../../../api/customerApi";
+import { useCart } from "../../../context/CartContext";
 
 export const ProductCard = ({ product }) => {
   const [loading, setLoading] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
-  const handleAddToCart = async (e) => {
+  const BACKEND_URL = "http://localhost:8080";
+
+  const imageSrc =
+    product.imageUrl && product.imageUrl.startsWith("/")
+      ? `${BACKEND_URL}${product.imageUrl}`
+      : product.imageUrl;
+
+  const { handleAddToCart } = useCart();
+
+  const onAddToCartClick = async (e) => {
     e.preventDefault();
+    e.stopPropagation(); // Prevents click from bubbling up to any parent link elements
+
     setLoading(true);
     try {
-      await cartApi.addToCart({
-        productId: product.id,
-        quantity: 1,
-      });
+      await handleAddToCart(product.productId || product.id, 1);
       alert("Product added to cart!");
     } catch (err) {
       console.error("Failed to add product to cart:", err);
@@ -38,25 +47,9 @@ export const ProductCard = ({ product }) => {
           border-bottom: 1px solid rgba(255, 122, 41, 0.1);
           border-radius: 16px 16px 0 0;
           overflow: hidden;
+          height: 180px;
         }
 
-        .product-rating-badge {
-          background-color: #fff4eb;
-          color: var(--cart-orange-dark, #ff5c00);
-          border: 1px solid rgba(255, 122, 41, 0.25);
-          font-weight: 600;
-          font-size: 0.8rem;
-        }
-
-        .product-category-badge {
-          background-color: #f3f0ee;
-          color: var(--cart-muted, #746962);
-          font-size: 0.75rem;
-          font-weight: 600;
-          letter-spacing: 0.03em;
-        }
-
-        /* Added Styling for Dynamic EAV Badges */
         .product-attribute-badge {
           background-color: #ffffff;
           color: #5c524b;
@@ -67,35 +60,41 @@ export const ProductCard = ({ product }) => {
         }
       `}</style>
 
-      <div className="card cart-item-card product-card-container h-100 border-0">
-        {/* Styled Image Container */}
-        <div className="product-card-img-wrapper position-relative p-3 text-center">
-          <img
-            src={product.imageUrl || "https://placehold.co/200"}
-            className="img-fluid"
-            alt={product.name}
-            style={{ height: "180px", objectFit: "contain" }}
-          />
+      <div className="card cart-item-card product-card-container h-100 border-0 shadow-sm">
+        {/* Styled Image Container with Temp Placeholder Fallback */}
+        <div className="product-card-img-wrapper position-relative p-3 d-flex align-items-center justify-content-center text-center">
+          {imageSrc && !imgError ? (
+            <img
+              src={imageSrc}
+              className="img-fluid"
+              alt={product.name}
+              onError={() => setImgError(true)}
+              style={{ maxHeight: "100%", objectFit: "contain" }}
+            />
+          ) : (
+            <span style={{ fontSize: "4rem" }}>📦</span>
+          )}
         </div>
 
         <div className="card-body d-flex flex-column p-3">
-          {/* Category Tag */}
-          <div className="mb-2">
-            <span className="badge product-category-badge px-2 py-1 rounded-2">
-              {product.categoryName || product.category || "General"}
-            </span>
-          </div>
-
           {/* Title */}
           <h6
-            className="fw-bold mb-2 text-truncate"
+            className="fw-bold mb-1 text-truncate"
             title={product.name}
             style={{ color: "var(--cart-text, #211a17)", fontSize: "1rem" }}
           >
             {product.name}
           </h6>
 
-          {/* ADDED: Dynamic EAV Badges Row */}
+          {/* Description */}
+          <p
+            className="card-text text-muted small mb-2 text-truncate"
+            title={product.description}
+          >
+            {product.description || "No description available."}
+          </p>
+
+          {/* Dynamic EAV Badges Row */}
           {product.attributes && product.attributes.length > 0 && (
             <div className="mb-3 d-flex flex-wrap gap-1">
               {product.attributes.map((attr, index) => (
@@ -111,38 +110,40 @@ export const ProductCard = ({ product }) => {
           )}
 
           <div className="mt-auto">
-            {/* Price & Rating Row */}
-            <div className="d-flex justify-content-between align-items-center mb-3">
+            {/* Price Row */}
+            <div className="mb-3">
               <span
                 className="fw-bold fs-5"
                 style={{ color: "var(--cart-orange-dark, #ff5c00)" }}
               >
                 ₹{product.price}
               </span>
-              <span className="badge product-rating-badge px-2 py-1 rounded-pill">
-                ⭐ {product.avgRating || "4.5"}
-              </span>
             </div>
 
-            {/* Action Buttons */}
+            {/* Action Buttons Row */}
             <div className="d-flex gap-2">
               <Link
                 to={`/products/${product.id}`}
                 state={{ product }}
-                className="btn btn-outline-secondary rounded-3 flex-grow-1 py-2 text-center"
+                onClick={(e) => e.stopPropagation()}
+                className="btn btn-outline-secondary rounded-3 flex-grow-1 py-2 text-center text-decoration-none"
                 style={{ fontSize: "0.875rem" }}
               >
                 View
               </Link>
 
               <button
-                onClick={handleAddToCart}
+                onClick={onAddToCartClick}
                 disabled={loading}
                 className="btn btn-accent rounded-3 flex-grow-1 py-2 d-flex align-items-center justify-content-center gap-2 shadow-sm fw-semibold"
                 style={{
                   fontSize: "0.875rem",
                   transition: "all 0.2s ease",
                   cursor: loading ? "not-allowed" : "pointer",
+                  background:
+                    "var(--cart-gradient, linear-gradient(135deg, #ff9142 0%, #ff5c00 100%))",
+                  color: "#ffffff",
+                  border: "none",
                 }}
               >
                 {loading ? (

@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useCheckout } from "../context/CheckoutContext";
+import Navbar from "../components/Navbar"; 
 
 import CheckoutHeader from "../components/customerComponents/checkout/CheckoutHeader";
 import AddressSection from "../components/customerComponents/checkout/AddressSection";
@@ -12,131 +13,104 @@ import PlaceOrderButton from "../components/customerComponents/checkout/PlaceOrd
 import "../css/Checkout.css";
 
 function Checkout() {
+  const navigate = useNavigate();
 
-    const navigate = useNavigate();
+  const {
+    cartItems,
+    addresses,
 
-    const {
+    subtotal,
+    grandTotal,
 
-        cartItems,
-        addresses,
+    selectedAddress,
+    paymentMethod,
 
-        subtotal,
-        grandTotal,
+    loading,
+    savingAddress,
+    error,
 
-        selectedAddress,
-        paymentMethod,
+    loadCheckout,
+    handleAddAddress,
+    handlePlaceOrder,
 
-        loading,
-        savingAddress,
-        error,
+    setSelectedAddress,
+    setPaymentMethod,
+  } = useCheckout();
 
-        loadCheckout,
-        handleAddAddress,
-        handlePlaceOrder,
+  useEffect(() => {
+    loadCheckout();
+  }, [loadCheckout]);
 
-        setSelectedAddress,
-        setPaymentMethod
+  const placeOrder = async () => {
+    const order = await handlePlaceOrder();
 
-    } = useCheckout();
-
-    useEffect(() => {
-
-        loadCheckout();
-
-    }, [loadCheckout]);
-
-    const placeOrder = async () => {
-
-        const order = await handlePlaceOrder();
-
-        if (order) {
-
-            navigate("/order-success", {
-                state: {
-                    orderId: order.orderId
-                }
-            });
-
-        }
-
-    };
-
-    if (loading) {
-
-        return (
-
-            <div className="loading-container">
-
-                <h2>Loading Checkout...</h2>
-
-            </div>
-
-        );
-
+    if (order) {
+      navigate("/order-success", {
+        state: {
+          orderId: order.orderId,
+        },
+      });
     }
+  };
 
-    return (
+  return (
+    <div style={{ backgroundColor: "#FAFAFA", minHeight: "100vh" }}>
+      {/* 👈 Renders Navbar at the top of the Checkout page */}
+      <Navbar />
 
-        <div className="checkout-page">
+      <div className="checkout-page">
+        <CheckoutHeader />
 
-            <CheckoutHeader />
+        {/* Keep Navbar visible while loading */}
+        {loading ? (
+          <div className="loading-container text-center py-5">
+            <div className="spinner-border text-primary" role="status" />
+            <h2 className="mt-3">Loading Checkout...</h2>
+          </div>
+        ) : (
+          <div className="container py-4">
+            <div className="row g-4">
+              {/* Left Side */}
+              <div className="col-lg-8">
+                <AddressSection
+                  addresses={addresses}
+                  selectedAddress={selectedAddress}
+                  setSelectedAddress={setSelectedAddress}
+                  savingAddress={savingAddress}
+                  onAddAddress={handleAddAddress}
+                />
 
-            <div className="container py-4">
+                <PaymentSection
+                  paymentMethod={paymentMethod}
+                  setPaymentMethod={setPaymentMethod}
+                />
+              </div>
 
-                <div className="row g-4">
+              {/* Right Side */}
+              <div className="col-lg-4">
+                <div className="checkout-sidebar">
+                  <OrderSummary
+                    cartItems={cartItems}
+                    subtotal={subtotal}
+                    grandTotal={grandTotal}
+                  />
 
-                    {/* Left Side */}
+                  {error && (
+                    <div className="alert alert-danger mt-3">{error}</div>
+                  )}
 
-                    <div className="col-lg-8">
-
-                        <AddressSection
-                            addresses={addresses}
-                            selectedAddress={selectedAddress}
-                            setSelectedAddress={setSelectedAddress}
-                            savingAddress={savingAddress}
-                            onAddAddress={handleAddAddress}
-                        />
-
-                        <PaymentSection
-                            paymentMethod={paymentMethod}
-                            setPaymentMethod={setPaymentMethod}
-                        />
-
-                    </div>
-
-                    {/* Right Side */}
-
-                    <div className="col-lg-4">
-                        <div className="checkout-sidebar">
-
-                            <OrderSummary
-                                cartItems={cartItems}
-                                subtotal={subtotal}
-                                grandTotal={grandTotal}
-                            />
-
-                            {
-                                error &&
-                                <div className="alert alert-danger mt-3">
-                                    {error}
-                                </div>
-                            }
-
-                            <PlaceOrderButton
-                                loading={loading}
-                                handlePlaceOrder={placeOrder}
-                            />
-
-                        </div>
-                    </div>
-
+                  <PlaceOrderButton
+                    loading={loading}
+                    handlePlaceOrder={placeOrder}
+                  />
                 </div>
-
+              </div>
             </div>
-        </div>
-
-    );
-
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
 
 export default Checkout;

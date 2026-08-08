@@ -2,8 +2,11 @@ import { useEffect, useState } from "react";
 import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
 import { useNavigate, Link } from "react-router-dom";
-import Navbar from "../components/Navbar"; // Adjust this import path depending on where your Navbar component sits
+import Navbar from "../components/Navbar";
 import "../css/Cart.css";
+
+// Update this to your actual backend base URL if your server serves images dynamically
+const BACKEND_URL = "http://localhost:8080";
 
 function Cart() {
   const navigate = useNavigate();
@@ -52,9 +55,18 @@ function Cart() {
     }
   };
 
+  // Helper to format/resolve dynamic product image URLs
+  const getImageUrl = (rawUrl) => {
+    if (!rawUrl) return "https://placehold.co/100";
+    if (rawUrl.startsWith("/")) {
+      return `${BACKEND_URL}${rawUrl}`;
+    }
+    return rawUrl;
+  };
+
   return (
     <div style={{ backgroundColor: "#FAFAFA", minHeight: "100vh" }}>
-      {/* Integrated your global navigation component */}
+      {/* Integrated global navigation component */}
       <Navbar />
 
       {/* --- Cart Content Header Section --- */}
@@ -120,132 +132,132 @@ function Cart() {
           <div className="row g-4">
             {/* Cart items collection column */}
             <div className="col-lg-8">
-              {cartItems.map((item) => (
-                <div
-                  key={item.id}
-                  className="card cart-item-card mb-3 border-0 shadow-sm rounded-4 overflow-hidden"
-                >
-                  <div className="card-body d-flex align-items-center gap-3 p-3 bg-white">
-                    {item.productImageUrl ? (
+              {cartItems.map((item) => {
+                const rawUrl =
+                  item.productImageUrl ||
+                  item.imageUrl ||
+                  item.image_url ||
+                  item.thumbnailUrl;
+                const imageSrc = getImageUrl(rawUrl);
+
+                return (
+                  <div
+                    key={item.id}
+                    className="card cart-item-card mb-3 border-0 shadow-sm rounded-4 overflow-hidden"
+                  >
+                    <div className="card-body d-flex align-items-center gap-3 p-3 bg-white">
                       <img
-                        src={item.productImageUrl}
-                        alt={item.productName}
+                        src={imageSrc}
+                        alt={item.productName || "Product"}
                         className="product-thumb rounded-3 border"
                         style={{
                           width: "85px",
                           height: "85px",
                           objectFit: "contain",
                         }}
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = "https://placehold.co/100";
+                        }}
                       />
-                    ) : (
-                      <div
-                        className="product-thumb d-flex align-items-center justify-content-center text-muted border rounded-3 bg-light fw-medium text-center"
-                        style={{
-                          fontSize: "0.75rem",
-                          width: "85px",
-                          height: "85px",
-                        }}
-                      >
-                        No Image
-                      </div>
-                    )}
 
-                    <div className="flex-grow-1">
-                      <h6 className="mb-1 fw-bold text-dark">
-                        {item.productName}
-                      </h6>
-                      <div className="d-flex align-items-center gap-2">
-                        <span className="text-dark fw-semibold">
-                          ₹{item.price}
+                      <div className="flex-grow-1">
+                        <h6 className="mb-1 fw-bold text-dark">
+                          {item.productName}
+                        </h6>
+                        <div className="d-flex align-items-center gap-2">
+                          <span className="text-dark fw-semibold">
+                            ₹{item.price}
+                          </span>
+                          {item.inStock ? (
+                            <span
+                              className="badge rounded-pill fw-bold"
+                              style={{
+                                backgroundColor: "#E6F7EC",
+                                color: "#1E7B3B",
+                                fontSize: "0.7rem",
+                              }}
+                            >
+                              In Stock
+                            </span>
+                          ) : (
+                            <span
+                              className="badge rounded-pill fw-bold"
+                              style={{
+                                backgroundColor: "#FDECEC",
+                                color: "#C0392B",
+                                fontSize: "0.7rem",
+                              }}
+                            >
+                              Out of Stock
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="d-flex align-items-center gap-2 bg-light px-2 py-1 rounded-3 border">
+                        <button
+                          className="qty-btn btn p-0 border-0 fw-bold fs-5 d-flex align-items-center justify-content-center"
+                          style={{
+                            width: "24px",
+                            height: "24px",
+                            color: "#6c757d",
+                          }}
+                          onClick={() => {
+                            if (item.quantity === 1) {
+                              setItemToRemove(item);
+                            } else {
+                              handleUpdateQuantity(item.id, item.quantity - 1);
+                            }
+                          }}
+                        >
+                          −
+                        </button>
+                        <span
+                          className="fw-bold text-dark"
+                          style={{
+                            minWidth: "24px",
+                            textAlign: "center",
+                            fontSize: "0.95rem",
+                          }}
+                        >
+                          {item.quantity}
                         </span>
-                        {item.inStock ? (
-                          <span
-                            className="badge rounded-pill fw-bold"
-                            style={{
-                              backgroundColor: "#E6F7EC",
-                              color: "#1E7B3B",
-                              fontSize: "0.7rem",
-                            }}
-                          >
-                            In Stock
-                          </span>
-                        ) : (
-                          <span
-                            className="badge rounded-pill fw-bold"
-                            style={{
-                              backgroundColor: "#FDECEC",
-                              color: "#C0392B",
-                              fontSize: "0.7rem",
-                            }}
-                          >
-                            Out of Stock
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="d-flex align-items-center gap-2 bg-light px-2 py-1 rounded-3 border">
-                      <button
-                        className="qty-btn btn p-0 border-0 fw-bold fs-5 d-flex align-items-center justify-content-center"
-                        style={{
-                          width: "24px",
-                          height: "24px",
-                          color: "#6c757d",
-                        }}
-                        onClick={() => {
-                          if (item.quantity === 1) {
-                            setItemToRemove(item);
-                          } else {
-                            handleUpdateQuantity(item.id, item.quantity - 1);
+                        <button
+                          className="qty-btn btn p-0 border-0 fw-bold fs-5 d-flex align-items-center justify-content-center"
+                          style={{
+                            width: "24px",
+                            height: "24px",
+                            color: "#6c757d",
+                          }}
+                          onClick={() =>
+                            handleUpdateQuantity(item.id, item.quantity + 1)
                           }
-                        }}
+                        >
+                          +
+                        </button>
+                      </div>
+
+                      <div
+                        style={{ minWidth: "100px", textAlign: "right" }}
+                        className="px-2"
                       >
-                        −
-                      </button>
-                      <span
-                        className="fw-bold text-dark"
-                        style={{
-                          minWidth: "24px",
-                          textAlign: "center",
-                          fontSize: "0.95rem",
-                        }}
-                      >
-                        {item.quantity}
-                      </span>
+                        <strong className="fs-6 text-dark">
+                          ₹{item.lineTotal.toLocaleString("en-IN")}
+                        </strong>
+                      </div>
+
                       <button
-                        className="qty-btn btn p-0 border-0 fw-bold fs-5 d-flex align-items-center justify-content-center"
-                        style={{
-                          width: "24px",
-                          height: "24px",
-                          color: "#6c757d",
-                        }}
-                        onClick={() =>
-                          handleUpdateQuantity(item.id, item.quantity + 1)
-                        }
+                        className="btn btn-sm btn-outline-danger border-0 rounded-3 px-3 py-2 fw-medium"
+                        onClick={() => setItemToRemove(item)}
+                        style={{ transition: "all 0.2s" }}
                       >
-                        +
+                        Remove
                       </button>
                     </div>
-
-                    <div
-                      style={{ minWidth: "100px", textAlign: "right" }}
-                      className="px-2"
-                    >
-                      <strong className="fs-6 text-dark">
-                        ₹{item.lineTotal.toLocaleString("en-IN")}
-                      </strong>
-                    </div>
-
-                    <button
-                      className="btn btn-sm btn-outline-danger border-0 rounded-3 px-3 py-2 fw-medium"
-                      onClick={() => setItemToRemove(item)}
-                      style={{ transition: "all 0.2s" }}
-                    >
-                      Remove
-                    </button>
                   </div>
-                </div>
-              ))}
+                );
+              })}
 
               <button
                 className="btn btn-outline-secondary border-dashed rounded-3 mt-2 fw-semibold px-4 py-2 bg-white"

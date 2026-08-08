@@ -1,7 +1,42 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { signoutUser } from "../api/authApi";
+import { useCart } from "../context/CartContext";
 
 export default function Navbar() {
+  const navigate = useNavigate();
+  const [navSearch, setNavSearch] = useState("");
+  const { cartCount, wishlistCount } = useCart(); // 👈 Ready to catch wishlistCount if your context provides it!
+
+  useEffect(() => {
+    if (sessionStorage.getItem("showLogoutAlert") === "true") {
+      alert("Logged out successfully!");
+      sessionStorage.removeItem("showLogoutAlert");
+    }
+  }, []);
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (navSearch.trim()) {
+      navigate(`/search?query=${encodeURIComponent(navSearch.trim())}`);
+      setNavSearch("");
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signoutUser();
+    } catch (error) {
+      console.warn("Server cookie clearing failed:", error);
+    } finally {
+      localStorage.removeItem("jwtToken");
+      localStorage.removeItem("user");
+      sessionStorage.clear();
+      sessionStorage.setItem("showLogoutAlert", "true");
+      window.location.href = "/";
+    }
+  };
+
   return (
     <>
       <style>{`
@@ -9,67 +44,92 @@ export default function Navbar() {
           background: var(--cart-gradient, linear-gradient(135deg, #ff9142 0%, #ff5c00 100%));
           box-shadow: 0 8px 20px rgba(255, 92, 0, 0.18);
           border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+          backdrop-filter: blur(8px);
+          z-index: 1030;
         }
-
         .custom-navbar .navbar-brand {
           color: #ffffff !important;
           font-size: 1.35rem;
           letter-spacing: -0.3px;
         }
-
         .custom-navbar .nav-link {
           color: rgba(255, 255, 255, 0.88) !important;
           font-weight: 500;
           transition: color 0.2s ease;
         }
-
         .custom-navbar .nav-link:hover {
           color: #ffffff !important;
         }
-
+        .navbar-search-wrapper {
+          flex-grow: 1;
+          max-width: 600px;
+        }
+        .navbar-search-input {
+          border: 1px solid rgba(255, 255, 255, 0.4);
+          background: rgba(255, 255, 255, 0.2);
+          color: #ffffff;
+          border-radius: 20px 0 0 20px;
+          padding: 0.5rem 1.2rem;
+          outline: none;
+          width: 100%;
+        }
+        .navbar-search-input::placeholder {
+          color: rgba(255, 255, 255, 0.75);
+        }
+        .navbar-search-input:focus {
+          background: rgba(255, 255, 255, 0.3);
+          color: #ffffff;
+          box-shadow: none;
+        }
+        .navbar-search-btn {
+          border: 1px solid rgba(255, 255, 255, 0.4);
+          border-left: none;
+          background: rgba(255, 255, 255, 0.3);
+          color: #ffffff;
+          border-radius: 0 20px 20px 0;
+          padding: 0.5rem 1.2rem;
+        }
+        .navbar-search-btn:hover {
+          background: #ffffff;
+          color: #ff5c00;
+        }
         .navbar-btn-outline {
           border: 1px solid rgba(255, 255, 255, 0.5) !important;
           background: rgba(255, 255, 255, 0.1) !important;
           color: #ffffff !important;
           font-weight: 600;
-          backdrop-filter: blur(4px);
-          transition: all 0.2s ease;
         }
-
-        .navbar-btn-outline:hover {
-          background: rgba(255, 255, 255, 0.25) !important;
-          border-color: #ffffff !important;
-          transform: translateY(-1px);
-          color: #ffffff !important;
-        }
-
         .navbar-btn-solid {
           background: #ffffff !important;
           color: var(--cart-orange-dark, #ff5c00) !important;
           font-weight: 700;
-          border: 0 !important;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-          transition: all 0.2s ease;
         }
-
-        .navbar-btn-solid:hover {
-          background: #fff8f3 !important;
-          transform: translateY(-1px);
-          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-          color: var(--cart-orange-dark, #ff5c00) !important;
+        .navbar-btn-logout {
+          background: rgba(220, 53, 69, 0.2) !important;
+          border: 1px solid rgba(255, 255, 255, 0.3) !important;
+          color: #ffffff !important;
+          font-weight: 600;
         }
-
-        .custom-navbar .navbar-toggler {
-          border-color: rgba(255, 255, 255, 0.4);
+        .cart-badge, .wishlist-badge {
+          background-color: #ffffff;
+          font-size: 0.75rem;
+          font-weight: 700;
+          padding: 0.25rem 0.45rem;
+          border-radius: 50%;
+          line-height: 1;
+          margin-left: 2px;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
-
-        .custom-navbar .navbar-toggler:focus {
-          box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.25);
+        .cart-badge {
+          color: #ff5c00;
+        }
+        .wishlist-badge {
+          color: #dc3545; /* Crimson/red look for the wishlist number */
         }
       `}</style>
 
-      <nav className="navbar navbar-expand-lg navbar-dark custom-navbar mb-4 py-3">
-        <div className="container">
+      <nav className="navbar navbar-expand-lg navbar-dark custom-navbar sticky-top py-3">
+        <div className="container-fluid px-4">
           <Link
             className="navbar-brand fw-bold d-flex align-items-center gap-2"
             to="/"
@@ -82,15 +142,12 @@ export default function Navbar() {
             type="button"
             data-bs-toggle="collapse"
             data-bs-target="#navContent"
-            aria-controls="navContent"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
           >
             <span className="navbar-toggler-icon"></span>
           </button>
 
           <div className="collapse navbar-collapse" id="navContent">
-            <ul className="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3">
+            <ul className="navbar-nav mb-2 mb-lg-0 ms-lg-3">
               <li className="nav-item">
                 <Link className="nav-link px-3" to="/">
                   Home
@@ -98,19 +155,56 @@ export default function Navbar() {
               </li>
             </ul>
 
-            <div className="d-flex align-items-center gap-2 mt-3 mt-lg-0">
+            <div className="navbar-search-wrapper mx-auto my-2 my-lg-0 w-100 px-lg-4">
+              <form onSubmit={handleSearchSubmit} className="d-flex w-100">
+                <input
+                  type="text"
+                  className="form-control navbar-search-input"
+                  placeholder="Search items, brands, and categories..."
+                  value={navSearch}
+                  onChange={(e) => setNavSearch(e.target.value)}
+                />
+                <button className="btn navbar-search-btn" type="submit">
+                  🔍
+                </button>
+              </form>
+            </div>
+
+            <div className="d-flex align-items-center gap-2 mt-2 mt-lg-0">
+              {/* Added: Wishlist Button */}
+              <Link
+                to="/wishlist"
+                className="btn navbar-btn-outline rounded-3 px-3 py-2 d-inline-flex align-items-center gap-2"
+              >
+                <span>❤️</span> Wishlist
+                {wishlistCount > 0 && (
+                  <span className="wishlist-badge">{wishlistCount}</span>
+                )}
+              </Link>
+
               <Link
                 to="/cart"
-                className="btn navbar-btn-outline rounded-3 px-4 py-2 position-relative d-inline-flex align-items-center gap-2"
+                className="btn navbar-btn-outline rounded-3 px-3 py-2 d-inline-flex align-items-center gap-2"
               >
                 <span>🛒</span> Cart
+                {cartCount > 0 && (
+                  <span className="cart-badge">{cartCount}</span>
+                )}
               </Link>
+
               <Link
                 to="/dashboard"
-                className="btn navbar-btn-solid rounded-3 px-4 py-2 d-inline-flex align-items-center gap-2"
+                className="btn navbar-btn-solid rounded-3 px-3 py-2 d-inline-flex align-items-center gap-2"
               >
                 <span>👤</span> Account
               </Link>
+
+              <button
+                onClick={handleLogout}
+                className="btn navbar-btn-logout rounded-3 px-3 py-2 d-inline-flex align-items-center gap-2"
+              >
+                <span>🚪</span> Logout
+              </button>
             </div>
           </div>
         </div>
