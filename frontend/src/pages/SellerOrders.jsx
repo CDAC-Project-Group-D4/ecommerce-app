@@ -249,7 +249,7 @@ function SellerOrders() {
                                             <td>
                                                 <div style={{ fontWeight: "600", color: "#111827" }}>{item.customerName}</div>
                                                 {item.customerPhone && (
-                                                    <div style={{ fontSize: "11.5px", color: "#6b7280" }}>📞 {item.customerPhone}</div>
+                                                    <div style={{ fontSize: "11.5px", color: "#6b7280" }}>{item.customerPhone}</div>
                                                 )}
                                             </td>
                                             <td className="sd-cell-qty" style={{ fontWeight: "700" }}>{item.orderedQty}</td>
