@@ -3,6 +3,9 @@ import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { catalogApi, cartApi } from "../api/customerApi";
 import Navbar from "../components/Navbar";
 
+// Update this with your actual backend base URL if your server serves images dynamically
+const BACKEND_URL = "http://localhost:8080";
+
 export default function ProductDetails() {
   const { id } = useParams();
   const location = useLocation();
@@ -97,6 +100,24 @@ export default function ProductDetails() {
     );
   }
 
+  // --- Image Link & Fallback Parsing ---
+  // Safely checks database properties (supports both snake_case from DB and camelCase from React)
+  const rawImageUrl =
+    product.imageUrl ||
+    product.image_url ||
+    product.thumbnailUrl ||
+    product.thumbnail_url;
+
+  let imageSrc = "https://placehold.co/400";
+  if (rawImageUrl) {
+    // If the path is relative (starts with '/'), prepend the backend host URL
+    if (rawImageUrl.startsWith("/")) {
+      imageSrc = `${BACKEND_URL}${rawImageUrl}`;
+    } else {
+      imageSrc = rawImageUrl;
+    }
+  }
+
   return (
     <div style={{ backgroundColor: "#FAFAFA", minHeight: "100vh" }}>
       <Navbar />
@@ -176,12 +197,8 @@ export default function ProductDetails() {
           <div className="col-lg-6">
             <div className="product-image-container p-4 text-center">
               <img
-                src={
-                  product.imageUrl ||
-                  product.thumbnailUrl ||
-                  "https://placehold.co/400"
-                }
-                alt={product.name}
+                src={imageSrc}
+                alt={product.name || product.product_name || "Product"}
                 className="img-fluid rounded object-fit-contain"
                 style={{ maxHeight: "420px", width: "100%" }}
                 onError={(e) => {
@@ -210,7 +227,7 @@ export default function ProductDetails() {
               </div>
 
               <h2 className="fw-bold mb-2" style={{ color: "#211a17" }}>
-                {product.name}
+                {product.name || product.product_name}
               </h2>
 
               <div className="d-flex align-items-center gap-2 mb-3">

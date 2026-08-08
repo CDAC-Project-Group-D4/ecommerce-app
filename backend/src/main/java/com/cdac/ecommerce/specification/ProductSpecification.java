@@ -64,7 +64,7 @@ public class ProductSpecification {
                         Join<ProductAttributeValue, ProductAttribute> keyJoin = valueJoin.join("attribute");
 
                         Predicate matchKey = cb.equal(cb.lower(keyJoin.get("name")), attrName.toLowerCase());
-                        Predicate matchVal = cb.equal(cb.lower(valueJoin.get("value")), attrName.toLowerCase());
+                        Predicate matchVal = cb.equal(cb.lower(valueJoin.get("value")), attrValue.toLowerCase());
 
                         predicates.add(cb.and(matchKey, matchVal));
                     }

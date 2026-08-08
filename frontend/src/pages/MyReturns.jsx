@@ -1,18 +1,15 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getMyReturns } from "../api/returnApi";
+import Navbar from "../components/Navbar";
 import "../css/Returns.css";
 
 const getStatus = (request) => {
     const isReplacement = request.requestType === "REPLACE";
     const requestLabel = isReplacement ? "Replacement" : "Return";
 
-    if (request.adminDecision === "APPROVED") {
-        return `${requestLabel} Approved by Admin`;
-    }
-    if (request.adminDecision === "REJECTED") {
-        return `${requestLabel} Rejected by Admin`;
-    }
+    if (request.adminDecision === "APPROVED") return `${requestLabel} Approved by Admin`;
+    if (request.adminDecision === "REJECTED") return `${requestLabel} Rejected by Admin`;
     if (request.sellerDecision === "REJECTED") return "Under Admin Review";
     if (request.sellerDecision === "APPROVED") {
         return isReplacement
@@ -23,9 +20,7 @@ const getStatus = (request) => {
 };
 
 const getCustomerMessage = (request) => {
-    if (request.adminDecision === "REJECTED") {
-        return "The admin upheld the seller's rejection.";
-    }
+    if (request.adminDecision === "REJECTED") return "The admin upheld the seller's rejection.";
     if (request.adminDecision === "APPROVED") {
         return request.requestType === "REPLACE"
             ? "The admin approved your replacement request."
@@ -59,7 +54,9 @@ function MyReturns() {
     }, []);
 
     return (
-        <div className="returns-page">
+        <div style={{ backgroundColor: "#FAFAFA", minHeight: "100vh" }}>
+            <Navbar />
+            <div className="returns-page">
             <header className="returns-hero">
                 <h1>My Returns</h1>
                 <p>Track return, replacement, and refund decisions.</p>
@@ -104,9 +101,7 @@ function MyReturns() {
                                     ))}
                                 </div>
                             )}
-                            <p className="return-progress-message">
-                                {getCustomerMessage(request)}
-                            </p>
+                            <p className="return-progress-message">{getCustomerMessage(request)}</p>
                             {request.sellerNotes && <p>Seller: {request.sellerNotes}</p>}
                             {request.adminNotes && <p>Admin: {request.adminNotes}</p>}
                             {request.requestType === "RETURN" && request.refundAmount && (
@@ -122,6 +117,7 @@ function MyReturns() {
                     </article>
                 ))}
             </main>
+            </div>
         </div>
     );
 }
