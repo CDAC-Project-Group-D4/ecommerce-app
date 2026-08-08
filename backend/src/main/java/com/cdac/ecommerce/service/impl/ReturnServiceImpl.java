@@ -16,8 +16,10 @@ import com.cdac.ecommerce.exception.ResourceAlreadyExistsException;
 import com.cdac.ecommerce.exception.ResourceNotFoundException;
 import com.cdac.ecommerce.exception.ReturnRequestNotFoundException;
 import com.cdac.ecommerce.mapper.ReturnMapper;
+import com.cdac.ecommerce.entity.Product;
 import com.cdac.ecommerce.repository.OrderItemRepository;
 import com.cdac.ecommerce.repository.OrderRepository;
+import com.cdac.ecommerce.repository.ProductRepository;
 import com.cdac.ecommerce.repository.ReturnRequestRepo;
 import com.cdac.ecommerce.repository.UserRepo;
 import com.cdac.ecommerce.service.ReturnService;
@@ -56,6 +58,7 @@ public class ReturnServiceImpl implements ReturnService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final UserRepo userRepository;
+    private final ProductRepository productRepository;
     private final ReturnMapper returnMapper;
 
     @Override
@@ -131,6 +134,9 @@ public class ReturnServiceImpl implements ReturnService {
         } else {
             request.setRefundStatus(RefundStatus.NOT_APPLICABLE);
         }
+
+        item.setItemStatus(OrderStatus.RETURN_REQUESTED);
+        orderItemRepository.save(item);
 
         try {
             return returnMapper.toDto(returnRequestRepo.save(request));
@@ -223,14 +229,35 @@ public class ReturnServiceImpl implements ReturnService {
         request.setSellerNotes(dto.getNotes());
         request.setSellerDecidedAt(LocalDateTime.now());
 
-        if (request.getRequestType() == RequestType.RETURN) {
+        OrderItem item = request.getOrderItem();
+        if (item != null) {
             if (dto.getDecision() == Decision.APPROVED) {
-                request.setRefundStatus(RefundStatus.COMPLETED);
-                request.setRefundReference(
-                        "REF-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
+                item.setItemStatus(OrderStatus.RETURN_ACCEPTED);
+
+                if (request.getRequestType() == RequestType.RETURN) {
+                    request.setRefundStatus(RefundStatus.COMPLETED);
+                    request.setRefundReference(
+                            "REF-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
+
+                    Product product = item.getProduct();
+                    if (product != null) {
+                        int restoredStock = product.getStock() + item.getQuantity();
+                        product.setStock(restoredStock);
+                        if (restoredStock > 0 && product.getStore() != null && product.getStore().isActive()) {
+                            product.setActive(true);
+                        }
+                        productRepository.save(product);
+                    }
+                } else {
+                    request.setRefundStatus(RefundStatus.NOT_APPLICABLE);
+                }
             } else {
-                request.setRefundStatus(RefundStatus.REJECTED);
+                item.setItemStatus(OrderStatus.RETURN_REJECTED);
+                if (request.getRequestType() == RequestType.RETURN) {
+                    request.setRefundStatus(RefundStatus.REJECTED);
+                }
             }
+            orderItemRepository.save(item);
         }
 
         return returnMapper.toDto(returnRequestRepo.save(request));

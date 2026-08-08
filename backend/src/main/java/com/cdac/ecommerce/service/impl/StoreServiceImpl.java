@@ -305,8 +305,16 @@ public class StoreServiceImpl implements StoreService {
         Long storeId = store.getId();
         List<Order> orders = orderRepository.findOrdersByStoreId(storeId);
 
-        // Fix order status in DB if order items have sufficient stock
         for (Order order : orders) {
+            if (order.getOrderItems() != null) {
+                for (OrderItem item : order.getOrderItems()) {
+                    if (item.getItemStatus() == null) {
+                        item.setItemStatus(order.getOrderStatus() != null ? order.getOrderStatus() : OrderStatus.CONFIRMED);
+                        orderItemRepository.save(item);
+                    }
+                }
+            }
+
             if (order.getOrderStatus() == OrderStatus.PLACED || order.getOrderStatus() == OrderStatus.PENDING) {
                 boolean allInStock = true;
                 if (order.getOrderItems() != null && !order.getOrderItems().isEmpty()) {
@@ -332,17 +340,7 @@ public class StoreServiceImpl implements StoreService {
             if (order.getOrderItems() != null) {
                 List<OrderItemResponseDTO> storeOnlyItems = order.getOrderItems().stream()
                     .filter(item -> item.getProduct() != null && item.getProduct().getStore() != null && item.getProduct().getStore().getId().equals(storeId))
-                    .map(item -> {
-                        OrderItemResponseDTO itemDto = new OrderItemResponseDTO();
-                        itemDto.setOrderItemId(item.getId());
-                        itemDto.setProductId(item.getProduct().getId());
-                        itemDto.setProductName(item.getProduct().getName());
-                        itemDto.setProductImage(item.getProduct().getImageUrl());
-                        itemDto.setQuantity(item.getQuantity());
-                        itemDto.setPrice(item.getPrice());
-                        itemDto.setLineTotal(item.getLineTotal());
-                        return itemDto;
-                    })
+                    .map(orderMapper::toOrderItemResponseDTO)
                     .collect(Collectors.toList());
                 dto.setOrderItems(storeOnlyItems);
             }
@@ -350,6 +348,115 @@ public class StoreServiceImpl implements StoreService {
         }).collect(Collectors.toList());
     }
 
-    
-   
+    @Override
+    @Transactional
+    public OrderItemResponseDTO shipOrderItem(Long orderItemId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        String email = userDetails.getUsername();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        Store store = user.getStore();
+        if (store == null) {
+            throw new ResourceNotFoundException("Store not found for this user");
+        }
+
+        OrderItem orderItem = orderItemRepository.findById(orderItemId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order item not found with ID: " + orderItemId));
+
+        if (orderItem.getProduct() == null || orderItem.getProduct().getStore() == null ||
+                !orderItem.getProduct().getStore().getId().equals(store.getId())) {
+            throw new IllegalStateException("Unauthorized: This order item does not belong to your store.");
+        }
+
+        if (orderItem.getItemStatus() == OrderStatus.CANCELLED) {
+            throw new IllegalStateException("Cannot ship an order item that has been cancelled.");
+        }
+
+        orderItem.setItemStatus(OrderStatus.SHIPPED);
+        orderItem.setShippedAt(java.time.LocalDateTime.now());
+        OrderItem updatedItem = orderItemRepository.save(orderItem);
+
+        // Update parent order status to SHIPPED if all items are shipped or delivered
+        Order order = orderItem.getOrder();
+        if (order != null && order.getOrderItems() != null) {
+            boolean allShippedOrDelivered = order.getOrderItems().stream().allMatch(item ->
+                    item.getItemStatus() == OrderStatus.SHIPPED ||
+                    item.getItemStatus() == OrderStatus.DELIVERED ||
+                    item.getItemStatus() == OrderStatus.COMPLETED ||
+                    item.getItemStatus() == OrderStatus.CANCELLED
+            );
+            if (allShippedOrDelivered && order.getOrderStatus() != OrderStatus.CANCELLED) {
+                order.setOrderStatus(OrderStatus.SHIPPED);
+                if (order.getShippedAt() == null) {
+                    order.setShippedAt(java.time.LocalDateTime.now());
+                }
+                orderRepository.save(order);
+            }
+        }
+
+        return orderMapper.toOrderItemResponseDTO(updatedItem);
+    }
+
+    @Override
+    @Transactional
+    public OrderItemResponseDTO cancelOrderItemBySeller(Long orderItemId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        String email = userDetails.getUsername();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        Store store = user.getStore();
+        if (store == null) {
+            throw new ResourceNotFoundException("Store not found for this user");
+        }
+
+        OrderItem orderItem = orderItemRepository.findById(orderItemId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order item not found with ID: " + orderItemId));
+
+        if (orderItem.getProduct() == null || orderItem.getProduct().getStore() == null ||
+                !orderItem.getProduct().getStore().getId().equals(store.getId())) {
+            throw new IllegalStateException("Unauthorized: This order item does not belong to your store.");
+        }
+
+        if (orderItem.getItemStatus() == OrderStatus.CANCELLED) {
+            throw new IllegalStateException("This order item is already cancelled.");
+        }
+
+        if (orderItem.getItemStatus() == OrderStatus.SHIPPED ||
+                orderItem.getItemStatus() == OrderStatus.DELIVERED ||
+                orderItem.getItemStatus() == OrderStatus.COMPLETED) {
+            throw new IllegalStateException("Cannot cancel an item that is already shipped/delivered.");
+        }
+
+        orderItem.setItemStatus(OrderStatus.CANCELLED);
+        OrderItem updatedItem = orderItemRepository.save(orderItem);
+
+        // Restore product stock and reactivate product if active/stock > 0
+        Product product = orderItem.getProduct();
+        if (product != null) {
+            int restoredStock = product.getStock() + orderItem.getQuantity();
+            product.setStock(restoredStock);
+            if (restoredStock > 0 && product.getStore() != null && product.getStore().isActive()) {
+                product.setActive(true);
+            }
+            productRepository.save(product);
+        }
+
+        // If all items in parent order are CANCELLED, set order status to CANCELLED as well
+        Order order = orderItem.getOrder();
+        if (order != null && order.getOrderItems() != null) {
+            boolean allCancelled = order.getOrderItems().stream().allMatch(item ->
+                    item.getItemStatus() == OrderStatus.CANCELLED
+            );
+            if (allCancelled) {
+                order.setOrderStatus(OrderStatus.CANCELLED);
+                orderRepository.save(order);
+            }
+        }
+
+        return orderMapper.toOrderItemResponseDTO(updatedItem);
+    }
 }

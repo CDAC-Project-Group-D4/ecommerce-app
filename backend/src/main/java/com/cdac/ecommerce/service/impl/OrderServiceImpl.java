@@ -171,9 +171,12 @@ OrderServiceImpl implements OrderService {
 
         order.setOrderStatus(OrderStatus.CANCELLED);
 
-        // Restore product stock and reactivate product if stock becomes > 0
+        // Restore product stock and set itemStatus to CANCELLED for all items
         if (order.getOrderItems() != null) {
             for (OrderItem item : order.getOrderItems()) {
+                item.setItemStatus(OrderStatus.CANCELLED);
+                orderItemRepository.save(item);
+
                 Product product = item.getProduct();
                 if (product != null) {
                     int restoredStock = product.getStock() + item.getQuantity();

@@ -83,4 +83,14 @@ public class StoreController {
             @RequestParam(value = "profilePhoto", required = false) MultipartFile profilePhoto) {
         return ResponseEntity.ok(storeService.uploadMedia(banner, profilePhoto));
     }
+
+    @PutMapping("/orders/items/{orderItemId}/ship")
+    public ResponseEntity<com.cdac.ecommerce.dto.response.OrderItemResponseDTO> shipOrderItem(@PathVariable Long orderItemId) {
+        return ResponseEntity.ok(storeService.shipOrderItem(orderItemId));
+    }
+
+    @PutMapping("/orders/items/{orderItemId}/cancel")
+    public ResponseEntity<com.cdac.ecommerce.dto.response.OrderItemResponseDTO> cancelOrderItemBySeller(@PathVariable Long orderItemId) {
+        return ResponseEntity.ok(storeService.cancelOrderItemBySeller(orderItemId));
+    }
 }
