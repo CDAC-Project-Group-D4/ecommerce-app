@@ -73,9 +73,9 @@ const LogisticsMgmt = () => {
       setError(null);
       const response = await adminApi.getAllOrders();
 
-      const data = Array.isArray(response.data)
-        ? response.data
-        : response.data?.content || response.data?.data || [];
+      const data = Array.isArray(response)
+        ? response
+        : response?.content || response.data?.data || [];
 
       setOrders(data);
     } catch (err) {

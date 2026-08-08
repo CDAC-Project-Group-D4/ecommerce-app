@@ -4,14 +4,42 @@ import { getMyReturns } from "../api/returnApi";
 import "../css/Returns.css";
 
 const getStatus = (request) => {
-    if (request.adminDecision) return `Admin ${request.adminDecision}`;
+    const isReplacement = request.requestType === "REPLACE";
+    const requestLabel = isReplacement ? "Replacement" : "Return";
+
+    if (request.adminDecision === "APPROVED") {
+        return `${requestLabel} Approved by Admin`;
+    }
+    if (request.adminDecision === "REJECTED") {
+        return `${requestLabel} Rejected by Admin`;
+    }
     if (request.sellerDecision === "REJECTED") return "Under Admin Review";
     if (request.sellerDecision === "APPROVED") {
-        return request.requestType === "RETURN"
-            ? `Refund ${request.refundStatus}`
-            : "Replacement Approved";
+        return isReplacement
+            ? "Replacement Approved"
+            : `Refund ${request.refundStatus || "PENDING"}`;
     }
     return "Pending Seller Review";
+};
+
+const getCustomerMessage = (request) => {
+    if (request.adminDecision === "REJECTED") {
+        return "The admin upheld the seller's rejection.";
+    }
+    if (request.adminDecision === "APPROVED") {
+        return request.requestType === "REPLACE"
+            ? "The admin approved your replacement request."
+            : "The admin approved your return and refund.";
+    }
+    if (request.sellerDecision === "REJECTED") {
+        return "The seller rejected this request. It is waiting for admin review.";
+    }
+    if (request.sellerDecision === "APPROVED") {
+        return request.requestType === "REPLACE"
+            ? "The seller approved your replacement. Fulfilment details will appear when the backend replacement workflow is implemented."
+            : "The seller approved your return.";
+    }
+    return "Your request is waiting for the seller's decision.";
 };
 
 function MyReturns() {
@@ -76,9 +104,12 @@ function MyReturns() {
                                     ))}
                                 </div>
                             )}
+                            <p className="return-progress-message">
+                                {getCustomerMessage(request)}
+                            </p>
                             {request.sellerNotes && <p>Seller: {request.sellerNotes}</p>}
                             {request.adminNotes && <p>Admin: {request.adminNotes}</p>}
-                            {request.refundAmount && (
+                            {request.requestType === "RETURN" && request.refundAmount && (
                                 <div className="refund-box">
                                     Refund: ₹{request.refundAmount}
                                     {request.refundReference && ` · ${request.refundReference}`}

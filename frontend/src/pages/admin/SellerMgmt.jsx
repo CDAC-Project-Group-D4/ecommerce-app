@@ -44,9 +44,9 @@ export default function SellerMgmt() {
       // Fetch sellers directly from AdminSellerController
       const sellersRes = await adminApi.getSellers();
       console.log(sellersRes);
-      const sellersData = Array.isArray(sellersRes.data)
-        ? sellersRes.data
-        : sellersRes.data?.content || [];
+      const sellersData = Array.isArray(sellersRes)
+        ? sellersRes
+        : sellersRes?.content || [];
 
       setSellers(sellersData);
     } catch (err) {
@@ -301,7 +301,7 @@ export default function SellerMgmt() {
                     seller.storeName ||
                     "Vendor";
                   const isBlocked =
-                    seller.isBlocked === true ||
+                    seller.blocked === true ||
                     seller.status === "BLOCKED" ||
                     seller.status === "Blocked";
 

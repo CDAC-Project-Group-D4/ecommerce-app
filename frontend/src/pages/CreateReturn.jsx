@@ -4,10 +4,12 @@ import { getOrder } from "../api/orderApi";
 import { createReturnRequest } from "../api/returnApi";
 import "../css/Returns.css";
 
-const isWithinReturnWindow = (order) => {
-    if (!["DELIVERED", "COMPLETED"].includes(order?.orderStatus)) return false;
-    if (!order?.deliveredAt) return false;
-    const deadline = new Date(order.deliveredAt);
+const isWithinReturnWindow = (item) => {
+    const status = item?.itemStatus?.toUpperCase();
+
+    if (!["DELIVERED", "COMPLETED"].includes(status)) return false;
+    if (!item?.deliveredAt) return false;
+    const deadline = new Date(item.deliveredAt);
     deadline.setDate(deadline.getDate() + 7);
     return new Date() <= deadline;
 };
@@ -39,16 +41,17 @@ function CreateReturn() {
 
             try {
                 const order = await getOrder(orderId);
-                if (!isWithinReturnWindow(order)) {
-                    setError("The 7-day return window is closed for this order.");
-                    return;
-                }
-
                 const matchedItem = order.orderItems.find(
                     (orderItem) => String(orderItem.orderItemId) === String(orderItemId)
                 );
                 if (!matchedItem) {
                     setError("This item does not belong to the selected order.");
+                    return;
+                }
+                if (!isWithinReturnWindow(matchedItem)) {
+                    setError(
+                        "Replacement is available only for a delivered item within 7 days of delivery."
+                    );
                     return;
                 }
                 setItem(matchedItem);
@@ -87,7 +90,12 @@ function CreateReturn() {
             await createReturnRequest(formData);
             navigate("/returns", {
                 replace: true,
-                state: { message: "Return request submitted successfully." }
+                state: {
+                    message:
+                        requestType === "REPLACE"
+                            ? "Replacement request submitted successfully."
+                            : "Return request submitted successfully."
+                }
             });
         } catch (requestError) {
             setError(
@@ -216,8 +224,8 @@ function CreateReturn() {
 
                     <div className="return-form-hint">
                         {requestType === "RETURN"
-                            ? "An approved return receives a simulated refund for this item's total."
-                            : "An approved replacement does not create a refund."}
+                            ? "If approved, a simulated refund will be created for this item's total."
+                            : "If approved, the seller will process a replacement. No refund is created."}
                     </div>
 
                     {error && <div className="return-error" role="alert">{error}</div>}

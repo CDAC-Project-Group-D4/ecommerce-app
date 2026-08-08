@@ -10,6 +10,32 @@ import { getMyReturns } from "../api/returnApi";
 import "../css/OrderDetails.css";
 import "../css/Returns.css";
 
+const getRequestStatus = (request) => {
+    if (request.adminDecision === "APPROVED") {
+        return request.requestType === "REPLACE"
+            ? "Replacement approved by admin"
+            : "Return approved by admin";
+    }
+
+    if (request.adminDecision === "REJECTED") {
+        return `${request.requestType === "REPLACE" ? "Replacement" : "Return"} rejected by admin`;
+    }
+
+    if (request.sellerDecision === "APPROVED") {
+        return request.requestType === "REPLACE"
+            ? "Replacement approved"
+            : `Return approved · Refund ${request.refundStatus || "PENDING"}`;
+    }
+
+    if (request.sellerDecision === "REJECTED") {
+        return "Under admin review";
+    }
+
+    return request.requestType === "REPLACE"
+        ? "Replacement requested"
+        : "Return requested";
+};
+
 function OrderDetails() {
 
     const { orderId } = useParams();
@@ -150,7 +176,14 @@ function OrderDetails() {
 
                                 {
 
-                                    order.orderItems.map(item => (
+                                    order.orderItems.map((item) => {
+                                        const existingRequest = myReturns.find(
+                                            (request) =>
+                                                String(request.orderItemId) ===
+                                                String(item.orderItemId)
+                                        );
+
+                                        return (
 
                                         <div
                                             key={item.orderItemId}
@@ -229,14 +262,10 @@ function OrderDetails() {
                                                 {
                                                     isItemDelivered(item) &&
                                                     (
-                                                        myReturns.some(
-                                                            (request) =>
-                                                                String(request.orderItemId) ===
-                                                                String(item.orderItemId)
-                                                        )
+                                                        existingRequest
                                                             ?
                                                             <span className="return-requested-badge">
-                                                                Return requested
+                                                                {getRequestStatus(existingRequest)}
                                                             </span>
                                                             :
                                                             isItemReturnWindowOpen(item)
@@ -252,7 +281,7 @@ function OrderDetails() {
                                                                 </button>
                                                                 :
                                                                 <span className="return-window-closed">
-                                                                    Return window closed
+                                                                    Return/replacement window closed
                                                                 </span>
                                                     )
                                                 }
@@ -261,7 +290,8 @@ function OrderDetails() {
 
                                         </div>
 
-                                    ))
+                                        );
+                                    })
 
                                 }
 

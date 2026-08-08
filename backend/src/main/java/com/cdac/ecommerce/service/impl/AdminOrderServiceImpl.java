@@ -56,8 +56,16 @@ public class AdminOrderServiceImpl implements AdminOrderService {
                 .findById(id)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found"));
 
-        if(order.getOrderStatus().equals(OrderStatus.SHIPPED)){
+        if (order.getOrderStatus() == OrderStatus.SHIPPED) {
             order.setOrderStatus(OrderStatus.OUT_FOR_DELIVERY);
+
+            order.getOrderItems().forEach(item -> {
+                if (item.getItemStatus() == OrderStatus.SHIPPED) {
+                    item.setItemStatus(OrderStatus.OUT_FOR_DELIVERY);
+                }
+            });
+
+            orderRepository.save(order);
             return true;
         }
 
@@ -79,9 +87,20 @@ public class AdminOrderServiceImpl implements AdminOrderService {
                 .findById(id)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found"));
 
-        if(order.getOrderStatus().equals(OrderStatus.OUT_FOR_DELIVERY)){
+        if (order.getOrderStatus() == OrderStatus.OUT_FOR_DELIVERY) {
+            LocalDateTime deliveredAt = LocalDateTime.now();
+
             order.setOrderStatus(OrderStatus.DELIVERED);
-            order.setDeliveredAt(LocalDateTime.now());
+            order.setDeliveredAt(deliveredAt);
+
+            order.getOrderItems().forEach(item -> {
+                if (item.getItemStatus() == OrderStatus.OUT_FOR_DELIVERY) {
+                    item.setItemStatus(OrderStatus.DELIVERED);
+                    item.setDeliveredAt(deliveredAt);
+                }
+            });
+
+            orderRepository.save(order);
             return true;
         }
 
