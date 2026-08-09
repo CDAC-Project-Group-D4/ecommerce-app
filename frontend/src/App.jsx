@@ -36,6 +36,7 @@ import AdminLayout from "./layout/AdminLayout.jsx";
 import AdminComplaints from "./pages/admin/AdminComplaints.jsx";
 import CustomerDashboard from "./pages/CustomerDashboard.jsx";
 import SearchResults from "./pages/SearchResult.jsx";
+import AIChatbot from "./components/customerComponents/AIChatbot.jsx";
 
 function App() {
   return (
@@ -83,6 +84,7 @@ function App() {
           <Route path="/seller/returns" element={<SellerReturns />} />
         </Route>
       </Routes>
+      <AIChatbot />
     </div>
   );
 }

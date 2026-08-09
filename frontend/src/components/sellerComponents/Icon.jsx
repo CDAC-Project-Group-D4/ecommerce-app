@@ -75,6 +75,14 @@ function Icon({ name, size = 18 }) {
             return (<svg {...props}><circle cx="12" cy="8" r="4" /><path d="M4 20a8 8 0 0 1 16 0" /></svg>);
         case "plus":
             return (<svg {...props}><path d="M12 5v14M5 12h14" /></svg>);
+        case "sparkles":
+            return (<svg {...props}><path d="m12 3-1.9 5.8L4.3 10.7l5.8 1.9L12 18.4l1.9-5.8 5.8-1.9-5.8-1.9L12 3Z" /><path d="M5 3v4M3 5h4M19 17v4M17 19h4" /></svg>);
+        case "bot":
+            return (<svg {...props}><path d="M12 2v2M12 8a4 4 0 0 1 4 4v5a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2v-5a4 4 0 0 1 4-4Z" /><path d="M6 12H4a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2M18 12h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2" /><circle cx="10" cy="13" r="1" fill="currentColor" /><circle cx="14" cy="13" r="1" fill="currentColor" /></svg>);
+        case "send":
+            return (<svg {...props}><path d="m22 2-7 20-4-9-9-4Z" /><path d="M22 2 11 13" /></svg>);
+        case "close":
+            return (<svg {...props}><path d="M18 6 6 18M6 6l12 12" /></svg>);
         default:
             return null;
     }
