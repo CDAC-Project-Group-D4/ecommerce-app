@@ -2,11 +2,17 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { signoutUser } from "../api/authApi";
 import { useCart } from "../context/CartContext";
+import { getCurrentUser } from "../utils/authhelper";
+import Icon from "./sellerComponents/Icon";
 
 export default function Navbar() {
   const navigate = useNavigate();
   const [navSearch, setNavSearch] = useState("");
-  const { cartCount, wishlistCount } = useCart(); // 👈 Ready to catch wishlistCount if your context provides it!
+  const { cartCount, wishlistCount } = useCart();
+
+  const currentUser = getCurrentUser();
+  const roleStr = String(currentUser?.role || currentUser?.roles?.[0] || "").toUpperCase();
+  const isSeller = roleStr.includes("SELLER");
 
   useEffect(() => {
     if (sessionStorage.getItem("showLogoutAlert") === "true") {
@@ -99,6 +105,17 @@ export default function Navbar() {
           color: #ffffff !important;
           font-weight: 600;
         }
+        .navbar-btn-seller {
+          border: 1px solid rgba(255, 255, 255, 0.6) !important;
+          background: rgba(255, 255, 255, 0.18) !important;
+          color: #ffffff !important;
+          font-weight: 600;
+          transition: all 0.2s ease;
+        }
+        .navbar-btn-seller:hover {
+          background: #ffffff !important;
+          color: #ff5c00 !important;
+        }
         .navbar-btn-solid {
           background: #ffffff !important;
           color: var(--cart-orange-dark, #ff5c00) !important;
@@ -124,7 +141,7 @@ export default function Navbar() {
           color: #ff5c00;
         }
         .wishlist-badge {
-          color: #dc3545; /* Crimson/red look for the wishlist number */
+          color: #dc3545;
         }
       `}</style>
 
@@ -134,7 +151,7 @@ export default function Navbar() {
             className="navbar-brand fw-bold d-flex align-items-center gap-2"
             to="/"
           >
-            <span>🛒</span> ApnaKart
+            <Icon name="cart-fill" size={22} /> ApnaKart
           </Link>
 
           <button
@@ -164,19 +181,27 @@ export default function Navbar() {
                   value={navSearch}
                   onChange={(e) => setNavSearch(e.target.value)}
                 />
-                <button className="btn navbar-search-btn" type="submit">
-                  🔍
+                <button className="btn navbar-search-btn d-flex align-items-center justify-content-center" type="submit">
+                  <Icon name="search" size={16} />
                 </button>
               </form>
             </div>
 
             <div className="d-flex align-items-center gap-2 mt-2 mt-lg-0">
-              {/* Added: Wishlist Button */}
+              {/* Seller Login / Seller Dashboard Button */}
+              <Link
+                to={isSeller ? "/seller/dashboard" : "/signin"}
+                className="btn navbar-btn-seller rounded-3 px-3 py-2 d-inline-flex align-items-center gap-2"
+              >
+                <Icon name="store" size={16} /> {isSeller ? "Seller Dashboard" : "Seller Login"}
+              </Link>
+
+              {/* Wishlist Button */}
               <Link
                 to="/wishlist"
                 className="btn navbar-btn-outline rounded-3 px-3 py-2 d-inline-flex align-items-center gap-2"
               >
-                <span>❤️</span> Wishlist
+                <Icon name="heart" size={24} />
                 {wishlistCount > 0 && (
                   <span className="wishlist-badge">{wishlistCount}</span>
                 )}
@@ -186,7 +211,7 @@ export default function Navbar() {
                 to="/cart"
                 className="btn navbar-btn-outline rounded-3 px-3 py-2 d-inline-flex align-items-center gap-2"
               >
-                <span>🛒</span> Cart
+                <Icon name="cart" size={16} /> Cart
                 {cartCount > 0 && (
                   <span className="cart-badge">{cartCount}</span>
                 )}
@@ -196,14 +221,14 @@ export default function Navbar() {
                 to="/dashboard"
                 className="btn navbar-btn-solid rounded-3 px-3 py-2 d-inline-flex align-items-center gap-2"
               >
-                <span>👤</span> Account
+                <Icon name="user" size={16} /> Account
               </Link>
 
               <button
                 onClick={handleLogout}
                 className="btn navbar-btn-logout rounded-3 px-3 py-2 d-inline-flex align-items-center gap-2"
               >
-                <span>🚪</span> Logout
+                <Icon name="logout" size={16} /> Logout
               </button>
             </div>
           </div>

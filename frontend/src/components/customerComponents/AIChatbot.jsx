@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { sendAIChatQuery } from "../../api/aiApi";
 import { getCurrentUser } from "../../utils/authhelper";
+import Icon from "../sellerComponents/Icon";
 import "./AIChatbot.css";
 
 function AIChatbot() {
@@ -40,16 +41,16 @@ function AIChatbot() {
         return null;
     }
 
-    // 3. Must be signed in (Token exists)
+    // 3. Must be Signed In (Token Authentication Verification)
     const token = localStorage.getItem("jwtToken") || localStorage.getItem("token");
     if (!token) {
         return null;
     }
 
-    // 4. Must be a Customer (Hide for Admin & Seller roles)
+    // 4. Must be a Customer (Role Verification - Hide for Admin & Seller)
     const user = getCurrentUser();
-    const role = (user?.role || "").toUpperCase();
-    if (role === "ADMIN" || role === "SELLER") {
+    const roleStr = String(user?.role || user?.roles?.[0] || "").toUpperCase();
+    if (roleStr.includes("ADMIN") || roleStr.includes("SELLER")) {
         return null;
     }
 
@@ -86,7 +87,7 @@ function AIChatbot() {
             {/* Launcher Button */}
             {!isOpen && (
                 <button className="ai-chatbot-launcher" onClick={() => setIsOpen(true)}>
-                    <span className="ai-sparkle-icon"></span> ApkaCart AI
+                    <Icon name="sparkles" size={18} /> ApkaCart AI
                 </button>
             )}
 
@@ -95,10 +96,10 @@ function AIChatbot() {
                 <div className="ai-chat-window">
                     <div className="ai-chat-header">
                         <div className="ai-chat-header-title">
-                            <span className="ai-header-sparkle"></span> ApkaCart AI Assistant
+                            <Icon name="bot" size={20} /> ApkaCart AI Assistant
                         </div>
                         <button className="ai-chat-close-btn" onClick={() => setIsOpen(false)}>
-                            ✕
+                            <Icon name="close" size={16} />
                         </button>
                     </div>
 
@@ -111,7 +112,7 @@ function AIChatbot() {
 
                         {loading && (
                             <div className="ai-bubble typing">
-                                Searching database catalog...
+                                <Icon name="sparkles" size={14} /> Searching database catalog...
                             </div>
                         )}
 
@@ -144,7 +145,7 @@ function AIChatbot() {
                             onClick={() => handleSend()}
                             disabled={loading || !input.trim()}
                         >
-                            Send
+                            <Icon name="send" size={16} />
                         </button>
                     </div>
                 </div>
