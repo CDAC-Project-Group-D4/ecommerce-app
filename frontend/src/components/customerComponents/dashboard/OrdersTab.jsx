@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { orderApi } from "../../../api/customerApi";
 
 const formatStatus = (status) => status?.replaceAll("_", " ");
@@ -21,6 +22,7 @@ const getStatusStyle = (status) => {
 };
 
 export function OrdersTab() {
+  const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [cancellingId, setCancellingId] = useState(null);
@@ -207,7 +209,14 @@ export function OrdersTab() {
                       })}
                     </strong>
                   </p>
-
+                  <button
+                    type="button"
+                    className="btn btn-warning fw-semibold"
+                    onClick={() => navigate(`/orders/${currentOrderId}`)}
+                    aria-label={`View details for order ${currentOrderId}`}
+                  >
+                    Order Details
+                  </button>
                 </div>
               </div>
             </div>
