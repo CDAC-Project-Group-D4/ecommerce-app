@@ -193,7 +193,7 @@ export default function Navbar() {
                 to={isSeller ? "/seller/dashboard" : "/signin"}
                 className="btn navbar-btn-seller rounded-3 px-3 py-2 d-inline-flex align-items-center gap-2"
               >
-                <Icon name="store" size={16} /> {isSeller ? "Seller Dashboard" : "Seller Login"}
+                <Icon name="store" size={16} /> {isSeller ? "Seller Dashboard" : "Login"}
               </Link>
 
               {/* Wishlist Button */}
