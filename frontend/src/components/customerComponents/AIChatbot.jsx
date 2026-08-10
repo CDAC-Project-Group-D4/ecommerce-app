@@ -11,7 +11,7 @@ function AIChatbot() {
     const [messages, setMessages] = useState([
         {
             sender: "bot",
-            text: "Hi! I am ApkaCart AI, your database-aware shopping assistant. Ask me to suggest top brands, products, or budget recommendations!"
+            text: "Hi! I am ApnaCart AI, your database-aware shopping assistant. Ask me to suggest top brands, products, or budget recommendations!"
         }
     ]);
     const [input, setInput] = useState("");
@@ -87,7 +87,7 @@ function AIChatbot() {
             {/* Launcher Button */}
             {!isOpen && (
                 <button className="ai-chatbot-launcher" onClick={() => setIsOpen(true)}>
-                    <Icon name="sparkles" size={18} /> ApkaCart AI
+                    <Icon name="sparkles" size={18} /> ApnaCart AI
                 </button>
             )}
 
